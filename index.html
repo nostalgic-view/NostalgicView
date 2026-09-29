@@ -1,0 +1,2978 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nostalgic View</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 12px;
+    color: #1a2a3a;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 40%),
+      radial-gradient(circle at 15% 80%, rgba(140,220,120,.55) 0%, rgba(140,220,120,0) 40%),
+      radial-gradient(circle at 85% 75%, rgba(140,220,120,.5) 0%, rgba(140,220,120,0) 45%),
+      radial-gradient(circle at 25% 15%, rgba(255,255,255,.7) 0%, rgba(255,255,255,0) 25%),
+      radial-gradient(circle at 75% 20%, rgba(255,255,255,.6) 0%, rgba(255,255,255,0) 22%),
+      linear-gradient(180deg, #7ec8f2 0%, #a8dcf7 30%, #d8eefb 55%, #d8f0c0 75%, #9ed678 100%);
+    background-attachment: fixed;
+  }
+
+  a { color: #0a4a8a; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .wrap {
+    max-width: 1100px;
+    margin: 16px auto;
+    background: linear-gradient(180deg, rgba(255,255,255,.95) 0%, rgba(235,245,252,.92) 100%);
+    border: 1px solid rgba(255,255,255,.9);
+    border-radius: 14px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,1) inset,
+      0 -1px 0 rgba(0,0,0,.08) inset,
+      0 10px 30px rgba(20,60,100,.35),
+      0 2px 6px rgba(0,0,0,.15);
+  }
+
+  /* ===== ШАПКА ===== */
+  .top {
+    position: relative;
+    height: 70px;
+    padding: 0 16px;
+    background:
+      linear-gradient(180deg,
+        rgba(255,255,255,.95) 0%,
+        rgba(220,238,250,.9) 45%,
+        rgba(180,215,240,.85) 50%,
+        rgba(150,195,230,.9) 100%);
+    border-bottom: 1px solid #6a90b8;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,1),
+      inset 0 -1px 0 rgba(255,255,255,.4),
+      0 1px 3px rgba(0,0,0,.15);
+    border-radius: 13px 13px 0 0;
+    overflow: visible;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+  }
+  .top::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,.85) 0%,
+      rgba(255,255,255,.25) 60%,
+      rgba(255,255,255,0) 100%);
+    pointer-events: none;
+    border-radius: 13px 13px 0 0;
+  }
+  .top::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 3px;
+    background: linear-gradient(90deg,
+      rgba(120,200,255,0) 0%,
+      rgba(120,200,255,.9) 20%,
+      rgba(180,230,255,1) 50%,
+      rgba(120,200,255,.9) 80%,
+      rgba(120,200,255,0) 100%);
+    filter: blur(.4px);
+    pointer-events: none;
+  }
+
+  .logo-box {
+    position: relative;
+    z-index: 3;
+    width: 52px;
+    height: 52px;
+    margin-right: 14px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #1a5a9a;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #9ed8f8 0%, #4a9ee0 48%, #1e6cb8 52%, #0d3f7a 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 -3px 6px rgba(0,0,0,.35),
+      0 3px 6px rgba(10,50,100,.45),
+      0 0 0 1px rgba(255,255,255,.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Georgia, serif;
+    font-weight: bold;
+    font-size: 11px;
+    color: #fff;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.5);
+  }
+  .logo-box img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  .tab-name {
+    position: relative;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 20px 6px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 26px;
+    font-weight: bold;
+    font-style: italic;
+    letter-spacing: .5px;
+    color: #0d3f7a;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,.95),
+      0 2px 0 rgba(255,255,255,.6),
+      0 3px 4px rgba(20,60,100,.25);
+    white-space: nowrap;
+    outline: none;
+  }
+  .tab-name:focus { outline: none; }
+
+  .tab {
+    position: absolute;
+    top: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 0 22px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: #1a4a7a;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+    cursor: pointer;
+    white-space: nowrap;
+    border: 1px solid #6a90b8;
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    background: linear-gradient(180deg, #b8d8f0 0%, #dceaf6 40%, #eef5fb 50%, #c8def0 100%);
+    box-shadow:
+      inset 0 2px 4px rgba(255,255,255,.9),
+      inset 0 -4px 8px rgba(120,160,200,.3),
+      0 3px 6px rgba(20,60,100,.2),
+      0 0 0 1px rgba(255,255,255,.5);
+    overflow: hidden;
+    transition: background .2s, box-shadow .2s, height .2s;
+    margin-left: -1px;
+    z-index: 2;
+  }
+  .tab::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 3px; right: 3px;
+    height: 45%;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,.95) 0%,
+      rgba(255,255,255,.4) 60%,
+      rgba(255,255,255,0) 100%);
+    border-radius: 0 0 60% 60% / 0 0 20px 20px;
+    pointer-events: none;
+  }
+  .tab:hover {
+    background: linear-gradient(180deg, #c8e4f8 0%, #eaf4fc 40%, #f8fcff 50%, #d8eaf8 100%);
+  }
+  .tab.active {
+    height: 36px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 60%),
+      linear-gradient(180deg, #ffffff 0%, #f4faff 50%, #e4f0fc 100%);
+    color: #0a4a8a;
+    box-shadow:
+      inset 0 2px 4px rgba(255,255,255,1),
+      inset 0 -2px 4px rgba(120,160,200,.15),
+      0 4px 10px rgba(20,60,100,.25),
+      0 0 0 1px rgba(255,255,255,.8);
+    z-index: 4;
+  }
+  .tab[data-tab="games"]  { left: 300px; }
+  .tab[data-tab="chat"]   { left: 400px; }
+  .tab[data-tab="donate"] { left: 490px; }
+
+  /* ===== ПРЯНИКИ + ПРАВЫЙ УГОЛ ===== */
+  .top-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    z-index: 3;
+    padding: 0 4px;
+  }
+  .top-right .user { margin-left: 0; padding: 0; }
+
+  .pryanik-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 18px;
+    border: 1px solid #8a5a10;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    color: #3a2400;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #ffe9a8 0%, #f7c95c 45%, #d9a534 55%, #a07620 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 -4px 8px -4px rgba(0,0,0,.5),
+      0 2px 5px rgba(120,80,10,.4);
+    transition: filter .15s, transform .05s;
+  }
+  .pryanik-chip:hover { filter: brightness(1.08); }
+  .pryanik-chip:active { filter: brightness(.9); transform: translateY(1px); }
+  .pryanik-chip .p-count { min-width: 20px; text-align: right; }
+  .pryanik-chip img {
+    width: 22px; height: 22px;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,.3));
+  }
+
+  .user {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 4px;
+  }
+  .user .uname {
+    font-weight: bold;
+    color: #0d3f7a;
+    font-size: 13px;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .logout-x {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid #6b1410;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.7) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #f8c4bc 0%, #e0675a 45%, #b32a1e 55%, #6b1410 100%);
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 -4px 8px -4px rgba(0,0,0,.5),
+      0 2px 4px rgba(100,20,10,.4);
+    text-shadow: 0 -1px 0 rgba(0,0,0,.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-family: inherit;
+  }
+  .logout-x:hover { filter: brightness(1.1); }
+  .logout-x:active { filter: brightness(.85); transform: translateY(1px); }
+
+  .avatar-wrap {
+    position: relative;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: 1px solid #1a5a9a;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #9ed8f8 0%, #4a9ee0 48%, #1e6cb8 52%, #0d3f7a 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 -3px 6px rgba(0,0,0,.35),
+      0 2px 5px rgba(10,50,100,.4);
+    overflow: hidden;
+  }
+  .avatar-wrap:hover { filter: brightness(1.08); }
+  .avatar-wrap img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .avatar-wrap.empty::after {
+    content: attr(data-initial);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    font-family: Georgia, serif;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.5);
+  }
+  .avatar-wrap::before {
+    content: "";
+    position: absolute;
+    top: 2px; left: 4px; right: 4px;
+    height: 45%;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,.55) 0%,
+      rgba(255,255,255,0) 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* ===== ОСНОВНАЯ ЧАСТЬ ===== */
+  .main {
+    display: flex;
+    padding-top: 42px;
+    min-height: 780px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .left {
+    width: 240px;
+    flex-shrink: 0;
+    position: relative;
+    padding: 12px;
+    background:
+      linear-gradient(180deg,
+        rgba(255,255,255,.5) 0%,
+        rgba(220,235,250,.15) 25%,
+        rgba(180,210,240,.1) 50%,
+        rgba(220,235,250,.15) 75%,
+        rgba(255,255,255,.45) 100%),
+      repeating-linear-gradient(45deg,
+        #c9d1da, #c9d1da 10px,
+        #b8c2ce 10px, #b8c2ce 20px);
+    border-right: 1px solid #6a90b8;
+    box-shadow:
+      inset 1px 0 0 rgba(255,255,255,.7),
+      inset -1px 0 0 rgba(0,0,0,.2),
+      inset 0 0 40px rgba(120,160,200,.2);
+    overflow: hidden;
+  }
+
+  .fon-frame {
+    position: relative;
+    width: 100%;
+    min-height: 756px;
+    height: 100%;
+    padding: 3px;
+    border-radius: 14px;
+    background: linear-gradient(180deg,
+      #b8dcf2 0%,
+      #6cb3e3 30%,
+      #2c76b8 55%,
+      #1a5a9a 80%,
+      #0d3f7a 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 -1px 0 rgba(0,0,0,.3),
+      0 0 0 1px rgba(255,255,255,.4),
+      0 8px 20px rgba(10,50,100,.45),
+      0 0 24px rgba(120,200,255,.45),
+      0 0 40px rgba(120,200,255,.2);
+  }
+  .fon-frame img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 750px;
+    object-fit: cover;
+    border-radius: 11px;
+    filter: blur(1.2px) saturate(1.05) brightness(1.03);
+    transform: scale(1.02);
+  }
+  .fon-frame::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 11px;
+    background: radial-gradient(ellipse at 50% 50%,
+      rgba(230,240,250,0) 45%,
+      rgba(230,240,250,.4) 100%);
+    pointer-events: none;
+  }
+
+  .content {
+    flex: 1;
+    min-width: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,.98) 0%, rgba(240,248,255,.96) 100%);
+    padding: 20px 26px;
+    min-height: 780px;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .panel h2 {
+    margin: 0 0 16px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 24px;
+    font-weight: bold;
+    color: #0d3f7a;
+    padding: 0 0 10px;
+    border-bottom: 1px solid #c8dcec;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+    position: relative;
+  }
+  .panel h2::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 1px;
+    background: linear-gradient(90deg,
+      rgba(120,200,255,0) 0%, rgba(120,200,255,.7) 20%, rgba(120,200,255,.3) 100%);
+  }
+
+  /* ===== ИГРЫ ===== */
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .game-card {
+    border: 1px solid #a8c4dc;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(245,250,255,1) 0%, rgba(232,242,252,1) 100%);
+    padding: 14px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 2px 6px rgba(120,160,200,.15);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: box-shadow .2s, transform .15s;
+  }
+  .game-card:hover {
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 6px 16px rgba(120,160,200,.3);
+    transform: translateY(-2px);
+  }
+  .game-cover {
+    height: 150px;
+    border-radius: 8px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.45) 0%, transparent 60%),
+      linear-gradient(135deg, #1a1a1a 0%, #2c3e50 55%, #1a1a1a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 26px;
+    font-weight: bold;
+    letter-spacing: 5px;
+    text-shadow: 0 2px 6px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.1);
+    border: 1px solid #1a5a9a;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.3),
+      inset 0 -8px 16px rgba(0,0,0,.45),
+      0 2px 5px rgba(10,50,100,.4);
+    position: relative;
+    overflow: hidden;
+  }
+  .game-cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+  }
+  .game-cover::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,.25) 0%,
+      rgba(255,255,255,0) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .game-cover::after {
+    content: "NEW";
+    position: absolute;
+    top: 8px; right: 8px;
+    background: linear-gradient(180deg, #f8c4bc 0%, #e0675a 45%, #b32a1e 55%, #6b1410 100%);
+    color: #fff;
+    font-family: Tahoma, Verdana, sans-serif;
+    font-size: 9px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #6b1410;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.5);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+    z-index: 3;
+  }
+  /* если логотип не найден — прячем NEW-бейдж и показываем текст */
+  .game-cover.no-logo::after { display: none; }
+  .game-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #0d3f7a;
+    letter-spacing: .5px;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+  }
+  .game-desc { font-size: 12px; color: #4a6a8a; line-height: 1.5; }
+  .game-meta { font-size: 10px; color: #7a94b0; text-transform: uppercase; letter-spacing: .5px; font-weight: bold; }
+  .game-card .aero-btn { align-self: flex-start; margin-top: 4px; }
+
+  /* ===== ПАНЕЛЬ ИГРЫ ===== */
+  .game-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #c8dcec;
+    position: relative;
+  }
+  .game-panel-head::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 1px;
+    background: linear-gradient(90deg,
+      rgba(120,200,255,0) 0%, rgba(120,200,255,.7) 20%, rgba(120,200,255,.3) 100%);
+  }
+  .game-panel-head h2 { margin: 0; padding: 0; border: none; }
+  .game-panel-head h2::after { display: none; }
+    .game-panel-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Фуллскрин-режим для обёртки игры */
+  .game-iframe-wrap:fullscreen,
+  .game-iframe-wrap:-webkit-full-screen {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+    background: #000;
+  }
+  .game-iframe-wrap:fullscreen iframe,
+  .game-iframe-wrap:-webkit-full-screen iframe {
+    width: 100%;
+    height: 100%;
+  }
+
+  .game-iframe-wrap {
+    width: 100%;
+    height: 720px;
+    border: 1px solid #a8c4dc;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow:
+      inset 0 2px 4px rgba(120,160,200,.2),
+      0 2px 8px rgba(10,40,80,.15);
+    overflow: hidden;
+  }
+  .game-iframe-wrap iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+  }
+
+  /* ===== ПРОФИЛЬ ===== */
+  .profile-header {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 6px 0 20px;
+    border-bottom: 1px solid #c8dcec;
+    margin-bottom: 20px;
+  }
+  .profile-avatar {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    border-radius: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    border: 2px solid #1a5a9a;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #9ed8f8 0%, #4a9ee0 48%, #1e6cb8 52%, #0d3f7a 100%);
+    box-shadow:
+      inset 0 2px 0 rgba(255,255,255,.9),
+      inset 0 -6px 12px rgba(0,0,0,.35),
+      0 6px 14px rgba(10,50,100,.4),
+      0 0 0 4px rgba(255,255,255,.6),
+      0 0 0 5px rgba(120,200,255,.5);
+    overflow: hidden;
+  }
+  .profile-avatar:hover { filter: brightness(1.06); }
+  .profile-avatar.not-own { cursor: default; pointer-events: none; }
+  .profile-avatar.not-own:hover { filter: none; }
+  .profile-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .profile-avatar.empty::after {
+    content: attr(data-initial);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 56px;
+    font-family: Georgia, serif;
+    text-shadow: 0 -2px 0 rgba(0,0,0,.5);
+  }
+  .profile-avatar::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,.75) 0%,
+      rgba(255,255,255,.35) 55%,
+      rgba(255,255,255,0) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .profile-avatar .edit-hint {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(10,50,100,.75);
+    color: #fff;
+    font-size: 10px;
+    text-align: center;
+    padding: 3px 0;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .profile-avatar:hover .edit-hint { opacity: 1; }
+  .profile-avatar.not-own .edit-hint { display: none; }
+  .profile-avatar.not-own input { display: none; }
+
+  .profile-info { flex: 1; min-width: 0; padding-top: 4px; }
+
+  .profile-name-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .profile-name {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 30px;
+    font-weight: bold;
+    font-style: italic;
+    color: #0d3f7a;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,.95),
+      0 2px 0 rgba(255,255,255,.6),
+      0 3px 6px rgba(20,60,100,.2);
+    word-break: break-word;
+  }
+  .profile-name-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+  
+  /* ===== КВАДРАТНАЯ AERO КНОПКА ДРУЖБЫ ===== */
+  .friend-btn {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 9px;
+    border: 1px solid #2a5e10;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 1;
+    color: #fff;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.5);
+    font-family: Tahoma, Verdana, sans-serif;
+    padding: 0;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.75) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg,
+        #e0f5c0 0%,
+        #a2dd6a 42%,
+        #5aac26 50%,
+        #3e8a14 58%,
+        #1e5a08 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 -6px 10px -6px rgba(0,0,0,.5),
+      0 2px 5px rgba(40,90,10,.45),
+      0 0 0 1px rgba(255,255,255,.35);
+    overflow: hidden;
+    transition: filter .15s, transform .05s;
+  }
+  .friend-btn::before {
+    content: "";
+    position: absolute;
+    top: 1px; left: 2px; right: 2px;
+    height: 48%;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,.95) 0%,
+      rgba(255,255,255,.45) 55%,
+      rgba(255,255,255,0) 100%);
+    border-radius: 8px 8px 60% 60% / 8px 8px 12px 12px;
+    pointer-events: none;
+  }
+  .friend-btn:hover { filter: brightness(1.1) saturate(1.15); }
+  .friend-btn:active {
+    filter: brightness(.88);
+    transform: translateY(1px);
+    box-shadow:
+      inset 0 3px 6px rgba(0,0,0,.55),
+      inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  .friend-btn.red {
+    border-color: #6b1410;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.7) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #f8c4bc 0%, #e0675a 45%, #b32a1e 55%, #6b1410 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 -6px 10px -6px rgba(0,0,0,.5),
+      0 2px 5px rgba(100,20,10,.45),
+      0 0 0 1px rgba(255,255,255,.35);
+  }
+  .friend-btn.gift {
+    border-color: #8a5a10;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.8) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg,
+        #ffe9a8 0%, #f7c95c 45%, #d9a534 55%, #a07620 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 -6px 10px -6px rgba(0,0,0,.5),
+      0 2px 5px rgba(120,80,10,.5),
+      0 0 0 1px rgba(255,255,255,.35);
+  }
+
+  /* ===== КНОПКА ЛС ===== */
+  .ls-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 18px;
+    border-radius: 18px;
+    border: 1px solid #0d3f7a;
+    cursor: pointer;
+    font-family: Tahoma, Verdana, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.25);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.7) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #a8dcf8 0%, #6cb3e3 45%, #2c76b8 50%, #1a5a9a 55%, #0d3f7a 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 -6px 12px -6px rgba(0,0,0,.55),
+      0 2px 5px rgba(10,50,100,.4),
+      0 0 0 1px rgba(255,255,255,.25);
+    margin-bottom: 12px;
+    transition: filter .15s, transform .05s;
+    position: relative;
+    overflow: hidden;
+  }
+  .ls-btn::before {
+    content: "";
+    position: absolute;
+    top: 1px; left: 4px; right: 4px;
+    height: 48%;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,.95) 0%,
+      rgba(255,255,255,.5) 50%,
+      rgba(255,255,255,.1) 85%,
+      rgba(255,255,255,0) 100%);
+    border-radius: 18px 18px 60% 60% / 18px 18px 14px 14px;
+    pointer-events: none;
+  }
+  .ls-btn:hover { filter: brightness(1.1); }
+  .ls-btn:active { filter: brightness(.88); transform: translateY(1px); }
+
+  .profile-label {
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: #4a6a8a;
+    margin-bottom: 6px;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+  }
+  .profile-bio {
+    min-height: 60px;
+    padding: 12px 14px;
+    border: 1px solid #a8c4dc;
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(245,250,255,1) 0%, rgba(232,242,252,1) 100%);
+    font-size: 12px;
+    line-height: 1.6;
+    color: #1a2a3a;
+    white-space: pre-wrap;
+    word-break: break-word;
+    box-shadow:
+      inset 0 2px 4px rgba(120,160,200,.15),
+      inset 0 1px 0 rgba(255,255,255,.8);
+    position: relative;
+  }
+  .profile-bio.empty { color: #7a94b0; font-style: italic; }
+  .profile-bio.editable { cursor: pointer; }
+  .profile-bio.editable:hover {
+    background: linear-gradient(180deg, rgba(235,245,255,1) 0%, rgba(220,238,250,1) 100%);
+  }
+  .profile-bio textarea {
+    width: 100%;
+    min-height: 80px;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1.6;
+    color: inherit;
+    outline: none;
+    resize: vertical;
+    padding: 0;
+  }
+  .profile-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
+
+  /* ===== РАЗДЕЛ ДРУЗЕЙ ===== */
+  .friends-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .friends-pane {
+    border: 1px solid #a8c4dc;
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(245,250,255,1) 0%, rgba(232,242,252,1) 100%);
+    padding: 12px;
+    min-height: 180px;
+    box-shadow:
+      inset 0 2px 4px rgba(120,160,200,.12),
+      inset 0 1px 0 rgba(255,255,255,.8);
+  }
+  .friends-pane h3 {
+    margin: 0 0 10px;
+    font-family: Georgia, serif;
+    font-size: 15px;
+    color: #0d3f7a;
+    border-bottom: 1px solid #c8dcec;
+    padding-bottom: 6px;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+  }
+  .friend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 4px;
+    border-bottom: 1px dashed #d8e2ec;
+  }
+  .friend-row:last-child { border-bottom: none; }
+  .fr-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid #1a5a9a;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #9ed8f8 0%, #4a9ee0 48%, #1e6cb8 52%, #0d3f7a 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: bold;
+    font-family: Georgia, serif; font-size: 12px;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.5);
+  }
+  .fr-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .fr-name {
+    flex: 1;
+    font-weight: bold;
+    color: #0a4a8a;
+    font-size: 12px;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fr-name:hover { text-decoration: underline; }
+  .mini-ok, .mini-x {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    border: 1px solid;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px; font-weight: bold;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0;
+    color: #fff;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.4);
+    transition: filter .15s, transform .05s;
+  }
+  .mini-ok {
+    border-color: #2a5e10;
+    background: linear-gradient(180deg, #a2dd6a 0%, #5aac26 55%, #3e8a14 100%);
+  }
+  .mini-x {
+    border-color: #6b1410;
+    background: linear-gradient(180deg, #e0675a 0%, #b32a1e 55%, #6b1410 100%);
+  }
+  .mini-ok:hover, .mini-x:hover { filter: brightness(1.1); }
+  .mini-ok:active, .mini-x:active { transform: translateY(1px); filter: brightness(.88); }
+
+  .empty-note {
+    color: #7a94b0;
+    font-style: italic;
+    font-size: 11px;
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  /* ===== ЧАТ ===== */
+  .chat-list {
+    height: 520px;
+    overflow-y: auto;
+    border: 1px solid #a8c4dc;
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(245,250,255,1) 0%, rgba(232,242,252,1) 100%);
+    padding: 12px;
+    margin-bottom: 10px;
+    box-shadow:
+      inset 0 2px 4px rgba(120,160,200,.2),
+      inset 0 1px 0 rgba(255,255,255,.8);
+  }
+  .msg {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .msg.own { flex-direction: row-reverse; }
+  .msg-avatar {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    cursor: pointer;
+    border: 1px solid #1a5a9a;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #9ed8f8 0%, #4a9ee0 48%, #1e6cb8 52%, #0d3f7a 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 -3px 6px rgba(0,0,0,.35),
+      0 1px 3px rgba(10,50,100,.35);
+    overflow: hidden;
+    transition: filter .15s;
+  }
+  .msg-avatar:hover { filter: brightness(1.1); }
+  .msg-avatar::after {
+    content: attr(data-initial);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    font-family: Georgia, serif;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.5);
+    z-index: 0;
+  }
+  .msg-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+  }
+  .msg-bubble {
+    display: inline-block;
+    max-width: 75%;
+    padding: 6px 10px 7px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.85);
+    border: 1px solid rgba(200,220,235,.9);
+    box-shadow: 0 1px 2px rgba(120,160,200,.15);
+    word-break: break-word;
+  }
+  .msg.own .msg-bubble {
+    background: linear-gradient(180deg, #fff6d8 0%, #ffeab0 100%);
+    border-color: #e8c878;
+  }
+  .msg-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 3px;
+    flex-wrap: wrap;
+  }
+  .msg-head .who {
+    font-weight: bold;
+    color: #0a4a8a;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .msg-head .who:hover { text-decoration: underline; }
+  .msg-head .when { color: #7a94b0; font-size: 10px; }
+  .msg-text {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #1a2a3a;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .chat-form { display: flex; gap: 8px; align-items: stretch; }
+  .chat-form input[type="text"] {
+    flex: 1;
+    padding: 0 12px;
+    height: 36px;
+    border: 1px solid #90b0cc;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(240,248,255,1) 0%, rgba(255,255,255,1) 50%, rgba(248,252,255,1) 100%);
+    font-family: inherit;
+    font-size: 12px;
+    color: #1a2a3a;
+    outline: none;
+    box-shadow:
+      inset 0 2px 4px rgba(120,160,200,.25),
+      0 1px 0 rgba(255,255,255,.9);
+  }
+  .chat-form input[type="text"]:focus {
+    border-color: #4a8ac4;
+    box-shadow:
+      inset 0 2px 4px rgba(120,160,200,.25),
+      0 0 0 3px rgba(120,200,255,.35),
+      0 1px 0 rgba(255,255,255,.9);
+  }
+  .chat-form input[name="who"] { flex: 0 0 150px; }
+  .chat-form input[readonly] { background: linear-gradient(180deg, #eef5fb 0%, #e2eef8 100%); color: #6a86a4; }
+
+  .chat-cooldown {
+    display: none;
+    text-align: center;
+    font-size: 11px;
+    color: #b32a1e;
+    font-weight: bold;
+    padding: 4px 0 0;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+  }
+  .chat-cooldown.show { display: block; }
+
+  /* ===== FRUTIGER AERO КНОПКИ ===== */
+  .aero-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 26px;
+    height: 36px;
+    font-family: Tahoma, Verdana, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff;
+    letter-spacing: .3px;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.25);
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 18px;
+    border: 1px solid #0d3f7a;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.7) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #a8dcf8 0%, #6cb3e3 45%, #2c76b8 50%, #1a5a9a 55%, #0d3f7a 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 -6px 12px -6px rgba(0,0,0,.55),
+      0 2px 5px rgba(10,50,100,.4),
+      0 0 0 1px rgba(255,255,255,.25);
+    overflow: hidden;
+    user-select: none;
+    transition: filter .15s, transform .05s;
+  }
+  .aero-btn::before {
+    content: "";
+    position: absolute;
+    top: 1px; left: 4px; right: 4px;
+    height: 48%;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,.95) 0%,
+      rgba(255,255,255,.5) 50%,
+      rgba(255,255,255,.1) 85%,
+      rgba(255,255,255,0) 100%);
+    border-radius: 18px 18px 60% 60% / 18px 18px 14px 14px;
+    pointer-events: none;
+  }
+  .aero-btn::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 6px; right: 6px;
+    height: 1px;
+    background: linear-gradient(90deg,
+      rgba(255,255,255,0) 0%, rgba(255,255,255,.7) 50%, rgba(255,255,255,0) 100%);
+    pointer-events: none;
+  }
+  .aero-btn:hover { filter: brightness(1.1) saturate(1.15); }
+  .aero-btn:active {
+    filter: brightness(.88);
+    box-shadow:
+      inset 0 3px 6px rgba(0,0,0,.55),
+      inset 0 1px 0 rgba(255,255,255,.4);
+    transform: translateY(1px);
+  }
+  .aero-btn:disabled {
+    filter: grayscale(.5) brightness(.75);
+    cursor: not-allowed;
+    transform: none;
+  }
+  .aero-btn.green {
+    border-color: #2a5e10;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.75) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg,
+        #e0f5c0 0%, #a2dd6a 42%, #5aac26 50%, #3e8a14 58%, #1e5a08 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 -6px 12px -6px rgba(0,0,0,.5),
+      0 2px 5px rgba(40,90,10,.45),
+      0 0 0 1px rgba(255,255,255,.35);
+  }
+  .aero-btn.red {
+    border-color: #6b1410;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.7) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #f8c4bc 0%, #e0675a 45%, #b32a1e 55%, #6b1410 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 -6px 12px -6px rgba(0,0,0,.5),
+      0 2px 5px rgba(100,20,10,.4),
+      0 0 0 1px rgba(255,255,255,.3);
+  }
+  .aero-btn.small {
+    height: 30px;
+    padding: 0 16px;
+    font-size: 11px;
+    border-radius: 15px;
+  }
+  .aero-btn.small::before { border-radius: 15px 15px 60% 60% / 15px 15px 12px 12px; }
+
+  /* ===== МОДАЛЬНЫЕ ОКНА ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(120,200,255,.25) 0%, rgba(0,0,0,.55) 70%),
+      rgba(10,30,60,.5);
+    backdrop-filter: blur(3px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-panel {
+    width: 100%;
+    max-width: 380px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.85);
+    background: linear-gradient(180deg, rgba(255,255,255,.98) 0%, rgba(230,242,252,.98) 100%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,1) inset,
+      0 20px 40px rgba(10,30,60,.5),
+      0 4px 12px rgba(0,0,0,.3),
+      0 0 0 1px rgba(120,200,255,.4);
+    overflow: hidden;
+    position: relative;
+  }
+  .modal-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: linear-gradient(180deg, rgba(220,238,250,1) 0%, rgba(180,215,240,1) 100%);
+    border-bottom: 1px solid #6a90b8;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+  }
+  .modal-head h3 {
+    margin: 0;
+    font-family: Georgia, serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #0d3f7a;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+  }
+  .modal-close {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    border: 1px solid #6b1410;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.7) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #f8c4bc 0%, #e0675a 45%, #b32a1e 55%, #6b1410 100%);
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    font-family: inherit;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 2px 4px rgba(100,20,10,.4);
+    text-shadow: 0 -1px 0 rgba(0,0,0,.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .modal-close:hover { filter: brightness(1.1); }
+  .modal-close:active { filter: brightness(.85); transform: translateY(1px); }
+  .modal-body { padding: 20px; }
+  .modal-body label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #1a4a7a;
+  }
+  .modal-body label input {
+    display: block;
+    width: 100%;
+    margin-top: 5px;
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid #90b0cc;
+    border-radius: 17px;
+    background: linear-gradient(180deg, rgba(240,248,255,1) 0%, rgba(255,255,255,1) 50%, rgba(248,252,255,1) 100%);
+    font-family: inherit;
+    font-size: 12px;
+    color: #1a2a3a;
+    outline: none;
+    font-weight: normal;
+    box-shadow:
+      inset 0 2px 4px rgba(120,160,200,.25),
+      0 1px 0 rgba(255,255,255,.9);
+  }
+  .modal-body label input:focus {
+    border-color: #4a8ac4;
+    box-shadow:
+      inset 0 2px 4px rgba(120,160,200,.25),
+      0 0 0 3px rgba(120,200,255,.35),
+      0 1px 0 rgba(255,255,255,.9);
+  }
+  .modal-error {
+    min-height: 18px;
+    font-size: 11px;
+    color: #b32a1e;
+    font-weight: bold;
+    margin-bottom: 6px;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+  }
+  .modal-hint {
+    font-size: 11px;
+    color: #5a7a9a;
+    font-style: italic;
+    margin: -4px 0 12px;
+    line-height: 1.4;
+  }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+
+  /* ===== ПОПОЛНЕНИЕ ПРЯНИКОВ ===== */
+  .rate-box {
+    text-align: center;
+    font-family: Georgia, serif;
+    font-size: 18px; font-weight: bold;
+    color: #7a5a10;
+    padding: 14px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    border: 1px solid #e0c070;
+    background: linear-gradient(180deg, #fff6d8 0%, #fbe9b0 100%);
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+  }
+  .topup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .topup-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 12px 8px;
+    border-radius: 10px;
+    border: 1px solid #8a5a10;
+    cursor: pointer;
+    font-family: Tahoma, Verdana, sans-serif;
+    color: #3a2400;
+    text-shadow: 0 1px 0 rgba(255,255,255,.7);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, #ffe9a8 0%, #f7c95c 45%, #d9a534 55%, #a07620 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 -6px 10px -6px rgba(0,0,0,.5),
+      0 2px 5px rgba(120,80,10,.4);
+    transition: filter .15s, transform .05s;
+  }
+  .topup-btn:hover { filter: brightness(1.08); }
+  .topup-btn:active { filter: brightness(.9); transform: translateY(1px); }
+  .topup-btn .tp-amount { font-size: 16px; font-weight: bold; }
+  .topup-btn .tp-price { font-size: 11px; opacity: .8; }
+
+  /* ===== СПИСОК ПОДАРКОВ ===== */
+  .gift-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .gift-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #a8c4dc;
+    background: linear-gradient(180deg, #f5faff 0%, #e8f2fc 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+  }
+  .gift-icon { font-size: 30px; flex-shrink: 0; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+  .gift-info { flex: 1; min-width: 0; }
+  .gift-name { font-weight: bold; color: #0d3f7a; font-size: 13px; }
+  .gift-price { font-size: 11px; color: #a06010; font-weight: bold; }
+
+  /* ===== ЛИЧНЫЕ СООБЩЕНИЯ ===== */
+  .dm-panel { max-width: 520px; }
+  .dm-list {
+    height: 340px;
+    overflow-y: auto;
+    padding: 14px;
+    background: linear-gradient(180deg, rgba(245,250,255,1) 0%, rgba(232,242,252,1) 100%);
+    border-bottom: 1px solid #c8dcec;
+  }
+  .dm-msg {
+    max-width: 80%;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.95);
+    border: 1px solid rgba(200,220,235,.9);
+    box-shadow: 0 1px 2px rgba(120,160,200,.15);
+    font-size: 12px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .dm-msg.own {
+    margin-left: auto;
+    background: linear-gradient(180deg, #fff6d8 0%, #ffeab0 100%);
+    border-color: #e8c878;
+  }
+  .dm-meta { font-size: 10px; color: #7a94b0; margin-bottom: 3px; }
+  .dm-text { color: #1a2a3a; white-space: pre-wrap; word-break: break-word; }
+  .dm-form {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(230,240,250,.6);
+  }
+  .dm-form input {
+    flex: 1;
+    padding: 0 12px;
+    height: 36px;
+    border: 1px solid #90b0cc;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(240,248,255,1) 0%, rgba(255,255,255,1) 50%, rgba(248,252,255,1) 100%);
+    font-family: inherit;
+    font-size: 12px;
+    color: #1a2a3a;
+    outline: none;
+    box-shadow:
+      inset 0 2px 4px rgba(120,160,200,.25),
+      0 1px 0 rgba(255,255,255,.9);
+  }
+  .dm-form input:focus {
+    border-color: #4a8ac4;
+    box-shadow:
+      inset 0 2px 4px rgba(120,160,200,.25),
+      0 0 0 3px rgba(120,200,255,.35),
+      0 1px 0 rgba(255,255,255,.9);
+  }
+
+  .placeholder {
+    color: #7a94b0;
+    font-style: italic;
+    padding: 60px 0;
+    text-align: center;
+    border: 2px dashed #c8dcec;
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(245,250,255,.6) 0%, rgba(232,242,252,.6) 100%);
+  }
+
+  .footer {
+    text-align: center;
+    padding: 14px;
+    font-size: 11px;
+    color: #4a6a8a;
+    background: linear-gradient(180deg, rgba(220,238,250,.9) 0%, rgba(180,215,240,.9) 100%);
+    border-top: 1px solid #6a90b8;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+    border-radius: 0 0 13px 13px;
+  }
+
+  /* ===== ЧАСЫ ===== */
+  .wall-clock {
+    position: fixed;
+    top: 100px;
+    right: 200px;
+    width: 172px;
+    height: 172px;
+    border-radius: 50%;
+    z-index: 50;
+    padding: 14px;
+    background:
+      radial-gradient(ellipse at 30% 18%, rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 45%),
+      radial-gradient(ellipse at 50% 110%, rgba(0,0,0,.4) 0%, rgba(255,255,255,0) 55%),
+      conic-gradient(from 0deg,
+        #f4f7fb 0deg, #a8bfd4 45deg, #e8eef5 90deg, #7d94ae 135deg,
+        #f4f7fb 180deg, #a8bfd4 225deg, #e8eef5 270deg, #7d94ae 315deg, #f4f7fb 360deg);
+    border: 2px solid #5a7aa0;
+    box-shadow:
+      inset 0 3px 6px rgba(255,255,255,.95),
+      inset 0 -6px 12px rgba(0,0,0,.4),
+      0 14px 30px rgba(10,40,80,.55),
+      0 4px 10px rgba(0,0,0,.35),
+      0 0 0 1px rgba(255,255,255,.5);
+  }
+  .wall-clock::before {
+    content: "";
+    position: absolute;
+    top: 4px; left: 22px; right: 22px;
+    height: 42%;
+    background: linear-gradient(180deg, rgba(255,255,255,.9) 0%, rgba(255,255,255,.3) 60%, rgba(255,255,255,0) 100%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 20;
+  }
+  .wall-clock-dial {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 30%, #fdfeff 0%, #eaf1f8 55%, #cfdbe8 100%);
+    border: 2px solid #7d94ae;
+    box-shadow:
+      inset 0 2px 4px rgba(255,255,255,.95),
+      inset 0 -4px 8px rgba(0,0,0,.15),
+      inset 0 0 20px rgba(120,160,200,.15);
+    overflow: hidden;
+  }
+  .wall-clock-tick {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 2px; height: 7px;
+    margin-left: -1px; margin-top: -3.5px;
+    background: #7d94ae;
+    border-radius: 1px;
+    transform-origin: 1px 3.5px;
+  }
+  .wall-clock-tick.major {
+    width: 3px; height: 11px;
+    margin-left: -1.5px; margin-top: -5.5px;
+    background: #2a3a4a;
+    transform-origin: 1.5px 5.5px;
+  }
+  .wall-clock-num {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 22px; height: 22px;
+    margin: -11px 0 0 -11px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 14px; font-weight: bold;
+    color: #1a2a3a;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+    transform-origin: 11px 11px;
+  }
+  .wall-clock-hand {
+    position: absolute;
+    left: 50%; bottom: 50%;
+    transform-origin: 50% 100%;
+    border-radius: 4px;
+    z-index: 8;
+  }
+  .wall-clock-hand.hour {
+    width: 6px; height: 42px; margin-left: -3px;
+    background: linear-gradient(180deg, #3a4a5a 0%, #1a2a3a 100%);
+    box-shadow: 0 1px 2px rgba(0,0,0,.5), inset 1px 0 0 rgba(255,255,255,.15);
+  }
+  .wall-clock-hand.minute {
+    width: 4px; height: 58px; margin-left: -2px;
+    background: linear-gradient(180deg, #3a4a5a 0%, #1a2a3a 100%);
+    box-shadow: 0 1px 2px rgba(0,0,0,.5), inset 1px 0 0 rgba(255,255,255,.15);
+    z-index: 9;
+  }
+  .wall-clock-hand.second {
+    width: 2px; height: 62px; margin-left: -1px;
+    background: linear-gradient(180deg, #d43a2e 0%, #8a1a10 100%);
+    box-shadow: 0 0 4px rgba(212,58,46,.6);
+    z-index: 10;
+  }
+  .wall-clock-hand.second::after {
+    content: "";
+    position: absolute;
+    bottom: -10px; left: 50%; transform: translateX(-50%);
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #d43a2e;
+    box-shadow: 0 0 4px rgba(212,58,46,.6);
+  }
+  .wall-clock-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 12px; height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff 0%, #8aa8c4 40%, #2a3a4a 100%);
+    border: 1px solid #1a2a3a;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 1px 3px rgba(0,0,0,.5);
+    z-index: 11;
+  }
+  @media (max-width: 1360px) { .wall-clock { display: none; } }
+
+  @media (max-width: 860px) {
+    .left { display: none; }
+    .tab { padding: 0 14px; font-size: 11px; height: 26px; }
+    .tab.active { height: 32px; }
+    .tab[data-tab="games"]  { left: 210px; }
+    .tab[data-tab="chat"]   { left: 285px; }
+    .tab[data-tab="donate"] { left: 355px; }
+    .tab-name { font-size: 18px; padding-right: 12px; }
+    .logo-box { width: 44px; height: 44px; }
+    .top { height: 62px; padding: 0 10px; }
+    .user .uname { display: none; }
+    .chat-form { flex-wrap: wrap; }
+    .chat-form input[name="who"] { flex: 1 1 100%; }
+    .profile-header { flex-direction: column; align-items: center; text-align: center; }
+    .profile-avatar { width: 120px; height: 120px; }
+    .profile-name { font-size: 22px; }
+    .profile-name-row { justify-content: center; }
+    .profile-name-actions { margin-left: 0; }
+    .friends-section { grid-template-columns: 1fr; }
+    .game-iframe-wrap { height: 600px; }
+  }
+  @media (max-width: 620px) {
+    .tab[data-tab="games"]  { left: 170px; }
+    .tab[data-tab="chat"]   { left: 235px; }
+    .tab[data-tab="donate"] { left: 295px; }
+    .tab { padding: 0 10px; font-size: 10px; }
+    .tab-name { font-size: 15px; }
+    .game-iframe-wrap { height: 500px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="logo-box">
+      <img id="logoImg" alt="Logo">
+    </div>
+
+    <button class="tab-name" data-tab="main">Nostalgic View</button>
+
+    <button class="tab" data-tab="games">Игры</button>
+    <button class="tab" data-tab="chat">Чат</button>
+    <button class="tab" data-tab="donate">Донат</button>
+
+    <div class="top-right">
+      <div class="pryanik-chip" id="pryanikChip" title="Пряники · Нажми, чтобы пополнить" onclick="openTopUp()" style="display:none;">
+        <span class="p-count" id="pryanikCount">0</span>
+        <img id="pryanikIcon" alt="Пряник">
+      </div>
+      <div class="user" id="userArea"></div>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <aside class="left">
+      <div class="fon-frame">
+        <img id="fonImg" alt="Fon">
+      </div>
+    </aside>
+
+    <section class="content">
+
+      <div class="panel active" id="panel-main">
+        <h2>Nostalgic View</h2>
+        <div class="placeholder">Приветствую! Я делаю игру про срочную службу в Вооружённых силах Российской Федерации 2000-х годов. Воинская часть полностью воссоздана на основе сериала «Солдаты». К сожалению, из-за довольно приличного количества киноляпов расположение некоторых комнат пришлось сделать по своему видению. В игре сделан упор на атмосферу, тактильность и взаимодействие с предметами. </div>
+      </div>
+
+      <div class="panel" id="panel-games">
+        <h2>Игры</h2>
+                        <div class="games-grid">
+
+          <div class="game-card">
+            <div class="game-cover" data-logo-base="games/ballast/logo">
+              <img alt="BALLAST">
+            </div>
+            <div class="game-title">BALLAST</div>
+            <div class="game-desc">Головоломка. Подставляй камуфляжи друг к другу чтобы они заполнили линию.</div>
+            <button class="aero-btn green" onclick="openGame('games/ballast/ballast.html', 'BALLAST')">▶ Играть</button>
+          </div>
+
+          <div class="game-card">
+            <div class="game-cover" data-logo-base="games/stroybat/logo">
+              <img alt="STROYBAT">
+            </div>
+            <div class="game-title">STROYBAT</div>
+            <div class="game-desc">Два солдата из стройбата заменяют экскаватор, так замените экскаватор в одного как настоящий Ефрейтор стройбата!</div>
+            <button class="aero-btn green" onclick="openGame('games/stroybat/stroybat.html', 'STROYBAT')">▶ Играть</button>
+          </div>
+
+        </div>
+      </div>
+
+            <div class="panel" id="panel-game">
+        <div class="game-panel-head">
+          <h2 id="gamePanelTitle">Игра</h2>
+          <div class="game-panel-actions">
+            <button class="aero-btn small" type="button" onclick="toggleFullscreen()" id="fsBtn">⛶ Во весь экран</button>
+            <button class="aero-btn red small" onclick="closeGame()">✕ Закрыть</button>
+          </div>
+        </div>
+        <div class="game-iframe-wrap" id="gameWrap">
+          <iframe id="gameFrame" src="" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-chat">
+        <h2>Чат</h2>
+        <div class="chat-list" id="chatList"></div>
+        <form class="chat-form" onsubmit="sendMsg(event)">
+          <input type="text" name="who" id="chatWho" placeholder="Войди, чтобы писать" maxlength="20" readonly>
+          <input type="text" name="text" id="chatText" placeholder="Сообщение..." maxlength="500" autocomplete="off" disabled>
+          <button class="aero-btn" type="submit" id="chatSend" disabled>Отправить</button>
+        </form>
+        <div class="chat-cooldown" id="chatCooldown"></div>
+      </div>
+
+      <div class="panel" id="panel-donate">
+        <h2>Донат</h2>
+        <div class="placeholder">Здесь блок для доната</div>
+        <div style="margin-top:16px; text-align:center;">
+          <button type="button" class="aero-btn green" onclick="openDonate()">Поддержать проект</button>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-profile">
+        <div class="game-panel-head">
+          <h2 id="profilePanelTitle">Моя страничка</h2>
+          <button class="aero-btn red small" onclick="closeProfile()">✕ Закрыть</button>
+        </div>
+
+        <div class="profile-header">
+          <label class="profile-avatar" id="profileAvatar" title="Сменить аватар">
+            <img id="profileAvatarImg" alt="">
+            <input type="file" accept="image/*" hidden onchange="changeAvatar(event)">
+            <span class="edit-hint">Сменить аватар</span>
+          </label>
+
+          <div class="profile-info">
+            <div class="profile-name-row">
+              <div class="profile-name" id="profileName">—</div>
+              <div class="profile-name-actions" id="profileActions"></div>
+            </div>
+
+            <div id="lsBtnWrap"></div>
+
+            <div class="profile-label">Описание</div>
+            <div class="profile-bio" id="profileBio"></div>
+
+            <div class="profile-actions" id="bioActions" style="display:none;">
+              <button type="button" class="aero-btn red small" onclick="cancelBioEdit()">Отмена</button>
+              <button type="button" class="aero-btn green small" onclick="saveBio()">Сохранить</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="friendsSection"></div>
+      </div>
+
+    </section>
+  </div>
+
+  <div class="footer">
+    © 2026 Nostalgic View · Все права защищены.
+  </div>
+</div>
+
+<!-- ===== ЧАСЫ ===== -->
+<div class="wall-clock" title="Время">
+  <div class="wall-clock-dial" id="clockDial"></div>
+  <div class="wall-clock-hand hour" id="clockHour"></div>
+  <div class="wall-clock-hand minute" id="clockMinute"></div>
+  <div class="wall-clock-hand second" id="clockSecond"></div>
+  <div class="wall-clock-center"></div>
+</div>
+
+<!-- ===== МОДАЛКА АВТОРИЗАЦИИ ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h3 id="modalTitle">Вход</h3>
+      <button class="modal-close" type="button" onclick="closeModal()">×</button>
+    </div>
+    <form class="modal-body" id="modalForm" onsubmit="submitAuth(event)">
+      <label>Логин
+        <input type="text" id="mLogin" required minlength="3" maxlength="20" autocomplete="username" placeholder="от 3 до 20 символов">
+      </label>
+      <label>Пароль
+        <input type="password" id="mPassword" required minlength="3" maxlength="40" autocomplete="current-password" placeholder="от 3 символов">
+      </label>
+      <div class="modal-hint" id="mHint" style="display:none;">
+        Аватар по умолчанию берётся из файла <b>Avatar</b> в папке сайта. Свой можно поставить позже — клик по аватарке в шапке.
+      </div>
+      <div class="modal-error" id="mError"></div>
+      <div class="modal-actions">
+        <button type="button" class="aero-btn red small" onclick="closeModal()">Отмена</button>
+        <button type="submit" class="aero-btn green" id="mSubmit">Войти</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА ПОПОЛНЕНИЯ ПРЯНИКОВ ===== -->
+<div class="modal-overlay" id="topUpModal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h3>Пополнить пряники</h3>
+      <button class="modal-close" type="button" onclick="closeTopUp()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="rate-box">1 пряник = 1,2 Руб.</div>
+      <div class="topup-grid">
+        <button class="topup-btn" type="button" onclick="topUp(100)">
+          <span class="tp-amount">+100</span>
+          <span class="tp-price">120 ₽</span>
+        </button>
+        <button class="topup-btn" type="button" onclick="topUp(500)">
+          <span class="tp-amount">+500</span>
+          <span class="tp-price">600 ₽</span>
+        </button>
+        <button class="topup-btn" type="button" onclick="topUp(1000)">
+          <span class="tp-amount">+1000</span>
+          <span class="tp-price">1200 ₽</span>
+        </button>
+        <button class="topup-btn" type="button" onclick="topUp(5000)">
+          <span class="tp-amount">+5000</span>
+          <span class="tp-price">6000 ₽</span>
+        </button>
+      </div>
+      <div class="modal-hint" style="text-align:center; margin-top:14px;">
+        Пополнение пока что выполняется руками. Задонатьте на Boosty и напишите сколько нужно пряников.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА ПОДАРКА ===== -->
+<div class="modal-overlay" id="giftModal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h3 id="giftModalTitle">Подарить</h3>
+      <button class="modal-close" type="button" onclick="closeGift()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="gift-list" id="giftList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА ЛС ===== -->
+<div class="modal-overlay" id="dmModal">
+  <div class="modal-panel dm-panel">
+    <div class="modal-head">
+      <h3 id="dmTitle">Сообщение</h3>
+      <button class="modal-close" type="button" onclick="closeDM()">×</button>
+    </div>
+    <div class="dm-list" id="dmList"></div>
+    <form class="dm-form" onsubmit="sendDM(event)">
+      <input type="text" id="dmInput" placeholder="Написать сообщение..." maxlength="500" autocomplete="off">
+      <button class="aero-btn green small" type="submit">Отправить</button>
+    </form>
+  </div>
+</div>
+<script>
+  /* ============================================================
+     ★ НАСТРОЙКИ ★
+     ============================================================ */
+  const DONATE_URL = 'https://boosty.to/nostalgicview/donate';
+  const CHAT_COOLDOWN_MS = 1000;
+  const ZVUK_VOLUME = 0.6;
+  const START_PRYANIKI = 100;
+  const RUB_PER_PRYANIK = 1.2;
+
+  const GIFTS = [
+    { id: 'rose',    icon: '🌹', name: 'Роза',    price: 10  },
+    { id: 'cake',    icon: '🍰', name: 'Тортик',  price: 25  },
+    { id: 'star',    icon: '⭐', name: 'Звезда',  price: 50  },
+    { id: 'diamond', icon: '💎', name: 'Алмаз',   price: 100 },
+    { id: 'cup',     icon: '🏆', name: 'Кубок',   price: 250 },
+    { id: 'heart',   icon: '💖', name: 'Сердце',  price: 500 }
+  ];
+
+  /* ============================================================
+     1. Автопоиск картинок
+     ============================================================ */
+  function candidateList(baseNames) {
+    const exts = ['jpg','jpeg','png','gif','webp','bmp','JPG','JPEG','PNG','GIF','WEBP','BMP'];
+    const list = [];
+    baseNames.forEach(n => exts.forEach(e => list.push(n + '.' + e)));
+    return list;
+  }
+  function findImage(imgEl, baseNames, onFail) {
+    const list = candidateList(baseNames);
+    let i = 0;
+    imgEl.onerror = function () {
+      i++;
+      if (i < list.length) this.src = list[i];
+      else if (onFail) onFail(this);
+    };
+    imgEl.src = list[0];
+  }
+
+  findImage(document.getElementById('logoImg'), ['Logo', 'logo', 'LOGO'],
+    el => { el.style.display = 'none'; el.parentNode.textContent = 'ЛОГО'; });
+  findImage(document.getElementById('fonImg'), ['Fon', 'fon', 'FON']);
+  findImage(document.getElementById('pryanikIcon'), ['valuta', 'Valuta', 'VALUTA'],
+    el => { el.style.display = 'none'; });
+
+  /* ============================================================
+     2. Zvuk
+     ============================================================ */
+  const zvukAudio = new Audio();
+  let zvukReady = false;
+
+  (function findZvuk() {
+    const exts  = ['mp3','wav','ogg','m4a','aac','opus','webm','MP3','WAV','OGG','M4A','AAC'];
+    const bases = ['Zvuk', 'zvuk', 'ZVUK'];
+    const list  = [];
+    bases.forEach(b => exts.forEach(e => list.push(b + '.' + e)));
+    let i = 0;
+    zvukAudio.preload = 'auto';
+    zvukAudio.onerror = function () {
+      i++;
+      if (i < list.length) zvukAudio.src = list[i];
+      else zvukReady = false;
+    };
+    zvukAudio.oncanplaythrough = () => { zvukReady = true; };
+    zvukAudio.src = list[0];
+  })();
+
+  function playZvuk() {
+    if (!zvukReady) return;
+    try {
+      zvukAudio.currentTime = 0;
+      zvukAudio.volume = ZVUK_VOLUME;
+      const p = zvukAudio.play();
+      if (p && p.catch) p.catch(() => {});
+    } catch (e) {}
+  }
+
+  document.addEventListener('click', function unlockZvuk() {
+    try {
+      const p = zvukAudio.play();
+      if (p && p.then) p.then(() => zvukAudio.pause()).catch(()=>{});
+      else zvukAudio.pause();
+    } catch(e){}
+    document.removeEventListener('click', unlockZvuk);
+  }, { once: true });
+
+  /* ============================================================
+     3. Часы
+     ============================================================ */
+  (function buildClockDial() {
+    const dial = document.getElementById('clockDial');
+    if (!dial) return;
+    for (let i = 0; i < 60; i++) {
+      const t = document.createElement('div');
+      const major = (i % 5 === 0);
+      t.className = 'wall-clock-tick' + (major ? ' major' : '');
+      const angle = i * 6;
+      const radius = major ? 62 : 64;
+      t.style.transform = 'rotate(' + angle + 'deg) translateY(-' + radius + 'px)';
+      dial.appendChild(t);
+    }
+    for (let i = 1; i <= 12; i++) {
+      const n = document.createElement('div');
+      n.className = 'wall-clock-num';
+      n.textContent = i;
+      const angle = i * 30;
+      n.style.transform = 'rotate(' + angle + 'deg) translateY(-46px) rotate(-' + angle + 'deg)';
+      dial.appendChild(n);
+    }
+  })();
+
+  const clockHourEl   = document.getElementById('clockHour');
+  const clockMinuteEl = document.getElementById('clockMinute');
+  const clockSecondEl = document.getElementById('clockSecond');
+
+  function tickClock() {
+    const now = new Date();
+    const h = now.getHours() % 12;
+    const m = now.getMinutes();
+    const s = now.getSeconds();
+    const ms = now.getMilliseconds();
+
+    const secAngle  = (s + ms / 1000) * 6;
+    const minAngle  = (m + s / 60) * 6;
+    const hourAngle = (h + m / 60 + s / 3600) * 30;
+
+    if (clockHourEl)   clockHourEl.style.transform   = 'rotate(' + hourAngle + 'deg)';
+    if (clockMinuteEl) clockMinuteEl.style.transform = 'rotate(' + minAngle + 'deg)';
+    if (clockSecondEl) clockSecondEl.style.transform = 'rotate(' + secAngle + 'deg)';
+
+    requestAnimationFrame(tickClock);
+  }
+  requestAnimationFrame(tickClock);
+
+  /* ============================================================
+     4. Пользователи
+     ============================================================ */
+  const LS_USERS   = 'game_users';
+  const LS_CURRENT = 'game_current_user';
+  const DM_KEY     = 'game_dms';
+
+  const getUsers   = () => JSON.parse(localStorage.getItem(LS_USERS)   || '[]');
+  const saveUsers  = (u) => localStorage.setItem(LS_USERS, JSON.stringify(u));
+  const getCurrent = () => localStorage.getItem(LS_CURRENT);
+  const setCurrent = (login) => {
+    if (login) localStorage.setItem(LS_CURRENT, login);
+    else localStorage.removeItem(LS_CURRENT);
+    renderUserArea();
+    renderPryanikChip();
+    renderChatAccess();
+    renderProfile();
+    renderChat();
+  };
+  const getMe = () => {
+    const login = getCurrent();
+    if (!login) return null;
+    return getUsers().find(u => u.login === login) || null;
+  };
+  const findUser = (login) =>
+    getUsers().find(u => u.login.toLowerCase() === String(login).toLowerCase());
+
+  function ensureFields(u) {
+    if (!u) return;
+    if (!Array.isArray(u.friends))   u.friends   = [];
+    if (!Array.isArray(u.following)) u.following = [];
+    if (!Array.isArray(u.followers)) u.followers = [];
+    if (!Array.isArray(u.gifts))     u.gifts     = [];
+    if (typeof u.pryaniki !== 'number') u.pryaniki = START_PRYANIKI;
+  }
+
+  /* ============================================================
+     5. Модалка авторизации
+     ============================================================ */
+  let modalMode = 'login';
+  const overlay = document.getElementById('modalOverlay');
+  const mTitle  = document.getElementById('modalTitle');
+  const mHint   = document.getElementById('mHint');
+  const mErr    = document.getElementById('mError');
+  const mSubmit = document.getElementById('mSubmit');
+  const mForm   = document.getElementById('modalForm');
+
+  function openModal(mode) {
+    modalMode = mode;
+    mTitle.textContent = mode === 'login' ? 'Вход' : 'Регистрация';
+    mSubmit.textContent = mode === 'login' ? 'Войти' : 'Создать аккаунт';
+    mHint.style.display = mode === 'register' ? '' : 'none';
+    mErr.textContent = '';
+    mForm.reset();
+    overlay.classList.add('open');
+    setTimeout(() => document.getElementById('mLogin').focus(), 50);
+  }
+  function closeModal() {
+    overlay.classList.remove('open');
+    mErr.textContent = '';
+  }
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (overlay.classList.contains('open')) closeModal();
+      if (document.getElementById('topUpModal').classList.contains('open')) closeTopUp();
+      if (document.getElementById('giftModal').classList.contains('open')) closeGift();
+      if (document.getElementById('dmModal').classList.contains('open')) closeDM();
+    }
+  });
+
+  function submitAuth(e) {
+    e.preventDefault();
+    mErr.textContent = '';
+    const login = document.getElementById('mLogin').value.trim();
+    const password = document.getElementById('mPassword').value;
+
+    if (login.length < 3) { mErr.textContent = 'Логин минимум 3 символа'; return; }
+    if (password.length < 3) { mErr.textContent = 'Пароль минимум 3 символа'; return; }
+
+    if (modalMode === 'register') {
+      if (findUser(login)) { mErr.textContent = 'Такой логин уже занят'; return; }
+      const users = getUsers();
+      users.push({
+        login, password,
+        avatar: null, bio: '',
+        friends: [], following: [], followers: [],
+        gifts: [], pryaniki: START_PRYANIKI
+      });
+      saveUsers(users);
+      setCurrent(login);
+      closeModal();
+    } else {
+      const u = findUser(login);
+      if (!u || u.password !== password) {
+        mErr.textContent = 'Неверный логин или пароль';
+        return;
+      }
+      ensureFields(u);
+      saveUsers(getUsers());
+      setCurrent(u.login);
+      closeModal();
+    }
+  }
+
+  function logout() {
+    setCurrent(null);
+    switchTab('main', true);
+  }
+
+  /* ============================================================
+     6. Смена аватара
+     ============================================================ */
+  function changeAvatar(evt) {
+    const file = evt.target.files && evt.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { alert('Это не картинка'); return; }
+    if (file.size > 2 * 1024 * 1024) { alert('Максимум 2 МБ'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const me = getMe();
+      if (!me) return;
+      const users = getUsers();
+      const idx = users.findIndex(u => u.login === me.login);
+      if (idx === -1) return;
+      users[idx].avatar = reader.result;
+      saveUsers(users);
+      renderUserArea();
+      renderProfile();
+      renderChat();
+    };
+    reader.readAsDataURL(file);
+    evt.target.value = '';
+  }
+  
+
+  /* ============================================================
+     7. Верхний правый угол
+     ============================================================ */
+  function renderUserArea() {
+    const area = document.getElementById('userArea');
+    const me = getMe();
+
+    if (!me) {
+      area.innerHTML = `
+        <button class="aero-btn green small" onclick="openModal('login')">Вход</button>
+        <button class="aero-btn green small" onclick="openModal('register')">Регистрация</button>
+      `;
+      return;
+    }
+
+    area.innerHTML = `
+      <label class="avatar-wrap" id="avatarWrap" title="Моя страничка">
+        <img id="userAvatarImg" alt="">
+        <input type="file" accept="image/*" hidden onchange="changeAvatar(event)">
+      </label>
+      <span class="uname">${esc(me.login)}</span>
+      <button class="logout-x" type="button" title="Выйти" onclick="logout()">×</button>
+    `;
+
+    document.getElementById('avatarWrap').addEventListener('click', (e) => {
+      e.preventDefault();
+      openProfile(me.login);
+    });
+
+    const img = document.getElementById('userAvatarImg');
+    const wrap = document.getElementById('avatarWrap');
+    if (me.avatar) {
+      img.src = me.avatar;
+    } else {
+      findImage(img, ['Avatar', 'avatar', 'AVATAR'], () => {
+        img.style.display = 'none';
+        wrap.classList.add('empty');
+        wrap.dataset.initial = (me.login[0] || '?').toUpperCase();
+      });
+    }
+  }
+
+  function renderPryanikChip() {
+    const chip = document.getElementById('pryanikChip');
+    const cnt  = document.getElementById('pryanikCount');
+    const me = getMe();
+    if (!chip) return;
+    if (!me) { chip.style.display = 'none'; return; }
+    ensureFields(me);
+    chip.style.display = 'flex';
+    cnt.textContent = me.pryaniki;
+  }
+
+  /* ============================================================
+     8. Профиль
+     ============================================================ */
+  let bioEditMode = false;
+  let currentProfileLogin = null;
+
+  function openProfile(login) {
+    const me = getMe();
+    if (!me) { openModal('login'); return; }
+    const user = findUser(login);
+    if (!user) return;
+    currentProfileLogin = user.login;
+    bioEditMode = false;
+    switchTab('profile', false);
+    renderProfile();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function closeProfile() {
+    switchTab('main', true);
+  }
+
+  function getRelation(otherLogin) {
+    const me = getMe();
+    if (!me) return 'guest';
+    if (me.login === otherLogin) return 'me';
+    ensureFields(me);
+    if (me.friends.includes(otherLogin)) return 'friend';
+    if (me.following.includes(otherLogin)) return 'following';
+
+    const other = findUser(otherLogin);
+    if (other) {
+      ensureFields(other);
+      if (other.following.includes(me.login)) return 'incoming';
+    }
+    return 'none';
+  }
+  
+  function renderProfile() {
+    const me = getMe();
+    const nameEl    = document.getElementById('profileName');
+    const bioEl     = document.getElementById('profileBio');
+    const pAvatar   = document.getElementById('profileAvatar');
+    const pImg      = document.getElementById('profileAvatarImg');
+    const actions   = document.getElementById('bioActions');
+    const friendBox = document.getElementById('profileActions');
+    const titleEl   = document.getElementById('profilePanelTitle');
+    const lsWrap    = document.getElementById('lsBtnWrap');
+    const friendsSec= document.getElementById('friendsSection');
+
+    if (!me || !currentProfileLogin) {
+      titleEl.textContent = 'Моя страничка';
+      nameEl.textContent = 'Гость';
+      bioEl.textContent = 'Войдите, чтобы увидеть свою страничку.';
+      bioEl.classList.add('empty');
+      bioEl.classList.remove('editable');
+      bioEl.onclick = null;
+      pAvatar.classList.add('empty', 'not-own');
+      pAvatar.dataset.initial = '?';
+      pImg.style.display = 'none';
+      actions.style.display = 'none';
+      friendBox.innerHTML = '';
+      lsWrap.innerHTML = '';
+      friendsSec.innerHTML = '';
+      return;
+    }
+
+    const user = findUser(currentProfileLogin);
+    if (!user) { closeProfile(); return; }
+    ensureFields(user);
+    ensureFields(me);
+
+    const isOwn = (user.login === me.login);
+
+    titleEl.textContent = isOwn ? 'Моя страничка' : ('Профиль ' + user.login);
+    nameEl.textContent = user.login;
+
+    // Аватар
+    pImg.style.display = '';
+    pAvatar.classList.toggle('not-own', !isOwn);
+    if (user.avatar) {
+      pImg.src = user.avatar;
+      pAvatar.classList.remove('empty');
+      pAvatar.dataset.initial = '';
+    } else {
+      pImg.style.display = '';
+      pImg.removeAttribute('src');
+      findImage(pImg, ['Avatar', 'avatar', 'AVATAR'], () => {
+        pImg.style.display = 'none';
+        pAvatar.classList.add('empty');
+        pAvatar.dataset.initial = (user.login[0] || '?').toUpperCase();
+      });
+      pAvatar.classList.remove('empty');
+    }
+
+    // Био
+    if (!bioEditMode) {
+      actions.style.display = 'none';
+      if (user.bio && user.bio.trim()) {
+        bioEl.textContent = user.bio;
+        bioEl.classList.remove('empty');
+      } else {
+        bioEl.textContent = isOwn
+          ? 'Нажми, чтобы написать описание о себе...'
+          : (user.login + ' пока ничего о себе не написал(а).');
+        bioEl.classList.add('empty');
+      }
+
+      if (isOwn) {
+        bioEl.classList.add('editable');
+        bioEl.onclick = startBioEdit;
+      } else {
+        bioEl.classList.remove('editable');
+        bioEl.onclick = null;
+      }
+    }
+
+    // Кнопки в ряду с именем
+    friendBox.innerHTML = '';
+    lsWrap.innerHTML = '';
+    friendsSec.innerHTML = '';
+
+    if (!isOwn) {
+      // дружба
+      const rel = getRelation(user.login);
+      if (rel === 'none') {
+        friendBox.appendChild(makeFriendBtn('+', 'Добавить в друзья', 'green', () => relationAction(user.login)));
+      } else if (rel === 'following') {
+        friendBox.appendChild(makeFriendBtn('✕', 'Отписаться', 'red', () => relationAction(user.login)));
+      } else if (rel === 'incoming') {
+        friendBox.appendChild(makeFriendBtn('✓', 'Принять в друзья', 'green', () => relationAction(user.login)));
+      } else if (rel === 'friend') {
+        friendBox.appendChild(makeFriendBtn('✕', 'Удалить из друзей', 'red', () => relationAction(user.login)));
+      }
+
+      // подарок
+      const giftBtn = document.createElement('button');
+      giftBtn.type = 'button';
+      giftBtn.className = 'friend-btn gift';
+      giftBtn.textContent = '🎁';
+      giftBtn.title = 'Подарить подарок';
+      giftBtn.addEventListener('click', () => openGift(user.login));
+      friendBox.appendChild(giftBtn);
+
+      // ЛС
+      const lsBtn = document.createElement('button');
+      lsBtn.type = 'button';
+      lsBtn.className = 'ls-btn';
+      lsBtn.textContent = '✉ Личные сообщения';
+      lsBtn.addEventListener('click', () => openDM(user.login));
+      lsWrap.appendChild(lsBtn);
+    }
+
+    // Раздел друзей (только на своей страничке)
+    if (isOwn) {
+      friendsSec.appendChild(buildFriendsSection(me));
+    }
+  }
+
+  function makeFriendBtn(label, title, color, onClick) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'friend-btn' + (color === 'red' ? ' red' : '');
+    btn.textContent = label;
+    btn.title = title;
+    btn.addEventListener('click', onClick);
+    return btn;
+  }
+
+  function buildFriendsSection(me) {
+    const wrap = document.createElement('div');
+    wrap.className = 'friends-section';
+
+    // Друзья
+    const friendsPane = document.createElement('div');
+    friendsPane.className = 'friends-pane';
+    friendsPane.innerHTML = '<h3>Друзья</h3>';
+    const frList = document.createElement('div');
+    if (me.friends.length === 0) {
+      frList.innerHTML = '<div class="empty-note">Пока никого</div>';
+    } else {
+      me.friends.forEach(login => {
+        frList.appendChild(buildFriendRow(login, 'friend'));
+      });
+    }
+    friendsPane.appendChild(frList);
+
+    // Заявки
+    const reqPane = document.createElement('div');
+    reqPane.className = 'friends-pane';
+    reqPane.innerHTML = '<h3>Заявки</h3>';
+    const reqList = document.createElement('div');
+
+    const incoming = me.followers.filter(x => !me.friends.includes(x));
+
+    if (incoming.length === 0) {
+      reqList.innerHTML = '<div class="empty-note">Заявок нет</div>';
+    } else {
+      incoming.forEach(login => {
+        reqList.appendChild(buildFriendRow(login, 'incoming'));
+      });
+    }
+    reqPane.appendChild(reqList);
+
+    wrap.appendChild(friendsPane);
+    wrap.appendChild(reqPane);
+    return wrap;
+  }
+
+  function buildFriendRow(login, kind) {
+    const row = document.createElement('div');
+    row.className = 'friend-row';
+
+    const u = findUser(login);
+    const av = document.createElement('div');
+    av.className = 'fr-avatar';
+    av.textContent = (login[0] || '?').toUpperCase();
+    if (u && u.avatar) {
+      const img = document.createElement('img');
+      img.src = u.avatar;
+      av.textContent = '';
+      av.appendChild(img);
+    } else {
+      const img = document.createElement('img');
+      img.alt = '';
+      findImage(img, ['Avatar', 'avatar', 'AVATAR'], () => {
+        img.style.display = 'none';
+      });
+      av.appendChild(img);
+    }
+
+    const name = document.createElement('span');
+    name.className = 'fr-name';
+    name.textContent = login;
+    name.addEventListener('click', () => openProfile(login));
+
+    row.appendChild(av);
+    row.appendChild(name);
+
+    if (kind === 'incoming') {
+      const ok = document.createElement('button');
+      ok.type = 'button';
+      ok.className = 'mini-ok';
+      ok.textContent = '✓';
+      ok.title = 'Принять заявку';
+      ok.addEventListener('click', () => relationAction(login));
+      row.appendChild(ok);
+
+      const x = document.createElement('button');
+      x.type = 'button';
+      x.className = 'mini-x';
+      x.textContent = '✕';
+      x.title = 'Отклонить';
+      x.addEventListener('click', () => rejectIncoming(login));
+      row.appendChild(x);
+    } else {
+      const x = document.createElement('button');
+      x.type = 'button';
+      x.className = 'mini-x';
+      x.textContent = '✕';
+      x.title = 'Удалить из друзей';
+      x.addEventListener('click', () => relationAction(login));
+      row.appendChild(x);
+    }
+
+    return row;
+  }
+
+  function relationAction(otherLogin) {
+    const me = getMe();
+    if (!me) return;
+    const users = getUsers();
+    const meIdx = users.findIndex(u => u.login === me.login);
+    const otherIdx = users.findIndex(u => u.login === otherLogin);
+    if (meIdx === -1 || otherIdx === -1) return;
+
+    const meU = users[meIdx];
+    const otherU = users[otherIdx];
+    ensureFields(meU);
+    ensureFields(otherU);
+
+    const rel = getRelation(otherLogin);
+
+    if (rel === 'none') {
+      if (!meU.following.includes(otherLogin)) meU.following.push(otherLogin);
+      if (!otherU.followers.includes(me.login)) otherU.followers.push(me.login);
+    } else if (rel === 'following') {
+      meU.following = meU.following.filter(x => x !== otherLogin);
+      otherU.followers = otherU.followers.filter(x => x !== me.login);
+    } else if (rel === 'incoming') {
+      if (!meU.friends.includes(otherLogin)) meU.friends.push(otherLogin);
+      if (!otherU.friends.includes(me.login)) otherU.friends.push(me.login);
+      meU.followers = meU.followers.filter(x => x !== otherLogin);
+      meU.following = meU.following.filter(x => x !== otherLogin);
+      otherU.followers = otherU.followers.filter(x => x !== me.login);
+      otherU.following = otherU.following.filter(x => x !== me.login);
+    } else if (rel === 'friend') {
+      meU.friends = meU.friends.filter(x => x !== otherLogin);
+      otherU.friends = otherU.friends.filter(x => x !== me.login);
+    }
+
+    saveUsers(users);
+    renderProfile();
+    renderUserArea();
+  }
+
+  function rejectIncoming(login) {
+    const me = getMe();
+    if (!me) return;
+    const users = getUsers();
+    const meIdx = users.findIndex(u => u.login === me.login);
+    const otherIdx = users.findIndex(u => u.login === login);
+    if (meIdx === -1 || otherIdx === -1) return;
+    ensureFields(users[meIdx]);
+    ensureFields(users[otherIdx]);
+    users[meIdx].followers = users[meIdx].followers.filter(x => x !== login);
+    users[otherIdx].following = users[otherIdx].following.filter(x => x !== me.login);
+    saveUsers(users);
+    renderProfile();
+  }
+
+  function startBioEdit() {
+    const me = getMe();
+    if (!me || !currentProfileLogin || currentProfileLogin !== me.login) return;
+    if (bioEditMode) return;
+    bioEditMode = true;
+
+    const bioEl = document.getElementById('profileBio');
+    const actions = document.getElementById('bioActions');
+
+    bioEl.classList.remove('empty');
+    bioEl.classList.remove('editable');
+    bioEl.onclick = null;
+    bioEl.innerHTML = '';
+    const ta = document.createElement('textarea');
+    ta.id = 'bioTextarea';
+    ta.maxLength = 500;
+    ta.placeholder = 'Расскажи о себе...';
+    ta.value = me.bio || '';
+    bioEl.appendChild(ta);
+    actions.style.display = 'flex';
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+  }
+
+  function saveBio() {
+    const me = getMe();
+    if (!me) return;
+    const ta = document.getElementById('bioTextarea');
+    const text = ta ? ta.value.trim().slice(0, 500) : '';
+    const users = getUsers();
+    const idx = users.findIndex(u => u.login === me.login);
+    if (idx !== -1) {
+      users[idx].bio = text;
+      saveUsers(users);
+    }
+    bioEditMode = false;
+    renderProfile();
+  }
+
+  function cancelBioEdit() {
+    bioEditMode = false;
+    renderProfile();
+  }
+
+  /* ============================================================
+     9. Чат — доступ
+     ============================================================ */
+  function renderChatAccess() {
+    const me = getMe();
+    const whoInput = document.getElementById('chatWho');
+    const textInput = document.getElementById('chatText');
+    const sendBtn = document.getElementById('chatSend');
+
+    if (me) {
+      whoInput.value = me.login;
+      whoInput.readOnly = true;
+      textInput.disabled = false;
+      textInput.placeholder = 'Сообщение...';
+      sendBtn.disabled = false;
+    } else {
+      whoInput.value = '';
+      whoInput.placeholder = 'Войди, чтобы писать';
+      whoInput.readOnly = true;
+      textInput.disabled = true;
+      textInput.value = '';
+      textInput.placeholder = 'Сначала войдите';
+      sendBtn.disabled = true;
+    }
+  }
+
+  /* ============================================================
+     10. Вкладки
+     ============================================================ */
+  function switchTab(name, clickTab) {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    if (clickTab) {
+      const t = document.querySelector(`.tab[data-tab="${name}"]`);
+      if (t) t.classList.add('active');
+    }
+    const p = document.getElementById('panel-' + name);
+    if (p) p.classList.add('active');
+  }
+
+  document.querySelectorAll('[data-tab]').forEach(t => {
+    t.addEventListener('click', () => {
+      const name = t.dataset.tab;
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+      if (t.classList.contains('tab')) t.classList.add('active');
+      document.getElementById('panel-' + name).classList.add('active');
+    });
+  });
+
+  /* ============================================================
+     11. Чат + кулдаун + звук
+     ============================================================ */
+  const CHAT_KEY = 'game_chat_msgs';
+  let msgs = JSON.parse(localStorage.getItem(CHAT_KEY) || '[]');
+  const list = document.getElementById('chatList');
+
+  let lastSentAt = 0;
+  let cooldownTimer = null;
+
+  function renderChat() {
+    const me = getMe();
+    if (!msgs.length) {
+      list.innerHTML = '<div style="color:#7a94b0;text-align:center;padding:20px;font-style:italic;">Сообщений пока нет.</div>';
+      return;
+    }
+
+    list.innerHTML = msgs.map(m => {
+      const d = new Date(m.t);
+      const when = d.toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+      const own = me && m.who === me.login;
+      const initial = (m.who[0] || '?').toUpperCase();
+
+      return `<div class="msg${own ? ' own' : ''}">
+        <div class="msg-avatar" data-initial="${esc(initial)}" data-login="${esc(m.who)}" title="Открыть профиль ${esc(m.who)}">
+          <img alt="">
+        </div>
+        <div class="msg-bubble">
+          <div class="msg-head">
+            <span class="who" data-login="${esc(m.who)}">${esc(m.who)}</span>
+            <span class="when">${when}</span>
+          </div>
+          <div class="msg-text">${esc(m.text)}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const avatarEls = list.querySelectorAll('.msg-avatar');
+    msgs.forEach((m, i) => {
+      const el = avatarEls[i];
+      if (!el) return;
+      const img = el.querySelector('img');
+      const user = findUser(m.who);
+      if (user && user.avatar) {
+        img.src = user.avatar;
+      } else {
+        findImage(img, ['Avatar', 'avatar', 'AVATAR'], () => {
+          img.style.display = 'none';
+        });
+      }
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openProfile(m.who);
+      });
+    });
+
+    list.querySelectorAll('.who[data-login]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openProfile(el.dataset.login);
+      });
+    });
+
+    list.scrollTop = list.scrollHeight;
+  }
+
+  function sendMsg(e) {
+    e.preventDefault();
+    const me = getMe();
+    if (!me) { openModal('login'); return; }
+
+    const now = Date.now();
+    const left = CHAT_COOLDOWN_MS - (now - lastSentAt);
+    if (left > 0) {
+      showCooldown(left);
+      return;
+    }
+
+    const textEl = document.getElementById('chatText');
+    const text = textEl.value.trim();
+    if (!text) { textEl.focus(); return; }
+
+    msgs.push({ who: me.login, text, t: Date.now() });
+    localStorage.setItem(CHAT_KEY, JSON.stringify(msgs));
+    textEl.value = '';
+    textEl.focus();
+    renderChat();
+    playZvuk();
+
+    lastSentAt = Date.now();
+    lockChatButton();
+    startCooldownTimer();
+  }
+
+  function lockChatButton() {
+    const btn = document.getElementById('chatSend');
+    const txt = document.getElementById('chatText');
+    if (btn) btn.disabled = true;
+    if (txt) txt.disabled = true;
+  }
+  function unlockChatButton() {
+    const me = getMe();
+    if (!me) return;
+    const btn = document.getElementById('chatSend');
+    const txt = document.getElementById('chatText');
+    if (btn) btn.disabled = false;
+    if (txt) txt.disabled = false;
+  }
+
+  function startCooldownTimer() {
+    if (cooldownTimer) clearInterval(cooldownTimer);
+    cooldownTimer = setInterval(() => {
+      const left = CHAT_COOLDOWN_MS - (Date.now() - lastSentAt);
+      if (left <= 0) {
+        clearInterval(cooldownTimer);
+        cooldownTimer = null;
+        hideCooldown();
+        unlockChatButton();
+      } else {
+        showCooldown(left);
+      }
+    }, 100);
+  }
+
+  function showCooldown(msLeft) {
+    const el = document.getElementById('chatCooldown');
+    if (!el) return;
+    const sec = (msLeft / 1000).toFixed(1);
+    el.textContent = 'Подожди ' + sec + ' сек...';
+    el.classList.add('show');
+  }
+  function hideCooldown() {
+    const el = document.getElementById('chatCooldown');
+    if (!el) return;
+    el.classList.remove('show');
+    el.textContent = '';
+  }
+
+  /* ============================================================
+     12. Игры
+     ============================================================ */
+  function openGame(file, title) {
+    const f = document.getElementById('gameFrame');
+    const t = document.getElementById('gamePanelTitle');
+    t.textContent = title || 'Игра';
+    f.src = file;
+    switchTab('game', false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function closeGame() {
+    const f = document.getElementById('gameFrame');
+    f.src = '';
+    switchTab('games', true);
+  }
+    /* ============================================================
+     Полноэкранный режим для игры
+     ============================================================ */
+  function toggleFullscreen() {
+    const wrap = document.getElementById('gameWrap');
+    const btn  = document.getElementById('fsBtn');
+    if (!wrap) return;
+
+    const isFs = document.fullscreenElement || document.webkitFullscreenElement;
+    if (!isFs) {
+      const req = wrap.requestFullscreen || wrap.webkitRequestFullscreen;
+      if (req) {
+        req.call(wrap).catch(() => {});
+        if (btn) btn.textContent = '⛶ Выйти из полноэкранного';
+      }
+    } else {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) exit.call(document);
+    }
+  }
+
+  // Меняем надпись кнопки, когда пользователь сам выходит по Esc
+  document.addEventListener('fullscreenchange', updateFsBtn);
+  document.addEventListener('webkitfullscreenchange', updateFsBtn);
+  function updateFsBtn() {
+    const btn = document.getElementById('fsBtn');
+    if (!btn) return;
+    const isFs = document.fullscreenElement || document.webkitFullscreenElement;
+    btn.textContent = isFs ? '⛶ Выйти из полноэкранного' : '⛶ Во весь экран';
+  }
+
+  /* ============================================================
+     13. Донат
+     ============================================================ */
+  function openDonate() {
+    if (!DONATE_URL || DONATE_URL === '#' || DONATE_URL.indexOf('example.com') !== -1) {
+      alert('Ссылка для доната ещё не настроена.');
+      return;
+    }
+    window.open(DONATE_URL, '_blank', 'noopener');
+  }
+
+  /* ============================================================
+     14. Пряники — пополнение
+     ============================================================ */
+  function openTopUp() {
+    const me = getMe();
+    if (!me) { openModal('login'); return; }
+    document.getElementById('topUpModal').classList.add('open');
+  }
+  function closeTopUp() {
+    document.getElementById('topUpModal').classList.remove('open');
+  }
+    function topUp(amount) {
+    // ===== ЗАГЛУШКА =====
+    // Реальное пополнение пока не подключено.
+    // Когда будешь готов — подключишь платёжную систему
+    // (ЮKassa, CloudPayments, Robokassa и т.п.)
+    // и здесь будет вызов их API.
+    alert('Пополнение пока что выполняется руками. Задонатьте на Boosty и напишите сколько нужно пряников.');
+  }
+  /* ============================================================
+     15. Подарки
+     ============================================================ */
+  let giftTarget = null;
+
+  function openGift(login) {
+    const me = getMe();
+    if (!me) { openModal('login'); return; }
+    giftTarget = login;
+    const titleEl = document.getElementById('giftModalTitle');
+    titleEl.textContent = 'Подарить · ' + login;
+
+    const list = document.getElementById('giftList');
+    list.innerHTML = '';
+
+    const meU = getMe();
+    ensureFields(meU);
+
+    GIFTS.forEach(g => {
+      const row = document.createElement('div');
+      row.className = 'gift-row';
+
+      const ic = document.createElement('div');
+      ic.className = 'gift-icon';
+      ic.textContent = g.icon;
+
+      const info = document.createElement('div');
+      info.className = 'gift-info';
+      info.innerHTML = '<div class="gift-name">' + esc(g.name) + '</div>' +
+                       '<div class="gift-price">' + g.price + ' пряников</div>';
+
+      const canAfford = meU.pryaniki >= g.price;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'aero-btn green small';
+      btn.textContent = canAfford ? 'Подарить' : 'Не хватает';
+      btn.disabled = !canAfford;
+      btn.addEventListener('click', () => sendGift(g));
+
+      row.appendChild(ic);
+      row.appendChild(info);
+      row.appendChild(btn);
+      list.appendChild(row);
+    });
+
+    document.getElementById('giftModal').classList.add('open');
+  }
+  function closeGift() {
+    document.getElementById('giftModal').classList.remove('open');
+    giftTarget = null;
+  }
+  function sendGift(gift) {
+    if (!giftTarget) return;
+    const me = getMe();
+    if (!me) return;
+    const users = getUsers();
+    const meIdx = users.findIndex(u => u.login === me.login);
+    const otherIdx = users.findIndex(u => u.login === giftTarget);
+    if (meIdx === -1 || otherIdx === -1) return;
+    ensureFields(users[meIdx]);
+    ensureFields(users[otherIdx]);
+
+    if (users[meIdx].pryaniki < gift.price) return;
+    users[meIdx].pryaniki -= gift.price;
+    users[otherIdx].gifts.push({
+      id: gift.id,
+      icon: gift.icon,
+      name: gift.name,
+      from: me.login,
+      t: Date.now()
+    });
+
+    saveUsers(users);
+    renderPryanikChip();
+    closeGift();
+    alert('Подарок отправлен!');
+  }
+
+  /* ============================================================
+     16. Личные сообщения
+     ============================================================ */
+  let dmTarget = null;
+
+  const getDMs = () => JSON.parse(localStorage.getItem(DM_KEY) || '{}');
+  const saveDMs = (d) => localStorage.setItem(DM_KEY, JSON.stringify(d));
+
+  function dmKey(a, b) {
+    return [a, b].sort().join('|');
+  }
+
+  function openDM(login) {
+    const me = getMe();
+    if (!me) { openModal('login'); return; }
+    if (!findUser(login)) return;
+    dmTarget = login;
+    document.getElementById('dmTitle').textContent = 'Сообщение · ' + login;
+    renderDM();
+    document.getElementById('dmModal').classList.add('open');
+    setTimeout(() => document.getElementById('dmInput').focus(), 50);
+  }
+  function closeDM() {
+    document.getElementById('dmModal').classList.remove('open');
+    dmTarget = null;
+  }
+
+  function renderDM() {
+    const me = getMe();
+    const list = document.getElementById('dmList');
+    if (!me || !dmTarget) { list.innerHTML = ''; return; }
+
+    const all = getDMs();
+    const key = dmKey(me.login, dmTarget);
+    const arr = all[key] || [];
+
+    if (arr.length === 0) {
+      list.innerHTML = '<div class="empty-note">Сообщений пока нет. Напиши первым!</div>';
+      return;
+    }
+
+    list.innerHTML = arr.map(m => {
+      const own = m.from === me.login;
+      const d = new Date(m.t);
+      const when = d.toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+      return '<div class="dm-msg' + (own ? ' own' : '') + '">' +
+        '<div class="dm-meta">' + esc(m.from) + ' · ' + when + '</div>' +
+        '<div class="dm-text">' + esc(m.text) + '</div>' +
+      '</div>';
+    }).join('');
+    list.scrollTop = list.scrollHeight;
+  }
+
+  function sendDM(e) {
+    e.preventDefault();
+    const me = getMe();
+    if (!me || !dmTarget) return;
+    const input = document.getElementById('dmInput');
+    const text = input.value.trim();
+    if (!text) { input.focus(); return; }
+
+    const all = getDMs();
+    const key = dmKey(me.login, dmTarget);
+    if (!all[key]) all[key] = [];
+    all[key].push({ from: me.login, text, t: Date.now() });
+    saveDMs(all);
+
+    input.value = '';
+    input.focus();
+    renderDM();
+    playZvuk();
+  }
+
+  /* ============================================================
+     17. Утилита
+     ============================================================ */
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ============================================================
+     18. Старт
+     ============================================================ */
+  renderUserArea();
+  renderPryanikChip();
+  renderChatAccess();
+  renderChat();
+  renderProfile();
+    /* ============================================================
+     Обложки игр — автопоиск Logo в папке игры
+     ============================================================ */
+  (function initGameCovers() {
+    document.querySelectorAll('.game-cover[data-logo-base]').forEach(cover => {
+      const img = cover.querySelector('img');
+      if (!img) return;
+      const base = cover.dataset.logoBase;
+      findImage(img, [base],
+        () => {
+          img.remove();
+          cover.classList.add('no-logo');
+        });
+    });
+  })();
+</script>
+
+</body>
+</html>
