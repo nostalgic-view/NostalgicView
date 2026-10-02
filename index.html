@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nostalgic View</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; }
 
@@ -1791,11 +1792,14 @@
       <button class="modal-close" type="button" onclick="closeModal()">×</button>
     </div>
     <form class="modal-body" id="modalForm" onsubmit="submitAuth(event)">
-      <label>Логин
-        <input type="text" id="mLogin" required minlength="3" maxlength="20" autocomplete="username" placeholder="от 3 до 20 символов">
+      <label id="mLoginLabel">Ник
+        <input type="text" id="mLogin" minlength="3" maxlength="20" autocomplete="username" placeholder="от 3 до 20 символов">
+      </label>
+      <label id="mEmailLabel">Email
+        <input type="email" id="mEmail" required autocomplete="email" placeholder="you@example.com">
       </label>
       <label>Пароль
-        <input type="password" id="mPassword" required minlength="3" maxlength="40" autocomplete="current-password" placeholder="от 3 символов">
+        <input type="password" id="mPassword" required minlength="6" maxlength="40" autocomplete="current-password" placeholder="минимум 6 символов">
       </label>
       <div class="modal-hint" id="mHint" style="display:none;">
         Аватар по умолчанию берётся из файла <b>Avatar</b> в папке сайта. Свой можно поставить позже — клик по аватарке в шапке.
@@ -1804,6 +1808,9 @@
       <div class="modal-actions">
         <button type="button" class="aero-btn red small" onclick="closeModal()">Отмена</button>
         <button type="submit" class="aero-btn green" id="mSubmit">Войти</button>
+      </div>
+      <div style="text-align:center; margin-top:10px;">
+        <a href="#" id="forgotLink" style="font-size:11px; color:#0a4a8a;">Забыли пароль?</a>
       </div>
     </form>
   </div>
@@ -1875,6 +1882,14 @@
      ★ НАСТРОЙКИ ★
      ============================================================ */
   const DONATE_URL = 'https://boosty.to/nostalgicview/donate';
+    /* ============================================================
+     SUPABASE
+     ============================================================ */
+  const SUPABASE_URL = 'https://ygtbmacfyilybtfwpjaf.supabase.co/rest/v1/';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlndGJtYWNmeWlseWJ0ZndwamFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5Njk3NjcsImV4cCI6MjEwNjU0NTc2N30.igr2riaeAzh5HOhZ_WE16UnC8lknJTGdlGZta7GWcCY';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let myProfile = null; // текущий залогиненный профиль
   const CHAT_COOLDOWN_MS = 1000;
   const ZVUK_VOLUME = 0.6;
   const START_PRYANIKI = 100;
@@ -2010,37 +2025,37 @@
   /* ============================================================
      4. Пользователи
      ============================================================ */
-  const LS_USERS   = 'game_users';
-  const LS_CURRENT = 'game_current_user';
-  const DM_KEY     = 'game_dms';
+  const DM_KEY = 'game_dms';
 
-  const getUsers   = () => JSON.parse(localStorage.getItem(LS_USERS)   || '[]');
-  const saveUsers  = (u) => localStorage.setItem(LS_USERS, JSON.stringify(u));
-  const getCurrent = () => localStorage.getItem(LS_CURRENT);
-  const setCurrent = (login) => {
-    if (login) localStorage.setItem(LS_CURRENT, login);
-    else localStorage.removeItem(LS_CURRENT);
-    renderUserArea();
-    renderPryanikChip();
-    renderChatAccess();
-    renderProfile();
-    renderChat();
-  };
-  const getMe = () => {
-    const login = getCurrent();
-    if (!login) return null;
-    return getUsers().find(u => u.login === login) || null;
-  };
-  const findUser = (login) =>
-    getUsers().find(u => u.login.toLowerCase() === String(login).toLowerCase());
+  function getMe() { return myProfile; }
+  function getCurrent() { return myProfile ? myProfile.login : null; }
 
-  function ensureFields(u) {
+  async function loadMyProfile() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) { myProfile = null; return; }
+    const { data } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+    myProfile = data || null;
+  }
+
+  async function findUser(login) {
+    const { data } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .ilike('login', login)
+      .maybeSingle();
+    return data || null;
+  }
+    function ensureFields(u) {
     if (!u) return;
     if (!Array.isArray(u.friends))   u.friends   = [];
     if (!Array.isArray(u.following)) u.following = [];
     if (!Array.isArray(u.followers)) u.followers = [];
     if (!Array.isArray(u.gifts))     u.gifts     = [];
-    if (typeof u.pryaniki !== 'number') u.pryaniki = START_PRYANIKI;
+    if (typeof u.pryaniki !== 'number') u.pryaniki = 100;
   }
 
   /* ============================================================
@@ -2059,10 +2074,18 @@
     mTitle.textContent = mode === 'login' ? 'Вход' : 'Регистрация';
     mSubmit.textContent = mode === 'login' ? 'Войти' : 'Создать аккаунт';
     mHint.style.display = mode === 'register' ? '' : 'none';
+
+    document.getElementById('mLoginLabel').style.display = mode === 'register' ? '' : 'none';
+    document.getElementById('mLogin').required = (mode === 'register');
+    document.getElementById('mEmailLabel').style.display = '';
+
     mErr.textContent = '';
     mForm.reset();
     overlay.classList.add('open');
-    setTimeout(() => document.getElementById('mLogin').focus(), 50);
+    setTimeout(() => {
+      const f = mode === 'register' ? 'mLogin' : 'mEmail';
+      document.getElementById(f).focus();
+    }, 50);
   }
   function closeModal() {
     overlay.classList.remove('open');
@@ -2078,65 +2101,83 @@
     }
   });
 
-  function submitAuth(e) {
+  async function submitAuth(e) {
     e.preventDefault();
     mErr.textContent = '';
-    const login = document.getElementById('mLogin').value.trim();
+
+    const email = document.getElementById('mEmail').value.trim();
     const password = document.getElementById('mPassword').value;
 
-    if (login.length < 3) { mErr.textContent = 'Логин минимум 3 символа'; return; }
-    if (password.length < 3) { mErr.textContent = 'Пароль минимум 3 символа'; return; }
+    if (!email || !email.includes('@')) { mErr.textContent = 'Введи корректный email'; return; }
+    if (password.length < 6) { mErr.textContent = 'Пароль минимум 6 символов'; return; }
 
     if (modalMode === 'register') {
-      if (findUser(login)) { mErr.textContent = 'Такой логин уже занят'; return; }
-      const users = getUsers();
-      users.push({
-        login, password,
-        avatar: null, bio: '',
-        friends: [], following: [], followers: [],
-        gifts: [], pryaniki: START_PRYANIKI
+      const login = document.getElementById('mLogin').value.trim();
+      if (login.length < 3) { mErr.textContent = 'Ник минимум 3 символа'; return; }
+
+      const { data: exist } = await supabaseClient
+        .from('profiles')
+        .select('login')
+        .eq('login', login)
+        .maybeSingle();
+      if (exist) { mErr.textContent = 'Такой ник уже занят'; return; }
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: { data: { login: login } }
       });
-      saveUsers(users);
-      setCurrent(login);
-      closeModal();
-    } else {
-      const u = findUser(login);
-      if (!u || u.password !== password) {
-        mErr.textContent = 'Неверный логин или пароль';
+
+      if (error) { mErr.textContent = error.message; return; }
+
+      if (!data.session) {
+        mErr.textContent = 'Аккаунт создан! Проверь почту и подтверди email.';
         return;
       }
-      ensureFields(u);
-      saveUsers(getUsers());
-      setCurrent(u.login);
+
       closeModal();
+      await loadMyProfile();
+      renderAll();
+
+    } else {
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) { mErr.textContent = 'Неверный email или пароль'; return; }
+
+      closeModal();
+      await loadMyProfile();
+      renderAll();
     }
   }
-
-  function logout() {
-    setCurrent(null);
+  async function logout() {
+    await supabaseClient.auth.signOut();
+    myProfile = null;
+    renderAll();
     switchTab('main', true);
   }
 
   /* ============================================================
      6. Смена аватара
      ============================================================ */
-  function changeAvatar(evt) {
+  async function changeAvatar(evt) {
     const file = evt.target.files && evt.target.files[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { alert('Это не картинка'); return; }
     if (file.size > 2 * 1024 * 1024) { alert('Максимум 2 МБ'); return; }
+
     const reader = new FileReader();
-    reader.onload = () => {
-      const me = getMe();
-      if (!me) return;
-      const users = getUsers();
-      const idx = users.findIndex(u => u.login === me.login);
-      if (idx === -1) return;
-      users[idx].avatar = reader.result;
-      saveUsers(users);
-      renderUserArea();
-      renderProfile();
-      renderChat();
+    reader.onload = async () => {
+      if (!myProfile) return;
+      const { error } = await supabaseClient
+        .from('profiles')
+        .update({ avatar: reader.result })
+        .eq('id', myProfile.id);
+      if (error) { alert('Ошибка: ' + error.message); return; }
+      await loadMyProfile();
+      renderAll();
     };
     reader.readAsDataURL(file);
     evt.target.value = '';
@@ -2988,11 +3029,38 @@
   /* ============================================================
      18. Старт
      ============================================================ */
-  renderUserArea();
-  renderPryanikChip();
-  renderChatAccess();
-  renderChat();
-  renderProfile();
+  async function renderAll() {
+    renderUserArea();
+    renderPryanikChip();
+    renderChatAccess();
+    renderChat();
+    renderProfile();
+  }
+
+  (async () => {
+    await loadMyProfile();
+    await renderAll();
+  })();
+
+  supabaseClient.auth.onAuthStateChange(async () => {
+    await loadMyProfile();
+    await renderAll();
+  });
+
+  // Восстановление пароля
+  const forgotLink = document.getElementById('forgotLink');
+  if (forgotLink) {
+    forgotLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = prompt('Введи email, на который зарегистрирован аккаунт:');
+      if (!email) return;
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: location.origin + location.pathname
+      });
+      if (error) alert('Ошибка: ' + error.message);
+      else alert('Письмо со ссылкой для сброса отправлено.');
+    });
+  }
     /* ============================================================
      Обложки игр — автопоиск Logo в папке игры
      ============================================================ */
