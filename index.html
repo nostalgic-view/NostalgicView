@@ -2086,37 +2086,36 @@
     }
   });
 
-  async function submitAuth(e) {
+    async function submitAuth(e) {
     e.preventDefault();
     mErr.textContent = '';
 
-    const email = document.getElementById('mEmail').value.trim();
+    const login = document.getElementById('mLogin').value.trim();
     const password = document.getElementById('mPassword').value;
 
-    if (!email || !email.includes('@')) { mErr.textContent = 'Введи корректный email'; return; }
+    if (login.length < 3) { mErr.textContent = 'Ник минимум 3 символа'; return; }
+    if (!/^[a-zA-Z0-9_а-яА-ЯёЁ]+$/.test(login)) { mErr.textContent = 'Только буквы, цифры и _'; return; }
     if (password.length < 6) { mErr.textContent = 'Пароль минимум 6 символов'; return; }
 
-    if (modalMode === 'register') {
-      const login = document.getElementById('mLogin').value.trim();
-      if (login.length < 3) { mErr.textContent = 'Ник минимум 3 символа'; return; }
+    const fakeEmail = login.toLowerCase() + '@nostalgicview.local';
 
+    if (modalMode === 'register') {
       const { data: exist } = await supabaseClient
         .from('profiles')
         .select('login')
-        .eq('login', login)
+        .ilike('login', login)
         .maybeSingle();
       if (exist) { mErr.textContent = 'Такой ник уже занят'; return; }
 
       const { data, error } = await supabaseClient.auth.signUp({
-        email: email,
+        email: fakeEmail,
         password: password,
         options: { data: { login: login } }
       });
 
       if (error) { mErr.textContent = error.message; return; }
-
       if (!data.session) {
-        mErr.textContent = 'Аккаунт создан! Проверь почту и подтверди email.';
+        mErr.textContent = 'Не удалось создать аккаунт. Проверь Supabase (Confirm email = OFF).';
         return;
       }
 
@@ -2125,12 +2124,20 @@
       renderAll();
 
     } else {
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('login')
+        .ilike('login', login)
+        .maybeSingle();
+      if (!profile) { mErr.textContent = 'Неверный ник или пароль'; return; }
+
+      const loginEmail = profile.login.toLowerCase() + '@nostalgicview.local';
       const { error } = await supabaseClient.auth.signInWithPassword({
-        email: email,
+        email: loginEmail,
         password: password
       });
 
-      if (error) { mErr.textContent = 'Неверный email или пароль'; return; }
+      if (error) { mErr.textContent = 'Неверный ник или пароль'; return; }
 
       closeModal();
       await loadMyProfile();
@@ -3032,20 +3039,6 @@
     await renderAll();
   });
 
-  // Восстановление пароля
-  const forgotLink = document.getElementById('forgotLink');
-  if (forgotLink) {
-    forgotLink.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const email = prompt('Введи email, на который зарегистрирован аккаунт:');
-      if (!email) return;
-      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: location.origin + location.pathname
-      });
-      if (error) alert('Ошибка: ' + error.message);
-      else alert('Письмо со ссылкой для сброса отправлено.');
-    });
-  }
     /* ============================================================
      Обложки игр — автопоиск Logo в папке игры
      ============================================================ */
