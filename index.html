@@ -1441,6 +1441,34 @@
     border-radius: 10px;
     background: linear-gradient(180deg, rgba(245,250,255,.6) 0%, rgba(232,242,252,.6) 100%);
   }
+    /* ===== ФОТО НА ГЛАВНОЙ ===== */
+  .main-photo {
+    width: 100%;
+    margin: 0 0 18px;
+    padding: 3px;
+    border-radius: 14px;
+    background: linear-gradient(180deg,
+      #b8dcf2 0%,
+      #6cb3e3 30%,
+      #2c76b8 55%,
+      #1a5a9a 80%,
+      #0d3f7a 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 -1px 0 rgba(0,0,0,.3),
+      0 0 0 1px rgba(255,255,255,.4),
+      0 8px 20px rgba(10,50,100,.35),
+      0 0 24px rgba(120,200,255,.35);
+  }
+  .main-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 11px;
+  }
+  .main-photo.empty { display: none; }
 
   .footer {
     text-align: center;
@@ -1639,6 +1667,11 @@
 
       <div class="panel active" id="panel-main">
         <h2>Nostalgic View</h2>
+
+        <div class="main-photo" id="mainPhotoWrap">
+          <img id="armeykafonImg" alt="Армейский фон">
+        </div>
+
         <div class="placeholder">Приветствую! Я делаю игру про срочную службу в Вооружённых силах Российской Федерации 2000-х годов. Воинская часть полностью воссоздана на основе сериала «Солдаты». К сожалению, из-за довольно приличного количества киноляпов расположение некоторых комнат пришлось сделать по своему видению. В игре сделан упор на атмосферу, тактильность и взаимодействие с предметами. </div>
       </div>
 
@@ -1881,6 +1914,9 @@
   findImage(document.getElementById('fonImg'), ['Fon', 'fon', 'FON']);
   findImage(document.getElementById('pryanikIcon'), ['valuta', 'Valuta', 'VALUTA'],
     el => { el.style.display = 'none'; });
+	  findImage(document.getElementById('armeykafonImg'),
+    ['armeykafon', 'Armeykafon', 'ARMEYKAFON'],
+    (el) => { el.closest('.main-photo').classList.add('empty'); });
 
   /* ============================================================
      2. Zvuk
