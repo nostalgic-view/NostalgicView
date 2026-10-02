@@ -1792,11 +1792,8 @@
       <button class="modal-close" type="button" onclick="closeModal()">×</button>
     </div>
     <form class="modal-body" id="modalForm" onsubmit="submitAuth(event)">
-      <label id="mLoginLabel">Ник
-        <input type="text" id="mLogin" minlength="3" maxlength="20" autocomplete="username" placeholder="от 3 до 20 символов">
-      </label>
-      <label id="mEmailLabel">Email
-        <input type="email" id="mEmail" required autocomplete="email" placeholder="you@example.com">
+      <label>Ник
+        <input type="text" id="mLogin" required minlength="3" maxlength="20" autocomplete="username" placeholder="от 3 до 20 символов">
       </label>
       <label>Пароль
         <input type="password" id="mPassword" required minlength="6" maxlength="40" autocomplete="current-password" placeholder="минимум 6 символов">
@@ -1808,9 +1805,6 @@
       <div class="modal-actions">
         <button type="button" class="aero-btn red small" onclick="closeModal()">Отмена</button>
         <button type="submit" class="aero-btn green" id="mSubmit">Войти</button>
-      </div>
-      <div style="text-align:center; margin-top:10px;">
-        <a href="#" id="forgotLink" style="font-size:11px; color:#0a4a8a;">Забыли пароль?</a>
       </div>
     </form>
   </div>
@@ -2069,23 +2063,14 @@
   const mSubmit = document.getElementById('mSubmit');
   const mForm   = document.getElementById('modalForm');
 
-  function openModal(mode) {
+    function openModal(mode) {
     modalMode = mode;
     mTitle.textContent = mode === 'login' ? 'Вход' : 'Регистрация';
     mSubmit.textContent = mode === 'login' ? 'Войти' : 'Создать аккаунт';
-    mHint.style.display = mode === 'register' ? '' : 'none';
-
-    document.getElementById('mLoginLabel').style.display = mode === 'register' ? '' : 'none';
-    document.getElementById('mLogin').required = (mode === 'register');
-    document.getElementById('mEmailLabel').style.display = '';
-
     mErr.textContent = '';
     mForm.reset();
     overlay.classList.add('open');
-    setTimeout(() => {
-      const f = mode === 'register' ? 'mLogin' : 'mEmail';
-      document.getElementById(f).focus();
-    }, 50);
+    setTimeout(() => document.getElementById('mLogin').focus(), 50);
   }
   function closeModal() {
     overlay.classList.remove('open');
