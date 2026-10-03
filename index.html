@@ -20,6 +20,7 @@
 
     <button class="tab" data-tab="games">Игры</button>
     <button class="tab" data-tab="chat">Чат</button>
+    <button class="tab" data-tab="shop">Магазин</button>
     <button class="tab" data-tab="donate">Донат</button>
 
     <div class="top-right">
@@ -98,6 +99,19 @@
           <button class="aero-btn" type="submit" id="chatSend" disabled>Отправить</button>
         </form>
         <div class="chat-cooldown" id="chatCooldown"></div>
+      </div>
+
+      <div class="panel" id="panel-shop">
+        <h2>Магазин</h2>
+
+        <div class="shop-balance" id="shopBalance">
+          <span class="label">Твой баланс</span>
+          <span class="amount"><span>0</span><span style="font-size:14px;color:#7a5a10;margin-left:2px;">🍪</span></span>
+        </div>
+
+        <div id="shopContent">
+          <div class="placeholder">Войдите, чтобы увидеть магазин.</div>
+        </div>
       </div>
 
       <div class="panel" id="panel-donate">

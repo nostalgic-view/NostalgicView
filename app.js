@@ -13,14 +13,32 @@ const CHAT_COOLDOWN_MS = 1000;
 const ZVUK_VOLUME = 0.6;
 const RUB_PER_PRYANIK = 1.2;
 
-const GIFTS = [
-  { id: 'rose',    icon: '🌹', name: 'Роза',    price: 10  },
-  { id: 'cake',    icon: '🍰', name: 'Тортик',  price: 25  },
-  { id: 'star',    icon: '⭐', name: 'Звезда',  price: 50  },
-  { id: 'diamond', icon: '💎', name: 'Алмаз',   price: 100 },
-  { id: 'cup',     icon: '🏆', name: 'Кубок',   price: 250 },
-  { id: 'heart',   icon: '💖', name: 'Сердце',  price: 500 }
-];
+  const GIFTS = [
+    { id: 'rose',    icon: '🌹', name: 'Роза',    price: 10  },
+    { id: 'cake',    icon: '🍰', name: 'Тортик',  price: 25  },
+    { id: 'star',    icon: '⭐', name: 'Звезда',  price: 50  },
+    { id: 'diamond', icon: '💎', name: 'Алмаз',   price: 100 },
+    { id: 'cup',     icon: '🏆', name: 'Кубок',   price: 250 },
+    { id: 'heart',   icon: '💖', name: 'Сердце',  price: 500 }
+  ];
+
+  /* Каталог ников в магазине */
+  const NICK_SHOP = [
+    { id: 'rainbow', type: 'class', cls: 'nick-rainbow', category: 'color', name: 'Радужный',  price: 100, desc: 'Переливается всеми цветами радуги' },
+    { id: 'gold',    type: 'class', cls: 'nick-gold',    category: 'color', name: 'Золотой',   price: 200, desc: 'Золотой блеск, как на погонах' },
+    { id: 'neon',    type: 'class', cls: 'nick-neon',    category: 'color', name: 'Неоновый',  price: 150, desc: 'Сине-фиолетовое неоновое свечение' },
+    { id: 'fire',    type: 'class', cls: 'nick-fire',    category: 'color', name: 'Огненный',  price: 120, desc: 'Пылающий ник, как костёр в ночи' },
+    { id: 'ice',     type: 'class', cls: 'nick-ice',     category: 'color', name: 'Ледяной',   price: 120, desc: 'Холодный ледяной отблеск' },
+
+    { id: 'camo_1', type: 'camo', camoNum: 1, category: 'camo', name: 'Камуфляж 1', price: 50 },
+    { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Камуфляж 2', price: 50 },
+    { id: 'camo_3', type: 'camo', camoNum: 3, category: 'camo', name: 'Камуфляж 3', price: 50 },
+    { id: 'camo_4', type: 'camo', camoNum: 4, category: 'camo', name: 'Камуфляж 4', price: 50 },
+    { id: 'camo_5', type: 'camo', camoNum: 5, category: 'camo', name: 'Камуфляж 5', price: 50 },
+    { id: 'camo_6', type: 'camo', camoNum: 6, category: 'camo', name: 'Камуфляж 6', price: 50 },
+    { id: 'camo_7', type: 'camo', camoNum: 7, category: 'camo', name: 'Камуфляж 7', price: 50 },
+    { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Камуфляж 8', price: 50 }
+  ];
 
 /* ============================================================
    1. Автопоиск картинок
@@ -142,16 +160,20 @@ requestAnimationFrame(tickClock);
    ============================================================ */
 function getMe() { return myProfile; }
 
-async function loadMyProfile() {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) { myProfile = null; return; }
-  const { data } = await supabaseClient
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
-  myProfile = data || null;
-}
+  async function loadMyProfile() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) { myProfile = null; return; }
+    const { data } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+    myProfile = data || null;
+    if (myProfile) {
+      avatarCache.set(myProfile.login, myProfile.avatar || null);
+      nickStyleCache.set(myProfile.login, myProfile.nick_style || null);
+    }
+  }
 
 async function findUser(login) {
   const { data } = await supabaseClient
@@ -300,23 +322,36 @@ function esc(s) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* Аватары: кэш и дефолт */
-const avatarCache = new Map();       // login -> url | null
-let defaultAvatarUrl;                // undefined = не искали; null = нет файла; string = путь
+  /* Аватары: кэш и дефолт */
+  const avatarCache = new Map();       // login -> url | null
+  const nickStyleCache = new Map();    // login -> item_id | null
+  const camoImageCache = new Map();    // camoNum -> url | null
+  const camoNums = [1,2,3,4,5,6,7,8];
+  let defaultAvatarUrl;                // undefined = не искали; null = нет файла; string = путь
+  let myOwnedItems = new Set();        // id купленных предметов
 
 function invalidateAvatar(login) {
   if (login) avatarCache.delete(login);
 }
 
-async function prefetchAvatars(logins) {
-  const missing = [...new Set(logins)].filter(l => l && !avatarCache.has(l));
-  if (!missing.length) return;
-  const { data } = await supabaseClient
-    .from('profiles').select('login, avatar').in('login', missing);
-  const found = new Set();
-  (data || []).forEach(p => { avatarCache.set(p.login, p.avatar || null); found.add(p.login); });
-  missing.forEach(l => { if (!found.has(l)) avatarCache.set(l, null); });
-}
+  async function prefetchAvatars(logins) {
+    const missing = [...new Set(logins)].filter(l => l && !avatarCache.has(l));
+    if (!missing.length) return;
+    const { data } = await supabaseClient
+      .from('profiles').select('login, avatar, nick_style').in('login', missing);
+    const found = new Set();
+    (data || []).forEach(p => {
+      avatarCache.set(p.login, p.avatar || null);
+      nickStyleCache.set(p.login, p.nick_style || null);
+      found.add(p.login);
+    });
+    missing.forEach(l => {
+      if (!found.has(l)) {
+        avatarCache.set(l, null);
+        nickStyleCache.set(l, null);
+      }
+    });
+  }
 
 function testImage(url) {
   return new Promise(res => {
@@ -327,15 +362,43 @@ function testImage(url) {
   });
 }
 
-async function resolveDefaultAvatar() {
-  if (defaultAvatarUrl !== undefined) return defaultAvatarUrl;
-  for (const e of ['png','jpg','jpeg','webp','gif']) {
-    const url = 'Avatar.' + e;
-    if (await testImage(url)) { defaultAvatarUrl = url; return url; }
+  async function resolveDefaultAvatar() {
+    if (defaultAvatarUrl !== undefined) return defaultAvatarUrl;
+    for (const e of ['png','jpg','jpeg','webp','gif']) {
+      const url = 'Avatar.' + e;
+      if (await testImage(url)) { defaultAvatarUrl = url; return url; }
+    }
+    defaultAvatarUrl = null;
+    return null;
   }
-  defaultAvatarUrl = null;
-  return null;
-}
+
+  /* ---- Ники ---- */
+  async function preloadCamoImages() {
+    for (const n of camoNums) {
+      for (const ext of ['jpg','jpeg','png','webp','gif']) {
+        const url = `kamuflyazh/${n}.${ext}`;
+        if (await testImage(url)) { camoImageCache.set(n, url); break; }
+      }
+      if (!camoImageCache.has(n)) camoImageCache.set(n, null);
+    }
+  }
+
+  function nickHtml(login) {
+    const safe = esc(login);
+    const styleId = nickStyleCache.get(login);
+    if (!styleId) return safe;
+    const item = NICK_SHOP.find(i => i.id === styleId);
+    if (!item) return safe;
+    if (item.type === 'class') {
+      return `<span class="nick ${item.cls}">${safe}</span>`;
+    }
+    if (item.type === 'camo') {
+      const url = camoImageCache.get(item.camoNum);
+      if (!url) return safe;
+      return `<span class="nick nick-camo" style="--camo-url:url('${url}')">${safe}</span>`;
+    }
+    return safe;
+  }
 
 /* ============================================================
    8. Верхний правый угол
@@ -357,7 +420,7 @@ async function renderUserArea() {
       <img id="userAvatarImg" alt="">
       <input type="file" accept="image/*" hidden onchange="changeAvatar(event)">
     </label>
-    <span class="uname">${esc(me.login)}</span>
+    <span class="uname">${nickHtml(me.login)}</span>
     <button class="logout-x" type="button" title="Выйти" onclick="logout()">×</button>
   `;
 
@@ -395,17 +458,19 @@ function renderPryanikChip() {
    ============================================================ */
 let bioEditMode = false;
 
-async function openProfile(login) {
-  const me = getMe();
-  if (!me) { openModal('login'); return; }
-  const user = await findUser(login);
-  if (!user) return;
-  currentProfile = user;
-  bioEditMode = false;
-  switchTab('profile', false);
-  await renderProfile();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+  async function openProfile(login) {
+    const me = getMe();
+    if (!me) { openModal('login'); return; }
+    const user = await findUser(login);
+    if (!user) return;
+    currentProfile = user;
+    avatarCache.set(user.login, user.avatar || null);
+    nickStyleCache.set(user.login, user.nick_style || null);
+    bioEditMode = false;
+    switchTab('profile', false);
+    await renderProfile();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
 function closeProfile() {
   currentProfile = null;
@@ -463,7 +528,7 @@ async function renderProfile() {
   const isOwn = (user.id === me.id);
 
   titleEl.textContent = isOwn ? 'Моя страничка' : ('Профиль ' + user.login);
-  nameEl.textContent = user.login;
+    nameEl.innerHTML = nickHtml(user.login);
 
   pAvatar.classList.toggle('not-own', !isOwn);
   const src = user.avatar || (await resolveDefaultAvatar());
@@ -623,7 +688,7 @@ function buildFriendRow(user, kind) {
 
   const name = document.createElement('span');
   name.className = 'fr-name';
-  name.textContent = user.login;
+    name.innerHTML = nickHtml(user.login);
   name.addEventListener('click', () => openProfile(user.login));
 
   row.appendChild(av);
@@ -821,7 +886,7 @@ async function renderChat() {
       </div>
       <div class="msg-bubble">
         <div class="msg-head">
-          <span class="who" data-login="${esc(m.login)}">${esc(m.login)}</span>
+          <span class="who" data-login="${esc(m.login)}">${nickHtml(m.login)}</span>
           <span class="when">${when}</span>
         </div>
         <div class="msg-text">${esc(m.text)}</div>
@@ -942,20 +1007,22 @@ function switchTab(name, clickTab) {
     const t = document.querySelector(`.tab[data-tab="${name}"]`);
     if (t) t.classList.add('active');
   }
-  const p = document.getElementById('panel-' + name);
-  if (p) p.classList.add('active');
-}
-
-document.querySelectorAll('[data-tab]').forEach(t => {
-  t.addEventListener('click', () => {
-    const name = t.dataset.tab;
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
-    if (t.classList.contains('tab')) t.classList.add('active');
-    const p = document.getElementById('panel-' + name);
+      const p = document.getElementById('panel-' + name);
     if (p) p.classList.add('active');
+    if (name === 'shop') renderShop();
+  }
+
+  document.querySelectorAll('[data-tab]').forEach(t => {
+    t.addEventListener('click', () => {
+      const name = t.dataset.tab;
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+      if (t.classList.contains('tab')) t.classList.add('active');
+      const p = document.getElementById('panel-' + name);
+      if (p) p.classList.add('active');
+      if (name === 'shop') renderShop();
+    });
   });
-});
 
 /* ============================================================
    12. Игры
@@ -1208,23 +1275,197 @@ function unsubscribeDM() {
   }
 }
 
-/* ============================================================
-   17. Старт
-   ============================================================ */
-async function renderAll() {
-  await renderUserArea();
-  renderPryanikChip();
-  renderChatAccess();
-  await renderChat();
-  await renderProfile();
-}
+  /* ============================================================
+     16.5. Магазин
+     ============================================================ */
+  async function loadMyOwnedItems() {
+    myOwnedItems = new Set();
+    const me = getMe();
+    if (!me) return;
+    const { data } = await supabaseClient
+      .from('user_items')
+      .select('item_id')
+      .eq('user_id', me.id);
+    (data || []).forEach(r => myOwnedItems.add(r.item_id));
+  }
 
-(async () => {
-  await loadMyProfile();
-  await loadChatMessages();
-  await renderAll();
-  subscribeChat();
-})();
+  async function renderShop() {
+    const container = document.getElementById('shopContent');
+    if (!container) return;
+    const me = getMe();
+
+    const balanceEl = document.getElementById('shopBalance');
+    if (balanceEl) {
+      const amountEl = balanceEl.querySelector('.amount');
+      if (amountEl) {
+        amountEl.innerHTML =
+          '<span>' + (me ? (me.pryaniki ?? 0) : 0) + '</span>' +
+          '<span style="font-size:14px;color:#7a5a10;margin-left:2px;">🍪</span>';
+      }
+    }
+
+    if (!me) {
+      container.innerHTML = '<div class="placeholder">Войдите, чтобы увидеть магазин.</div>';
+      return;
+    }
+
+    const groups = [
+      { title: 'Переливающиеся ники', items: NICK_SHOP.filter(i => i.category === 'color') },
+      { title: 'Камуфляжные ники',    items: NICK_SHOP.filter(i => i.category === 'camo')  }
+    ];
+
+    const activeStyle = me.nick_style || null;
+    const balance = me.pryaniki || 0;
+
+    let html = '';
+    for (const g of groups) {
+      html += '<div class="shop-category"><h3>' + esc(g.title) + '</h3><div class="shop-grid">';
+      for (const item of g.items) {
+        html += renderShopCard(item, myOwnedItems.has(item.id), activeStyle === item.id, balance);
+      }
+      html += '</div></div>';
+    }
+    container.innerHTML = html;
+
+    container.querySelectorAll('[data-shop-action]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const item = NICK_SHOP.find(i => i.id === btn.dataset.itemId);
+        if (!item) return;
+        const action = btn.dataset.shopAction;
+        if (action === 'buy') await buyNickItem(item);
+        else if (action === 'equip') await equipNickItem(item);
+        else if (action === 'unequip') await unequipNickItem();
+      });
+    });
+  }
+
+  function renderShopCard(item, owned, active, balance) {
+    const preview = nickPreviewHtml(item);
+    const desc = item.desc || (item.type === 'camo' ? 'Камуфляжный узор под номером ' + item.camoNum : '');
+
+    let actionHtml = '';
+    if (active) {
+      actionHtml = '<button type="button" class="aero-btn red small" data-shop-action="unequip" data-item-id="' + item.id + '">Снять</button>';
+    } else if (owned) {
+      actionHtml = '<button type="button" class="aero-btn green small" data-shop-action="equip" data-item-id="' + item.id + '">Надеть</button>';
+    } else {
+      const canAfford = balance >= item.price;
+      actionHtml = '<button type="button" class="aero-btn green small" data-shop-action="buy" data-item-id="' + item.id + '"' +
+        (canAfford ? '' : ' disabled') + '>' + (canAfford ? 'Купить' : 'Не хватает') + '</button>';
+    }
+
+    let badge = '';
+    if (active) badge = '<span class="badge active">НАДЕТО</span>';
+    else if (owned) badge = '<span class="badge owned">КУПЛЕНО</span>';
+
+    return '<div class="shop-item' + (owned ? ' owned' : '') + (active ? ' active' : '') + '">' +
+      badge +
+      '<div class="shop-preview">' + preview + '</div>' +
+      '<div class="name">' + esc(item.name) + '</div>' +
+      '<div class="desc">' + esc(desc) + '</div>' +
+      '<div class="price"><span>🍪</span><span>' + item.price + '</span></div>' +
+      '<div class="actions">' + actionHtml + '</div>' +
+    '</div>';
+  }
+
+  function nickPreviewHtml(item) {
+    const sample = 'Солдат';
+    if (item.type === 'class') {
+      return '<span class="nick ' + item.cls + '">' + sample + '</span>';
+    }
+    if (item.type === 'camo') {
+      const url = camoImageCache.get(item.camoNum);
+      if (!url) return '<span style="color:#7a94b0;font-style:italic;">картинка не найдена</span>';
+      return '<span class="nick nick-camo" style="--camo-url:url(\'' + url + '\')">' + sample + '</span>';
+    }
+    return esc(sample);
+  }
+
+  async function buyNickItem(item) {
+    const me = getMe();
+    if (!me) { openModal('login'); return; }
+    if (myOwnedItems.has(item.id)) return;
+    if ((me.pryaniki || 0) < item.price) { alert('Не хватает пряников'); return; }
+
+    const { error: errIns } = await supabaseClient
+      .from('user_items')
+      .insert({ user_id: me.id, item_id: item.id });
+    if (errIns) { alert('Ошибка: ' + errIns.message); return; }
+
+    const { error: errUpd } = await supabaseClient
+      .from('profiles')
+      .update({ pryaniki: (me.pryaniki || 0) - item.price })
+      .eq('id', me.id);
+    if (errUpd) { alert('Ошибка: ' + errUpd.message); return; }
+
+    await loadMyProfile();
+    myOwnedItems.add(item.id);
+    renderPryanikChip();
+    await renderShop();
+  }
+
+  async function equipNickItem(item) {
+    const me = getMe();
+    if (!me) return;
+    if (!myOwnedItems.has(item.id)) return;
+
+    const { error } = await supabaseClient
+      .from('profiles')
+      .update({ nick_style: item.id })
+      .eq('id', me.id);
+    if (error) { alert('Ошибка: ' + error.message); return; }
+
+    await loadMyProfile();
+    nickStyleCache.set(me.login, item.id);
+    await renderShop();
+    await renderUserArea();
+    await renderChat();
+    if (currentProfile && currentProfile.id === me.id) {
+      currentProfile.nick_style = item.id;
+    }
+    if (currentProfile) await renderProfile();
+  }
+
+  async function unequipNickItem() {
+    const me = getMe();
+    if (!me) return;
+
+    const { error } = await supabaseClient
+      .from('profiles')
+      .update({ nick_style: null })
+      .eq('id', me.id);
+    if (error) { alert('Ошибка: ' + error.message); return; }
+
+    await loadMyProfile();
+    nickStyleCache.set(me.login, null);
+    await renderShop();
+    await renderUserArea();
+    await renderChat();
+    if (currentProfile && currentProfile.id === me.id) {
+      currentProfile.nick_style = null;
+    }
+    if (currentProfile) await renderProfile();
+  }
+
+  /* ============================================================
+     17. Старт
+     ============================================================ */
+  async function renderAll() {
+    await renderUserArea();
+    renderPryanikChip();
+    renderChatAccess();
+    await renderChat();
+    await renderProfile();
+    if (getMe()) await loadMyOwnedItems();
+  }
+
+  (async () => {
+    await preloadCamoImages();
+    await loadMyProfile();
+    await loadChatMessages();
+    await renderAll();
+    subscribeChat();
+  })();
 
 supabaseClient.auth.onAuthStateChange(async () => {
   await loadMyProfile();
