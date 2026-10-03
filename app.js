@@ -1399,19 +1399,30 @@ async function buyNickItem(item) {
   const me = getMe();
   if (!me) { openModal('login'); return; }
   if (myOwnedItems.has(item.id)) return;
-  if ((me.pryaniki || 0) < item.price) { alert('Не хватает пряников'); return; }
 
-  const { error: errIns } = await supabaseClient
-    .from('user_items')
-    .insert({ user_id: me.id, item_id: item.id });
-  if (errIns) { alert('Ошибка: ' + errIns.message); return; }
+  const { data, error } = await supabaseClient.rpc('buy_item', {
+    p_item_id: item.id,
+    p_price: item.price
+  });
 
-  const { error: errUpd } = await supabaseClient
-    .from('profiles')
-    .update({ pryaniki: (me.pryaniki || 0) - item.price })
-    .eq('id', me.id);
-  if (errUpd) { alert('Ошибка: ' + errUpd.message); return; }
+  if (error) { alert('Ошибка: ' + error.message); return; }
 
+  if (!data || !data.ok) {
+    if (data && data.error === 'already_owned') {
+      myOwnedItems.add(item.id);
+      await loadMyOwnedItems();
+      await renderShop();
+      return;
+    }
+    if (data && data.error === 'not_enough') {
+      alert('Не хватает пряников');
+      return;
+    }
+    alert('Ошибка: ' + (data ? data.error : 'unknown'));
+    return;
+  }
+
+  // успех
   await loadMyProfile();
   myOwnedItems.add(item.id);
   renderPryanikChip();
