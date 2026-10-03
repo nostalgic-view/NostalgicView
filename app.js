@@ -1400,7 +1400,6 @@ async function buyNickItem(item) {
   if (!me) { openModal('login'); return; }
   if (myOwnedItems.has(item.id)) return;
 
-  // 1. Уже есть в БД? (перестраховка от гонок и старых записей)
   const { data: existing } = await supabaseClient
     .from('user_items')
     .select('id')
@@ -1414,34 +1413,31 @@ async function buyNickItem(item) {
     return;
   }
 
-  // 2. Хватает ли пряников
   if ((me.pryaniki || 0) < item.price) {
     alert('Не хватает пряников');
     return;
   }
 
-  // 3. Списываем деньги
   const startBalance = me.pryaniki || 0;
   const newBalance = startBalance - item.price;
+
   const { error: errUpd } = await supabaseClient
     .from('profiles')
     .update({ pryaniki: newBalance })
     .eq('id', me.id);
   if (errUpd) { alert('Ошибка: ' + errUpd.message); return; }
 
-  // 4. Пытаемся вставить владение
   const { error: errIns } = await supabaseClient
     .from('user_items')
     .insert({ user_id: me.id, item_id: item.id });
 
   if (errIns) {
-    // Откатываем деньги в любом случае, если предмет не записался
+    // откат денег
     await supabaseClient
       .from('profiles')
       .update({ pryaniki: startBalance })
       .eq('id', me.id);
 
-    // 23505 = unique_violation, значит предмет уже был — не страшно
     if (errIns.code === '23505') {
       myOwnedItems.add(item.id);
       await loadMyProfile();
@@ -1453,7 +1449,6 @@ async function buyNickItem(item) {
     return;
   }
 
-  // 5. Успех
   await loadMyProfile();
   myOwnedItems.add(item.id);
   renderPryanikChip();
