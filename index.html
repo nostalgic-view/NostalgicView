@@ -1876,17 +1876,15 @@
      ★ НАСТРОЙКИ ★
      ============================================================ */
   const DONATE_URL = 'https://boosty.to/nostalgicview/donate';
-    /* ============================================================
-     SUPABASE
-     ============================================================ */
   const SUPABASE_URL = 'https://ygtbmacfyilybtfwpjaf.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlndGJtYWNmeWlseWJ0ZndwamFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5Njk3NjcsImV4cCI6MjEwNjU0NTc2N30.igr2riaeAzh5HOhZ_WE16UnC8lknJTGdlGZta7GWcCY';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  let myProfile = null; // текущий залогиненный профиль
+  let myProfile = null;
+  let currentProfile = null;
+
   const CHAT_COOLDOWN_MS = 1000;
   const ZVUK_VOLUME = 0.6;
-  const START_PRYANIKI = 100;
   const RUB_PER_PRYANIK = 1.2;
 
   const GIFTS = [
@@ -1908,6 +1906,7 @@
     return list;
   }
   function findImage(imgEl, baseNames, onFail) {
+    if (!imgEl) return;
     const list = candidateList(baseNames);
     let i = 0;
     imgEl.onerror = function () {
@@ -1923,16 +1922,15 @@
   findImage(document.getElementById('fonImg'), ['Fon', 'fon', 'FON']);
   findImage(document.getElementById('pryanikIcon'), ['valuta', 'Valuta', 'VALUTA'],
     el => { el.style.display = 'none'; });
-	  findImage(document.getElementById('armeykafonImg'),
+  findImage(document.getElementById('armeykafonImg'),
     ['armeykafon', 'Armeykafon', 'ARMEYKAFON'],
-    (el) => { el.closest('.main-photo').classList.add('empty'); });
+    (el) => { const w = el.closest('.main-photo'); if (w) w.classList.add('empty'); });
 
   /* ============================================================
      2. Zvuk
      ============================================================ */
   const zvukAudio = new Audio();
   let zvukReady = false;
-
   (function findZvuk() {
     const exts  = ['mp3','wav','ogg','m4a','aac','opus','webm','MP3','WAV','OGG','M4A','AAC'];
     const bases = ['Zvuk', 'zvuk', 'ZVUK'];
@@ -2003,15 +2001,12 @@
     const m = now.getMinutes();
     const s = now.getSeconds();
     const ms = now.getMilliseconds();
-
     const secAngle  = (s + ms / 1000) * 6;
     const minAngle  = (m + s / 60) * 6;
     const hourAngle = (h + m / 60 + s / 3600) * 30;
-
     if (clockHourEl)   clockHourEl.style.transform   = 'rotate(' + hourAngle + 'deg)';
     if (clockMinuteEl) clockMinuteEl.style.transform = 'rotate(' + minAngle + 'deg)';
     if (clockSecondEl) clockSecondEl.style.transform = 'rotate(' + secAngle + 'deg)';
-
     requestAnimationFrame(tickClock);
   }
   requestAnimationFrame(tickClock);
@@ -2019,11 +2014,7 @@
   /* ============================================================
      4. Пользователи
      ============================================================ */
-  const DM_KEY = 'game_dms';
-  let currentProfile = null;
-
   function getMe() { return myProfile; }
-  function getCurrent() { return myProfile ? myProfile.login : null; }
 
   async function loadMyProfile() {
     const { data: { user } } = await supabaseClient.auth.getUser();
@@ -2044,14 +2035,6 @@
       .maybeSingle();
     return data || null;
   }
-    function ensureFields(u) {
-    if (!u) return;
-    if (!Array.isArray(u.friends))   u.friends   = [];
-    if (!Array.isArray(u.following)) u.following = [];
-    if (!Array.isArray(u.followers)) u.followers = [];
-    if (!Array.isArray(u.gifts))     u.gifts     = [];
-    if (typeof u.pryaniki !== 'number') u.pryaniki = 100;
-  }
 
   /* ============================================================
      5. Модалка авторизации
@@ -2064,10 +2047,11 @@
   const mSubmit = document.getElementById('mSubmit');
   const mForm   = document.getElementById('modalForm');
 
-    function openModal(mode) {
+  function openModal(mode) {
     modalMode = mode;
     mTitle.textContent = mode === 'login' ? 'Вход' : 'Регистрация';
     mSubmit.textContent = mode === 'login' ? 'Войти' : 'Создать аккаунт';
+    if (mHint) mHint.style.display = mode === 'register' ? '' : 'none';
     mErr.textContent = '';
     mForm.reset();
     overlay.classList.add('open');
@@ -2081,16 +2065,18 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (overlay.classList.contains('open')) closeModal();
-      if (document.getElementById('topUpModal').classList.contains('open')) closeTopUp();
-      if (document.getElementById('giftModal').classList.contains('open')) closeGift();
-      if (document.getElementById('dmModal').classList.contains('open')) closeDM();
+      const tu = document.getElementById('topUpModal');
+      if (tu && tu.classList.contains('open')) closeTopUp();
+      const gm = document.getElementById('giftModal');
+      if (gm && gm.classList.contains('open')) closeGift();
+      const dm = document.getElementById('dmModal');
+      if (dm && dm.classList.contains('open')) closeDM();
     }
   });
 
-    async function submitAuth(e) {
+  async function submitAuth(e) {
     e.preventDefault();
     mErr.textContent = '';
-
     const login = document.getElementById('mLogin').value.trim();
     const password = document.getElementById('mPassword').value;
 
@@ -2116,14 +2102,12 @@
 
       if (error) { mErr.textContent = error.message; return; }
       if (!data.session) {
-        mErr.textContent = 'Не удалось создать аккаунт. Проверь Supabase (Confirm email = OFF).';
+        mErr.textContent = 'Не удалось создать аккаунт. Проверь Supabase.';
         return;
       }
-
       closeModal();
       await loadMyProfile();
-      renderAll();
-
+      await renderAll();
     } else {
       const { data: profile } = await supabaseClient
         .from('profiles')
@@ -2137,18 +2121,18 @@
         email: loginEmail,
         password: password
       });
-
       if (error) { mErr.textContent = 'Неверный ник или пароль'; return; }
-
       closeModal();
       await loadMyProfile();
-      renderAll();
+      await renderAll();
     }
   }
+
   async function logout() {
     await supabaseClient.auth.signOut();
     myProfile = null;
-    renderAll();
+    currentProfile = null;
+    await renderAll();
     switchTab('main', true);
   }
 
@@ -2160,7 +2144,6 @@
     if (!file) return;
     if (!file.type.startsWith('image/')) { alert('Это не картинка'); return; }
     if (file.size > 2 * 1024 * 1024) { alert('Максимум 2 МБ'); return; }
-
     const reader = new FileReader();
     reader.onload = async () => {
       if (!myProfile) return;
@@ -2170,15 +2153,25 @@
         .eq('id', myProfile.id);
       if (error) { alert('Ошибка: ' + error.message); return; }
       await loadMyProfile();
-      renderAll();
+      if (currentProfile && currentProfile.id === myProfile.id) {
+        currentProfile = myProfile;
+      }
+      await renderAll();
     };
     reader.readAsDataURL(file);
     evt.target.value = '';
   }
-  
 
   /* ============================================================
-     7. Верхний правый угол
+     7. Утилита
+     ============================================================ */
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ============================================================
+     8. Верхний правый угол
      ============================================================ */
   function renderUserArea() {
     const area = document.getElementById('userArea');
@@ -2225,13 +2218,12 @@
     const me = getMe();
     if (!chip) return;
     if (!me) { chip.style.display = 'none'; return; }
-    ensureFields(me);
     chip.style.display = 'flex';
-    cnt.textContent = me.pryaniki;
+    cnt.textContent = me.pryaniki ?? 0;
   }
 
   /* ============================================================
-     8. Профиль
+     9. Профиль
      ============================================================ */
   let bioEditMode = false;
 
@@ -2243,7 +2235,7 @@
     currentProfile = user;
     bioEditMode = false;
     switchTab('profile', false);
-    renderProfile();
+    await renderProfile();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -2252,14 +2244,24 @@
     switchTab('main', true);
   }
 
-  function getRelation(otherLogin) {
+  async function getRelation(otherId) {
     const me = getMe();
     if (!me) return 'guest';
-    if (me.login === otherLogin) return 'me';
-    return 'none';
+    if (me.id === otherId) return 'me';
+
+    const { data } = await supabaseClient
+      .from('friendships')
+      .select('*')
+      .or(`and(user_id.eq.${me.id},friend_id.eq.${otherId}),and(user_id.eq.${otherId},friend_id.eq.${me.id})`)
+      .maybeSingle();
+
+    if (!data) return 'none';
+    if (data.status === 'accepted') return 'friend';
+    if (data.user_id === me.id) return 'outgoing';
+    return 'incoming';
   }
-  
-  function renderProfile() {
+
+  async function renderProfile() {
     const me = getMe();
     const nameEl    = document.getElementById('profileName');
     const bioEl     = document.getElementById('profileBio');
@@ -2290,12 +2292,11 @@
       return;
     }
 
-    const isOwn = (user.login === me.login);
+    const isOwn = (user.id === me.id);
 
     titleEl.textContent = isOwn ? 'Моя страничка' : ('Профиль ' + user.login);
     nameEl.textContent = user.login;
 
-    // Аватар
     pImg.style.display = '';
     pAvatar.classList.toggle('not-own', !isOwn);
     if (user.avatar) {
@@ -2313,7 +2314,6 @@
       pAvatar.classList.remove('empty');
     }
 
-    // Био
     if (!bioEditMode) {
       actions.style.display = 'none';
       if (user.bio && user.bio.trim()) {
@@ -2325,7 +2325,6 @@
           : (user.login + ' пока ничего о себе не написал(а).');
         bioEl.classList.add('empty');
       }
-
       if (isOwn) {
         bioEl.classList.add('editable');
         bioEl.onclick = startBioEdit;
@@ -2335,53 +2334,22 @@
       }
     }
 
-    // Кнопки дружбы/подарков/ЛС — пока скрыты (мигрируем позже)
-    friendBox.innerHTML = '';
-    lsWrap.innerHTML = '';
-    friendsSec.innerHTML = '';
-  }
-
-    // Био
-    if (!bioEditMode) {
-      actions.style.display = 'none';
-      if (user.bio && user.bio.trim()) {
-        bioEl.textContent = user.bio;
-        bioEl.classList.remove('empty');
-      } else {
-        bioEl.textContent = isOwn
-          ? 'Нажми, чтобы написать описание о себе...'
-          : (user.login + ' пока ничего о себе не написал(а).');
-        bioEl.classList.add('empty');
-      }
-
-      if (isOwn) {
-        bioEl.classList.add('editable');
-        bioEl.onclick = startBioEdit;
-      } else {
-        bioEl.classList.remove('editable');
-        bioEl.onclick = null;
-      }
-    }
-
-    // Кнопки в ряду с именем
     friendBox.innerHTML = '';
     lsWrap.innerHTML = '';
     friendsSec.innerHTML = '';
 
     if (!isOwn) {
-      // дружба
-      const rel = getRelation(user.login);
+      const rel = await getRelation(user.id);
       if (rel === 'none') {
-        friendBox.appendChild(makeFriendBtn('+', 'Добавить в друзья', 'green', () => relationAction(user.login)));
-      } else if (rel === 'following') {
-        friendBox.appendChild(makeFriendBtn('✕', 'Отписаться', 'red', () => relationAction(user.login)));
+        friendBox.appendChild(makeFriendBtn('+', 'Добавить в друзья', 'green', () => relationAction(user)));
+      } else if (rel === 'outgoing') {
+        friendBox.appendChild(makeFriendBtn('✕', 'Отменить заявку', 'red', () => relationAction(user)));
       } else if (rel === 'incoming') {
-        friendBox.appendChild(makeFriendBtn('✓', 'Принять в друзья', 'green', () => relationAction(user.login)));
+        friendBox.appendChild(makeFriendBtn('✓', 'Принять в друзья', 'green', () => relationAction(user)));
       } else if (rel === 'friend') {
-        friendBox.appendChild(makeFriendBtn('✕', 'Удалить из друзей', 'red', () => relationAction(user.login)));
+        friendBox.appendChild(makeFriendBtn('✕', 'Удалить из друзей', 'red', () => relationAction(user)));
       }
 
-      // подарок
       const giftBtn = document.createElement('button');
       giftBtn.type = 'button';
       giftBtn.className = 'friend-btn gift';
@@ -2390,18 +2358,14 @@
       giftBtn.addEventListener('click', () => openGift(user.login));
       friendBox.appendChild(giftBtn);
 
-      // ЛС
       const lsBtn = document.createElement('button');
       lsBtn.type = 'button';
       lsBtn.className = 'ls-btn';
       lsBtn.textContent = '✉ Личные сообщения';
       lsBtn.addEventListener('click', () => openDM(user.login));
       lsWrap.appendChild(lsBtn);
-    }
-
-    // Раздел друзей (только на своей страничке)
-    if (isOwn) {
-      friendsSec.appendChild(buildFriendsSection(me));
+    } else {
+      await buildFriendsSection(friendsSec, me);
     }
   }
 
@@ -2415,72 +2379,92 @@
     return btn;
   }
 
-  function buildFriendsSection(me) {
+  async function buildFriendsSection(container, me) {
+    container.innerHTML = '';
+
+    const { data: rels } = await supabaseClient
+      .from('friendships')
+      .select('*')
+      .or(`user_id.eq.${me.id},friend_id.eq.${me.id}`)
+      .eq('status', 'accepted');
+    const friendIds = (rels || []).map(r => r.user_id === me.id ? r.friend_id : r.user_id);
+
+    const { data: inc } = await supabaseClient
+      .from('friendships')
+      .select('*')
+      .eq('friend_id', me.id)
+      .eq('status', 'pending');
+    const incomingIds = (inc || []).map(r => r.user_id);
+
+    const allIds = [...new Set([...friendIds, ...incomingIds])];
+    let usersMap = {};
+    if (allIds.length > 0) {
+      const { data: users } = await supabaseClient
+        .from('profiles')
+        .select('id, login, avatar')
+        .in('id', allIds);
+      (users || []).forEach(u => { usersMap[u.id] = u; });
+    }
+
     const wrap = document.createElement('div');
     wrap.className = 'friends-section';
 
-    // Друзья
     const friendsPane = document.createElement('div');
     friendsPane.className = 'friends-pane';
     friendsPane.innerHTML = '<h3>Друзья</h3>';
     const frList = document.createElement('div');
-    if (me.friends.length === 0) {
+    if (friendIds.length === 0) {
       frList.innerHTML = '<div class="empty-note">Пока никого</div>';
     } else {
-      me.friends.forEach(login => {
-        frList.appendChild(buildFriendRow(login, 'friend'));
+      friendIds.forEach(id => {
+        const u = usersMap[id];
+        if (u) frList.appendChild(buildFriendRow(u, 'friend'));
       });
     }
     friendsPane.appendChild(frList);
 
-    // Заявки
     const reqPane = document.createElement('div');
     reqPane.className = 'friends-pane';
     reqPane.innerHTML = '<h3>Заявки</h3>';
     const reqList = document.createElement('div');
-
-    const incoming = me.followers.filter(x => !me.friends.includes(x));
-
-    if (incoming.length === 0) {
+    if (incomingIds.length === 0) {
       reqList.innerHTML = '<div class="empty-note">Заявок нет</div>';
     } else {
-      incoming.forEach(login => {
-        reqList.appendChild(buildFriendRow(login, 'incoming'));
+      incomingIds.forEach(id => {
+        const u = usersMap[id];
+        if (u) reqList.appendChild(buildFriendRow(u, 'incoming'));
       });
     }
     reqPane.appendChild(reqList);
 
     wrap.appendChild(friendsPane);
     wrap.appendChild(reqPane);
-    return wrap;
+    container.appendChild(wrap);
   }
 
-  function buildFriendRow(login, kind) {
+  function buildFriendRow(user, kind) {
     const row = document.createElement('div');
     row.className = 'friend-row';
 
-    const u = findUser(login);
     const av = document.createElement('div');
     av.className = 'fr-avatar';
-    av.textContent = (login[0] || '?').toUpperCase();
-    if (u && u.avatar) {
+    av.textContent = (user.login[0] || '?').toUpperCase();
+    if (user.avatar) {
       const img = document.createElement('img');
-      img.src = u.avatar;
+      img.src = user.avatar;
       av.textContent = '';
       av.appendChild(img);
     } else {
       const img = document.createElement('img');
       img.alt = '';
-      findImage(img, ['Avatar', 'avatar', 'AVATAR'], () => {
-        img.style.display = 'none';
-      });
+      findImage(img, ['Avatar', 'avatar', 'AVATAR'], () => { img.style.display = 'none'; });
       av.appendChild(img);
     }
 
     const name = document.createElement('span');
     name.className = 'fr-name';
-    name.textContent = login;
-    name.addEventListener('click', () => openProfile(login));
+    name.textContent = user.login;
+    name.addEventListener('click', () => openProfile(user.login));
 
     row.appendChild(av);
     row.appendChild(name);
@@ -2491,7 +2475,7 @@
       ok.className = 'mini-ok';
       ok.textContent = '✓';
       ok.title = 'Принять заявку';
-      ok.addEventListener('click', () => relationAction(login));
+      ok.addEventListener('click', () => acceptFriend(user.id));
       row.appendChild(ok);
 
       const x = document.createElement('button');
@@ -2499,7 +2483,7 @@
       x.className = 'mini-x';
       x.textContent = '✕';
       x.title = 'Отклонить';
-      x.addEventListener('click', () => rejectIncoming(login));
+      x.addEventListener('click', () => rejectIncoming(user.id));
       row.appendChild(x);
     } else {
       const x = document.createElement('button');
@@ -2507,69 +2491,67 @@
       x.className = 'mini-x';
       x.textContent = '✕';
       x.title = 'Удалить из друзей';
-      x.addEventListener('click', () => relationAction(login));
+      x.addEventListener('click', () => removeFriend(user.id));
       row.appendChild(x);
     }
 
     return row;
   }
 
-  function relationAction(otherLogin) {
+  async function relationAction(user) {
     const me = getMe();
-    if (!me) return;
-    const users = getUsers();
-    const meIdx = users.findIndex(u => u.login === me.login);
-    const otherIdx = users.findIndex(u => u.login === otherLogin);
-    if (meIdx === -1 || otherIdx === -1) return;
-
-    const meU = users[meIdx];
-    const otherU = users[otherIdx];
-    ensureFields(meU);
-    ensureFields(otherU);
-
-    const rel = getRelation(otherLogin);
+    if (!me || !user) return;
+    const rel = await getRelation(user.id);
 
     if (rel === 'none') {
-      if (!meU.following.includes(otherLogin)) meU.following.push(otherLogin);
-      if (!otherU.followers.includes(me.login)) otherU.followers.push(me.login);
-    } else if (rel === 'following') {
-      meU.following = meU.following.filter(x => x !== otherLogin);
-      otherU.followers = otherU.followers.filter(x => x !== me.login);
+      const { error } = await supabaseClient
+        .from('friendships')
+        .insert({ user_id: me.id, friend_id: user.id, status: 'pending' });
+      if (error) { alert('Ошибка: ' + error.message); return; }
+    } else if (rel === 'outgoing') {
+      await supabaseClient.from('friendships')
+        .delete().eq('user_id', me.id).eq('friend_id', user.id);
     } else if (rel === 'incoming') {
-      if (!meU.friends.includes(otherLogin)) meU.friends.push(otherLogin);
-      if (!otherU.friends.includes(me.login)) otherU.friends.push(me.login);
-      meU.followers = meU.followers.filter(x => x !== otherLogin);
-      meU.following = meU.following.filter(x => x !== otherLogin);
-      otherU.followers = otherU.followers.filter(x => x !== me.login);
-      otherU.following = otherU.following.filter(x => x !== me.login);
+      await supabaseClient.from('friendships')
+        .update({ status: 'accepted' })
+        .eq('user_id', user.id).eq('friend_id', me.id);
     } else if (rel === 'friend') {
-      meU.friends = meU.friends.filter(x => x !== otherLogin);
-      otherU.friends = otherU.friends.filter(x => x !== me.login);
+      await removeFriend(user.id);
+      return;
     }
 
-    saveUsers(users);
-    renderProfile();
-    renderUserArea();
+    await renderProfile();
   }
 
-  function rejectIncoming(login) {
+  async function acceptFriend(otherId) {
     const me = getMe();
     if (!me) return;
-    const users = getUsers();
-    const meIdx = users.findIndex(u => u.login === me.login);
-    const otherIdx = users.findIndex(u => u.login === login);
-    if (meIdx === -1 || otherIdx === -1) return;
-    ensureFields(users[meIdx]);
-    ensureFields(users[otherIdx]);
-    users[meIdx].followers = users[meIdx].followers.filter(x => x !== login);
-    users[otherIdx].following = users[otherIdx].following.filter(x => x !== me.login);
-    saveUsers(users);
-    renderProfile();
+    await supabaseClient.from('friendships')
+      .update({ status: 'accepted' })
+      .eq('user_id', otherId).eq('friend_id', me.id);
+    await renderProfile();
+  }
+
+  async function removeFriend(otherId) {
+    const me = getMe();
+    if (!me) return;
+    await supabaseClient.from('friendships')
+      .delete()
+      .or(`and(user_id.eq.${me.id},friend_id.eq.${otherId}),and(user_id.eq.${otherId},friend_id.eq.${me.id})`);
+    await renderProfile();
+  }
+
+  async function rejectIncoming(otherId) {
+    const me = getMe();
+    if (!me) return;
+    await supabaseClient.from('friendships')
+      .delete().eq('user_id', otherId).eq('friend_id', me.id);
+    await renderProfile();
   }
 
   function startBioEdit() {
     const me = getMe();
-    if (!me || !currentProfile || currentProfile.login !== me.login) return;
+    if (!me || !currentProfile || currentProfile.id !== me.id) return;
     if (bioEditMode) return;
     bioEditMode = true;
 
@@ -2604,7 +2586,7 @@
     await loadMyProfile();
     if (myProfile) currentProfile = myProfile;
     bioEditMode = false;
-    renderProfile();
+    await renderProfile();
   }
 
   function cancelBioEdit() {
@@ -2613,8 +2595,13 @@
   }
 
   /* ============================================================
-     9. Чат — доступ
+     10. Чат
      ============================================================ */
+  let chatMessages = [];
+  let chatSubscribed = false;
+  let lastSentAt = 0;
+  let cooldownTimer = null;
+
   function renderChatAccess() {
     const me = getMe();
     const whoInput = document.getElementById('chatWho');
@@ -2638,60 +2625,46 @@
     }
   }
 
-  /* ============================================================
-     10. Вкладки
-     ============================================================ */
-  function switchTab(name, clickTab) {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
-    if (clickTab) {
-      const t = document.querySelector(`.tab[data-tab="${name}"]`);
-      if (t) t.classList.add('active');
-    }
-    const p = document.getElementById('panel-' + name);
-    if (p) p.classList.add('active');
+  async function loadChatMessages() {
+    const { data } = await supabaseClient
+      .from('chat_messages')
+      .select('*')
+      .order('created_at', { ascending: true })
+      .limit(200);
+    chatMessages = data || [];
   }
 
-  document.querySelectorAll('[data-tab]').forEach(t => {
-    t.addEventListener('click', () => {
-      const name = t.dataset.tab;
-      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
-      if (t.classList.contains('tab')) t.classList.add('active');
-      document.getElementById('panel-' + name).classList.add('active');
-    });
-  });
-
-  /* ============================================================
-     11. Чат + кулдаун + звук
-     ============================================================ */
-  const CHAT_KEY = 'game_chat_msgs';
-  let msgs = JSON.parse(localStorage.getItem(CHAT_KEY) || '[]');
-  const list = document.getElementById('chatList');
-
-  let lastSentAt = 0;
-  let cooldownTimer = null;
-
-  function renderChat() {
+  async function renderChat() {
+    const list = document.getElementById('chatList');
     const me = getMe();
-    if (!msgs.length) {
+
+    if (!chatMessages.length) {
       list.innerHTML = '<div style="color:#7a94b0;text-align:center;padding:20px;font-style:italic;">Сообщений пока нет.</div>';
       return;
     }
 
-    list.innerHTML = msgs.map(m => {
-      const d = new Date(m.t);
-      const when = d.toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-      const own = me && m.who === me.login;
-      const initial = (m.who[0] || '?').toUpperCase();
+    const logins = [...new Set(chatMessages.map(m => m.login))];
+    let avatars = {};
+    if (logins.length > 0) {
+      const { data: profiles } = await supabaseClient
+        .from('profiles')
+        .select('login, avatar')
+        .in('login', logins);
+      (profiles || []).forEach(p => { avatars[p.login] = p.avatar; });
+    }
 
+    list.innerHTML = chatMessages.map(m => {
+      const d = new Date(m.created_at);
+      const when = d.toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+      const own = me && m.login === me.login;
+      const initial = (m.login[0] || '?').toUpperCase();
       return `<div class="msg${own ? ' own' : ''}">
-        <div class="msg-avatar" data-initial="${esc(initial)}" data-login="${esc(m.who)}" title="Открыть профиль ${esc(m.who)}">
+        <div class="msg-avatar" data-initial="${esc(initial)}" data-login="${esc(m.login)}" title="Открыть профиль ${esc(m.login)}">
           <img alt="">
         </div>
         <div class="msg-bubble">
           <div class="msg-head">
-            <span class="who" data-login="${esc(m.who)}">${esc(m.who)}</span>
+            <span class="who" data-login="${esc(m.login)}">${esc(m.login)}</span>
             <span class="when">${when}</span>
           </div>
           <div class="msg-text">${esc(m.text)}</div>
@@ -2700,21 +2673,18 @@
     }).join('');
 
     const avatarEls = list.querySelectorAll('.msg-avatar');
-    msgs.forEach((m, i) => {
+    chatMessages.forEach((m, i) => {
       const el = avatarEls[i];
       if (!el) return;
       const img = el.querySelector('img');
-      const user = findUser(m.who);
-      if (user && user.avatar) {
-        img.src = user.avatar;
+      if (avatars[m.login]) {
+        img.src = avatars[m.login];
       } else {
-        findImage(img, ['Avatar', 'avatar', 'AVATAR'], () => {
-          img.style.display = 'none';
-        });
+        findImage(img, ['Avatar', 'avatar', 'AVATAR'], () => { img.style.display = 'none'; });
       }
       el.addEventListener('click', (e) => {
         e.stopPropagation();
-        openProfile(m.who);
+        openProfile(m.login);
       });
     });
 
@@ -2728,28 +2698,29 @@
     list.scrollTop = list.scrollHeight;
   }
 
-  function sendMsg(e) {
+  async function sendMsg(e) {
     e.preventDefault();
     const me = getMe();
     if (!me) { openModal('login'); return; }
 
     const now = Date.now();
     const left = CHAT_COOLDOWN_MS - (now - lastSentAt);
-    if (left > 0) {
-      showCooldown(left);
-      return;
-    }
+    if (left > 0) { showCooldown(left); return; }
 
     const textEl = document.getElementById('chatText');
     const text = textEl.value.trim();
     if (!text) { textEl.focus(); return; }
 
-    msgs.push({ who: me.login, text, t: Date.now() });
-    localStorage.setItem(CHAT_KEY, JSON.stringify(msgs));
     textEl.value = '';
     textEl.focus();
-    renderChat();
     playZvuk();
+
+    const { error } = await supabaseClient.from('chat_messages').insert({
+      user_id: me.id,
+      login: me.login,
+      text: text
+    });
+    if (error) { alert('Ошибка: ' + error.message); return; }
 
     lastSentAt = Date.now();
     lockChatButton();
@@ -2800,6 +2771,46 @@
     el.textContent = '';
   }
 
+  function subscribeChat() {
+    if (chatSubscribed) return;
+    chatSubscribed = true;
+    supabaseClient
+      .channel('chat_messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
+        if (!chatMessages.find(m => m.id === payload.new.id)) {
+          chatMessages.push(payload.new);
+        }
+        renderChat();
+        playZvuk();
+      })
+      .subscribe();
+  }
+
+  /* ============================================================
+     11. Вкладки
+     ============================================================ */
+  function switchTab(name, clickTab) {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    if (clickTab) {
+      const t = document.querySelector(`.tab[data-tab="${name}"]`);
+      if (t) t.classList.add('active');
+    }
+    const p = document.getElementById('panel-' + name);
+    if (p) p.classList.add('active');
+  }
+
+  document.querySelectorAll('[data-tab]').forEach(t => {
+    t.addEventListener('click', () => {
+      const name = t.dataset.tab;
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+      if (t.classList.contains('tab')) t.classList.add('active');
+      const p = document.getElementById('panel-' + name);
+      if (p) p.classList.add('active');
+    });
+  });
+
   /* ============================================================
      12. Игры
      ============================================================ */
@@ -2816,28 +2827,18 @@
     f.src = '';
     switchTab('games', true);
   }
-    /* ============================================================
-     Полноэкранный режим для игры
-     ============================================================ */
   function toggleFullscreen() {
     const wrap = document.getElementById('gameWrap');
-    const btn  = document.getElementById('fsBtn');
     if (!wrap) return;
-
     const isFs = document.fullscreenElement || document.webkitFullscreenElement;
     if (!isFs) {
       const req = wrap.requestFullscreen || wrap.webkitRequestFullscreen;
-      if (req) {
-        req.call(wrap).catch(() => {});
-        if (btn) btn.textContent = '⛶ Выйти из полноэкранного';
-      }
+      if (req) req.call(wrap).catch(() => {});
     } else {
       const exit = document.exitFullscreen || document.webkitExitFullscreen;
       if (exit) exit.call(document);
     }
   }
-
-  // Меняем надпись кнопки, когда пользователь сам выходит по Esc
   document.addEventListener('fullscreenchange', updateFsBtn);
   document.addEventListener('webkitfullscreenchange', updateFsBtn);
   function updateFsBtn() {
@@ -2859,7 +2860,7 @@
   }
 
   /* ============================================================
-     14. Пряники — пополнение
+     14. Пряники
      ============================================================ */
   function openTopUp() {
     const me = getMe();
@@ -2869,31 +2870,25 @@
   function closeTopUp() {
     document.getElementById('topUpModal').classList.remove('open');
   }
-    function topUp(amount) {
-    // ===== ЗАГЛУШКА =====
-    // Реальное пополнение пока не подключено.
-    // Когда будешь готов — подключишь платёжную систему
-    // (ЮKassa, CloudPayments, Robokassa и т.п.)
-    // и здесь будет вызов их API.
+  function topUp(amount) {
     alert('Пополнение пока что выполняется руками. Задонатьте на Boosty и напишите сколько нужно пряников.');
   }
+
   /* ============================================================
      15. Подарки
      ============================================================ */
-  let giftTarget = null;
+  let giftTargetId = null;
 
-  function openGift(login) {
+  async function openGift(login) {
     const me = getMe();
     if (!me) { openModal('login'); return; }
-    giftTarget = login;
-    const titleEl = document.getElementById('giftModalTitle');
-    titleEl.textContent = 'Подарить · ' + login;
+    const user = await findUser(login);
+    if (!user) return;
+    giftTargetId = user.id;
 
+    document.getElementById('giftModalTitle').textContent = 'Подарить · ' + login;
     const list = document.getElementById('giftList');
     list.innerHTML = '';
-
-    const meU = getMe();
-    ensureFields(meU);
 
     GIFTS.forEach(g => {
       const row = document.createElement('div');
@@ -2908,7 +2903,7 @@
       info.innerHTML = '<div class="gift-name">' + esc(g.name) + '</div>' +
                        '<div class="gift-price">' + g.price + ' пряников</div>';
 
-      const canAfford = meU.pryaniki >= g.price;
+      const canAfford = (me.pryaniki || 0) >= g.price;
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'aero-btn green small';
@@ -2924,32 +2919,34 @@
 
     document.getElementById('giftModal').classList.add('open');
   }
+
   function closeGift() {
     document.getElementById('giftModal').classList.remove('open');
-    giftTarget = null;
+    giftTargetId = null;
   }
-  function sendGift(gift) {
-    if (!giftTarget) return;
+
+  async function sendGift(gift) {
+    if (!giftTargetId) return;
     const me = getMe();
     if (!me) return;
-    const users = getUsers();
-    const meIdx = users.findIndex(u => u.login === me.login);
-    const otherIdx = users.findIndex(u => u.login === giftTarget);
-    if (meIdx === -1 || otherIdx === -1) return;
-    ensureFields(users[meIdx]);
-    ensureFields(users[otherIdx]);
+    if ((me.pryaniki || 0) < gift.price) return;
 
-    if (users[meIdx].pryaniki < gift.price) return;
-    users[meIdx].pryaniki -= gift.price;
-    users[otherIdx].gifts.push({
-      id: gift.id,
-      icon: gift.icon,
-      name: gift.name,
-      from: me.login,
-      t: Date.now()
+    const { error: errIns } = await supabaseClient.from('gifts').insert({
+      from_id: me.id,
+      to_id: giftTargetId,
+      gift_id: gift.id,
+      gift_name: gift.name,
+      gift_icon: gift.icon
     });
+    if (errIns) { alert('Ошибка: ' + errIns.message); return; }
 
-    saveUsers(users);
+    const { error: errUpd } = await supabaseClient
+      .from('profiles')
+      .update({ pryaniki: (me.pryaniki || 0) - gift.price })
+      .eq('id', me.id);
+    if (errUpd) { alert('Ошибка: ' + errUpd.message); return; }
+
+    await loadMyProfile();
     renderPryanikChip();
     closeGift();
     alert('Подарок отправлен!');
@@ -2959,97 +2956,124 @@
      16. Личные сообщения
      ============================================================ */
   let dmTarget = null;
+  let dmTargetId = null;
+  let dmSubscribed = false;
 
-  const getDMs = () => JSON.parse(localStorage.getItem(DM_KEY) || '{}');
-  const saveDMs = (d) => localStorage.setItem(DM_KEY, JSON.stringify(d));
-
-  function dmKey(a, b) {
-    return [a, b].sort().join('|');
-  }
-
-  function openDM(login) {
+  async function openDM(login) {
     const me = getMe();
     if (!me) { openModal('login'); return; }
-    if (!findUser(login)) return;
+    const user = await findUser(login);
+    if (!user) return;
     dmTarget = login;
+    dmTargetId = user.id;
     document.getElementById('dmTitle').textContent = 'Сообщение · ' + login;
-    renderDM();
+    await renderDM();
     document.getElementById('dmModal').classList.add('open');
     setTimeout(() => document.getElementById('dmInput').focus(), 50);
+    subscribeDM();
   }
+
   function closeDM() {
     document.getElementById('dmModal').classList.remove('open');
     dmTarget = null;
+    dmTargetId = null;
   }
 
-  function renderDM() {
+  async function renderDM() {
     const me = getMe();
     const list = document.getElementById('dmList');
-    if (!me || !dmTarget) { list.innerHTML = ''; return; }
+    if (!me || !dmTargetId) { list.innerHTML = ''; return; }
 
-    const all = getDMs();
-    const key = dmKey(me.login, dmTarget);
-    const arr = all[key] || [];
+    const { data: msgs } = await supabaseClient
+      .from('dm_messages')
+      .select('*')
+      .or(`and(sender_id.eq.${me.id},recipient_id.eq.${dmTargetId}),and(sender_id.eq.${dmTargetId},recipient_id.eq.${me.id})`)
+      .order('created_at', { ascending: true })
+      .limit(200);
 
-    if (arr.length === 0) {
+    if (!msgs || msgs.length === 0) {
       list.innerHTML = '<div class="empty-note">Сообщений пока нет. Напиши первым!</div>';
       return;
     }
 
-    list.innerHTML = arr.map(m => {
-      const own = m.from === me.login;
-      const d = new Date(m.t);
+    const ids = [...new Set(msgs.flatMap(m => [m.sender_id, m.recipient_id]))];
+    let loginMap = {};
+    if (ids.length > 0) {
+      const { data: profiles } = await supabaseClient
+        .from('profiles')
+        .select('id, login')
+        .in('id', ids);
+      (profiles || []).forEach(p => { loginMap[p.id] = p.login; });
+    }
+
+    list.innerHTML = msgs.map(m => {
+      const own = m.sender_id === me.id;
+      const d = new Date(m.created_at);
       const when = d.toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
       return '<div class="dm-msg' + (own ? ' own' : '') + '">' +
-        '<div class="dm-meta">' + esc(m.from) + ' · ' + when + '</div>' +
+        '<div class="dm-meta">' + esc(loginMap[m.sender_id] || '?') + ' · ' + when + '</div>' +
         '<div class="dm-text">' + esc(m.text) + '</div>' +
       '</div>';
     }).join('');
     list.scrollTop = list.scrollHeight;
   }
 
-  function sendDM(e) {
+  async function sendDM(e) {
     e.preventDefault();
     const me = getMe();
-    if (!me || !dmTarget) return;
+    if (!me || !dmTargetId) return;
     const input = document.getElementById('dmInput');
     const text = input.value.trim();
     if (!text) { input.focus(); return; }
 
-    const all = getDMs();
-    const key = dmKey(me.login, dmTarget);
-    if (!all[key]) all[key] = [];
-    all[key].push({ from: me.login, text, t: Date.now() });
-    saveDMs(all);
-
     input.value = '';
     input.focus();
-    renderDM();
     playZvuk();
+
+    const { error } = await supabaseClient.from('dm_messages').insert({
+      sender_id: me.id,
+      recipient_id: dmTargetId,
+      text: text
+    });
+    if (error) { alert('Ошибка: ' + error.message); return; }
+    await renderDM();
+  }
+
+  function subscribeDM() {
+    if (dmSubscribed) return;
+    dmSubscribed = true;
+    supabaseClient
+      .channel('dm_messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dm_messages' }, payload => {
+        const m = payload.new;
+        if (!myProfile || !dmTargetId) return;
+        const relevant =
+          (m.sender_id === myProfile.id && m.recipient_id === dmTargetId) ||
+          (m.sender_id === dmTargetId && m.recipient_id === myProfile.id);
+        if (relevant) {
+          renderDM();
+          playZvuk();
+        }
+      })
+      .subscribe();
   }
 
   /* ============================================================
-     17. Утилита
-     ============================================================ */
-  function esc(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  /* ============================================================
-     18. Старт
+     17. Старт
      ============================================================ */
   async function renderAll() {
     renderUserArea();
     renderPryanikChip();
     renderChatAccess();
-    renderChat();
-    renderProfile();
+    await renderChat();
+    await renderProfile();
   }
 
   (async () => {
     await loadMyProfile();
+    await loadChatMessages();
     await renderAll();
+    subscribeChat();
   })();
 
   supabaseClient.auth.onAuthStateChange(async () => {
@@ -3057,19 +3081,18 @@
     await renderAll();
   });
 
-    /* ============================================================
-     Обложки игр — автопоиск Logo в папке игры
+  /* ============================================================
+     Обложки игр
      ============================================================ */
   (function initGameCovers() {
     document.querySelectorAll('.game-cover[data-logo-base]').forEach(cover => {
       const img = cover.querySelector('img');
       if (!img) return;
       const base = cover.dataset.logoBase;
-      findImage(img, [base],
-        () => {
-          img.remove();
-          cover.classList.add('no-logo');
-        });
+      findImage(img, [base], () => {
+        img.remove();
+        cover.classList.add('no-logo');
+      });
     });
   })();
 </script>
