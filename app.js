@@ -1400,29 +1400,60 @@ async function buyNickItem(item) {
   if (!me) { openModal('login'); return; }
   if (myOwnedItems.has(item.id)) return;
 
-  const { data, error } = await supabaseClient.rpc('buy_item', {
-    p_item_id: item.id,
-    p_price: item.price
-  });
+  // 1. Уже есть в БД? (перестраховка от гонок и старых записей)
+  const { data: existing } = await supabaseClient
+    .from('user_items')
+    .select('id')
+    .eq('user_id', me.id)
+    .eq('item_id', item.id)
+    .maybeSingle();
 
-  if (error) { alert('Ошибка: ' + error.message); return; }
-
-  if (!data || !data.ok) {
-    if (data && data.error === 'already_owned') {
-      myOwnedItems.add(item.id);
-      await loadMyOwnedItems();
-      await renderShop();
-      return;
-    }
-    if (data && data.error === 'not_enough') {
-      alert('Не хватает пряников');
-      return;
-    }
-    alert('Ошибка: ' + (data ? data.error : 'unknown'));
+  if (existing) {
+    myOwnedItems.add(item.id);
+    await renderShop();
     return;
   }
 
-  // успех
+  // 2. Хватает ли пряников
+  if ((me.pryaniki || 0) < item.price) {
+    alert('Не хватает пряников');
+    return;
+  }
+
+  // 3. Списываем деньги
+  const startBalance = me.pryaniki || 0;
+  const newBalance = startBalance - item.price;
+  const { error: errUpd } = await supabaseClient
+    .from('profiles')
+    .update({ pryaniki: newBalance })
+    .eq('id', me.id);
+  if (errUpd) { alert('Ошибка: ' + errUpd.message); return; }
+
+  // 4. Пытаемся вставить владение
+  const { error: errIns } = await supabaseClient
+    .from('user_items')
+    .insert({ user_id: me.id, item_id: item.id });
+
+  if (errIns) {
+    // Откатываем деньги в любом случае, если предмет не записался
+    await supabaseClient
+      .from('profiles')
+      .update({ pryaniki: startBalance })
+      .eq('id', me.id);
+
+    // 23505 = unique_violation, значит предмет уже был — не страшно
+    if (errIns.code === '23505') {
+      myOwnedItems.add(item.id);
+      await loadMyProfile();
+      renderPryanikChip();
+      await renderShop();
+      return;
+    }
+    alert('Ошибка: ' + errIns.message);
+    return;
+  }
+
+  // 5. Успех
   await loadMyProfile();
   myOwnedItems.add(item.id);
   renderPryanikChip();
