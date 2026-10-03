@@ -28,14 +28,14 @@ const NICK_SHOP = [
   { id: 'neon',    type: 'class', cls: 'nick-neon',    category: 'color', name: 'Неоновый',  price: 150, desc: 'Сине-фиолетовое неоновое свечение' },
   { id: 'fire',    type: 'class', cls: 'nick-fire',    category: 'color', name: 'Огненный',  price: 120, desc: 'Пылающий ник, как костёр в ночи' },
   { id: 'ice',     type: 'class', cls: 'nick-ice',     category: 'color', name: 'Ледяной',   price: 120, desc: 'Холодный ледяной отблеск' },
-  { id: 'camo_1', type: 'camo', camoNum: 1, category: 'camo', name: 'Камуфляж 1', price: 50 },
-  { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Камуфляж 2', price: 50 },
-  { id: 'camo_3', type: 'camo', camoNum: 3, category: 'camo', name: 'Камуфляж 3', price: 50 },
-  { id: 'camo_4', type: 'camo', camoNum: 4, category: 'camo', name: 'Камуфляж 4', price: 50 },
-  { id: 'camo_5', type: 'camo', camoNum: 5, category: 'camo', name: 'Камуфляж 5', price: 50 },
-  { id: 'camo_6', type: 'camo', camoNum: 6, category: 'camo', name: 'Камуфляж 6', price: 50 },
-  { id: 'camo_7', type: 'camo', camoNum: 7, category: 'camo', name: 'Камуфляж 7', price: 50 },
-  { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Камуфляж 8', price: 50 }
+  { id: 'camo_1', type: 'camo', camoNum: 1, category: 'camo', name: 'ВСР-93 Барвиха', price: 100 },
+  { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Берёзка серебряный лист', price: 100 },
+  { id: 'camo_3', type: 'camo', camoNum: 3, category: 'camo', name: 'ВСР-98 Флора', price: 100 },
+  { id: 'camo_4', type: 'camo', camoNum: 4, category: 'camo', name: 'Бутан', price: 100 },
+  { id: 'camo_5', type: 'camo', camoNum: 5, category: 'camo', name: 'Цифра', price: 100 },
+  { id: 'camo_6', type: 'camo', camoNum: 6, category: 'camo', name: 'Вудланд', price: 100 },
+  { id: 'camo_7', type: 'camo', camoNum: 7, category: 'camo', name: 'Камыш синий', price: 100 },
+  { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Берёзка бронзовый лист', price: 100 }
 ];
 
 /* ============================================================
@@ -1355,7 +1355,6 @@ async function renderShop() {
 
 function renderShopCard(item, owned, active, balance) {
   const preview = nickPreviewHtml(item);
-  const desc = item.desc || (item.type === 'camo' ? 'Камуфляжный узор под номером ' + item.camoNum : '');
 
   let actionHtml = '';
   if (active) {
