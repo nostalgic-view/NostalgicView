@@ -28,14 +28,15 @@ const NICK_SHOP = [
   { id: 'neon',    type: 'class', cls: 'nick-neon',    category: 'color', name: 'Неоновый',  price: 150, desc: 'Сине-фиолетовое неоновое свечение' },
   { id: 'fire',    type: 'class', cls: 'nick-fire',    category: 'color', name: 'Огненный',  price: 120, desc: 'Пылающий ник, как костёр в ночи' },
   { id: 'ice',     type: 'class', cls: 'nick-ice',     category: 'color', name: 'Ледяной',   price: 120, desc: 'Холодный ледяной отблеск' },
-  { id: 'camo_1', type: 'camo', camoNum: 1, category: 'camo', name: 'ВСР-93 Барвиха', price: 100 },
-  { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Берёзка серебряный лист', price: 100 },
-  { id: 'camo_3', type: 'camo', camoNum: 3, category: 'camo', name: 'ВСР-98 Флора', price: 100 },
-  { id: 'camo_4', type: 'camo', camoNum: 4, category: 'camo', name: 'Бутан', price: 100 },
-  { id: 'camo_5', type: 'camo', camoNum: 5, category: 'camo', name: 'Цифра', price: 100 },
-  { id: 'camo_6', type: 'camo', camoNum: 6, category: 'camo', name: 'Вудланд', price: 100 },
-  { id: 'camo_7', type: 'camo', camoNum: 7, category: 'camo', name: 'Камыш синий', price: 100 },
-  { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Берёзка бронзовый лист', price: 100 }
+
+  { id: 'camo_1', type: 'camo', camoNum: 1, category: 'camo', name: 'ВСР-93',            price: 100, desc: 'Барвиха, Вертикалка, Арбуз. Первый российский камуфляж, принятый на вооружение в 1993 году' },
+  { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Берёзка серебряный лист',   price: 100, desc: 'Классическая «Берёзка» серебряный лист.' },
+  { id: 'camo_3', type: 'camo', camoNum: 3, category: 'camo', name: 'ВСР-98 Флора',              price: 100, desc: 'Арбуз. Легендарная «Флора»,' },
+  { id: 'camo_4', type: 'camo', camoNum: 4, category: 'camo', name: 'Бутан',                     price: 100, desc: 'Дубок. Элитный камуфляж Советского Союза, мабуте такое не выдавали' },
+  { id: 'camo_5', type: 'camo', camoNum: 5, category: 'camo', name: 'Цифра',                     price: 100, desc: 'Пиксель, ЕМР, современный камуфляж РФ' },
+  { id: 'camo_6', type: 'camo', camoNum: 6, category: 'camo', name: 'Вудланд',                   price: 100, desc: 'Старый камуфляж америкосов' },
+  { id: 'camo_7', type: 'camo', camoNum: 7, category: 'camo', name: 'Камыш синий',               price: 100, desc: 'Синий камуфляж для морских частей и спецподразделений' },
+  { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Берёзка бронзовый лист',    price: 100, desc: '«Берёзка» с бронзовым отливом — редкая поздняя версия' }
 ];
 
 /* ============================================================
@@ -1375,7 +1376,7 @@ function renderShopCard(item, owned, active, balance) {
     badge +
     '<div class="shop-preview">' + preview + '</div>' +
     '<div class="name">' + esc(item.name) + '</div>' +
-    '<div class="desc">' + esc(desc) + '</div>' +
+    '<div class="desc">' + esc(item.desc || '') + '</div>' +
     '<div class="price">' + pryanikImgHtml(16) + '<span>' + item.price + '</span></div>' +
     '<div class="actions">' + actionHtml + '</div>' +
   '</div>';
