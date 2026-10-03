@@ -2020,6 +2020,7 @@
      4. Пользователи
      ============================================================ */
   const DM_KEY = 'game_dms';
+  let currentProfile = null;
 
   function getMe() { return myProfile; }
   function getCurrent() { return myProfile ? myProfile.login : null; }
@@ -2233,14 +2234,13 @@
      8. Профиль
      ============================================================ */
   let bioEditMode = false;
-  let currentProfileLogin = null;
 
-  function openProfile(login) {
+  async function openProfile(login) {
     const me = getMe();
     if (!me) { openModal('login'); return; }
-    const user = findUser(login);
+    const user = await findUser(login);
     if (!user) return;
-    currentProfileLogin = user.login;
+    currentProfile = user;
     bioEditMode = false;
     switchTab('profile', false);
     renderProfile();
@@ -2248,6 +2248,7 @@
   }
 
   function closeProfile() {
+    currentProfile = null;
     switchTab('main', true);
   }
 
@@ -2255,15 +2256,6 @@
     const me = getMe();
     if (!me) return 'guest';
     if (me.login === otherLogin) return 'me';
-    ensureFields(me);
-    if (me.friends.includes(otherLogin)) return 'friend';
-    if (me.following.includes(otherLogin)) return 'following';
-
-    const other = findUser(otherLogin);
-    if (other) {
-      ensureFields(other);
-      if (other.following.includes(me.login)) return 'incoming';
-    }
     return 'none';
   }
   
@@ -2279,7 +2271,9 @@
     const lsWrap    = document.getElementById('lsBtnWrap');
     const friendsSec= document.getElementById('friendsSection');
 
-    if (!me || !currentProfileLogin) {
+    const user = currentProfile;
+
+    if (!me || !user) {
       titleEl.textContent = 'Моя страничка';
       nameEl.textContent = 'Гость';
       bioEl.textContent = 'Войдите, чтобы увидеть свою страничку.';
@@ -2295,11 +2289,6 @@
       friendsSec.innerHTML = '';
       return;
     }
-
-    const user = findUser(currentProfileLogin);
-    if (!user) { closeProfile(); return; }
-    ensureFields(user);
-    ensureFields(me);
 
     const isOwn = (user.login === me.login);
 
@@ -2323,6 +2312,34 @@
       });
       pAvatar.classList.remove('empty');
     }
+
+    // Био
+    if (!bioEditMode) {
+      actions.style.display = 'none';
+      if (user.bio && user.bio.trim()) {
+        bioEl.textContent = user.bio;
+        bioEl.classList.remove('empty');
+      } else {
+        bioEl.textContent = isOwn
+          ? 'Нажми, чтобы написать описание о себе...'
+          : (user.login + ' пока ничего о себе не написал(а).');
+        bioEl.classList.add('empty');
+      }
+
+      if (isOwn) {
+        bioEl.classList.add('editable');
+        bioEl.onclick = startBioEdit;
+      } else {
+        bioEl.classList.remove('editable');
+        bioEl.onclick = null;
+      }
+    }
+
+    // Кнопки дружбы/подарков/ЛС — пока скрыты (мигрируем позже)
+    friendBox.innerHTML = '';
+    lsWrap.innerHTML = '';
+    friendsSec.innerHTML = '';
+  }
 
     // Био
     if (!bioEditMode) {
@@ -2552,7 +2569,7 @@
 
   function startBioEdit() {
     const me = getMe();
-    if (!me || !currentProfileLogin || currentProfileLogin !== me.login) return;
+    if (!me || !currentProfile || currentProfile.login !== me.login) return;
     if (bioEditMode) return;
     bioEditMode = true;
 
@@ -2574,17 +2591,18 @@
     ta.setSelectionRange(ta.value.length, ta.value.length);
   }
 
-  function saveBio() {
+  async function saveBio() {
     const me = getMe();
     if (!me) return;
     const ta = document.getElementById('bioTextarea');
     const text = ta ? ta.value.trim().slice(0, 500) : '';
-    const users = getUsers();
-    const idx = users.findIndex(u => u.login === me.login);
-    if (idx !== -1) {
-      users[idx].bio = text;
-      saveUsers(users);
-    }
+    const { error } = await supabaseClient
+      .from('profiles')
+      .update({ bio: text })
+      .eq('id', me.id);
+    if (error) { alert('Ошибка: ' + error.message); return; }
+    await loadMyProfile();
+    if (myProfile) currentProfile = myProfile;
     bioEditMode = false;
     renderProfile();
   }
