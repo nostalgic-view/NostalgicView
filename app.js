@@ -39,6 +39,15 @@ const NICK_SHOP = [
   { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Берёзка бронзовый лист',    price: 100, desc: '«Берёзка» с бронзовым отливом — редкая поздняя версия' }
 ];
 
+const PET_SHOP = [
+  { id: 'pet_1', type: 'pet', petNum: 1, category: 'pet', name: 'Кот Барсик',   price: 300, desc: 'Полосатый кот, любит гулять по расположению' },
+  { id: 'pet_2', type: 'pet', petNum: 2, category: 'pet', name: 'Кошка Мурка',  price: 300, desc: 'Трёхцветная кошка, спит на солнце у КПП' },
+  { id: 'pet_3', type: 'pet', petNum: 3, category: 'pet', name: 'Пёс Шарик',    price: 350, desc: 'Верный пёс, охраняет казарму по ночам' },
+  { id: 'pet_4', type: 'pet', petNum: 4, category: 'pet', name: 'Собака Жучка', price: 350, desc: 'Дворняга, знает всех солдат в лицо' },
+  { id: 'pet_5', type: 'pet', petNum: 5, category: 'pet', name: 'Кот Васька',   price: 400, desc: 'Хитрый кот, таскает еду со стола' },
+  { id: 'pet_6', type: 'pet', petNum: 6, category: 'pet', name: 'Щенок Рекс',   price: 450, desc: 'Маленький щенок, будущий защитник части' }
+];
+
 /* ============================================================
    1. Автопоиск картинок
    ============================================================ */
@@ -180,20 +189,24 @@ requestAnimationFrame(tickClock);
    ============================================================ */
 function getMe() { return myProfile; }
 
-async function loadMyProfile() {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) { myProfile = null; return; }
-  const { data } = await supabaseClient
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
-  myProfile = data || null;
-  if (myProfile) {
-    avatarCache.set(myProfile.login, myProfile.avatar || null);
-    nickStyleCache.set(myProfile.login, myProfile.nick_style || null);
+  async function loadMyProfile() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) { myProfile = null; stopPetWalk(); return; }
+    const { data } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+    myProfile = data || null;
+    if (myProfile) {
+      avatarCache.set(myProfile.login, myProfile.avatar || null);
+      nickStyleCache.set(myProfile.login, myProfile.nick_style || null);
+      if (myProfile.active_pet) startPetWalk(myProfile.active_pet);
+      else stopPetWalk();
+    } else {
+      stopPetWalk();
+    }
   }
-}
 
 async function findUser(login) {
   const { data } = await supabaseClient
@@ -296,13 +309,14 @@ async function submitAuth(e) {
   }
 }
 
-async function logout() {
-  await supabaseClient.auth.signOut();
-  myProfile = null;
-  currentProfile = null;
-  await renderAll();
-  switchTab('main', true);
-}
+  async function logout() {
+    await supabaseClient.auth.signOut();
+    myProfile = null;
+    currentProfile = null;
+    stopPetWalk();
+    await renderAll();
+    switchTab('main', true);
+  }
 
 /* ============================================================
    6. Смена аватара
@@ -345,7 +359,9 @@ function esc(s) {
 /* Аватары: кэш и дефолт */
 const avatarCache = new Map();
 const nickStyleCache = new Map();
-const camoImageCache = new Map();
+  const camoImageCache = new Map();    // camoNum -> url | null
+  const petImageCache  = new Map();    // pet_id  -> url | null
+  let petWalker = null;                // активный питомец (движок прогулки)
 const camoNums = [1,2,3,4,5,6,7,8];
 let defaultAvatarUrl;
 let myOwnedItems = new Set();
@@ -393,15 +409,117 @@ async function resolveDefaultAvatar() {
 }
 
 /* ---- Ники ---- */
-async function preloadCamoImages() {
-  for (const n of camoNums) {
-    for (const ext of ['jpg','jpeg','png','webp','gif']) {
-      const url = `kamuflyazh/${n}.${ext}`;
-      if (await testImage(url)) { camoImageCache.set(n, url); break; }
+  async function preloadCamoImages() {
+    for (const n of camoNums) {
+      for (const ext of ['jpg','jpeg','png','webp','gif']) {
+        const url = `kamuflyazh/${n}.${ext}`;
+        if (await testImage(url)) { camoImageCache.set(n, url); break; }
+      }
+      if (!camoImageCache.has(n)) camoImageCache.set(n, null);
     }
-    if (!camoImageCache.has(n)) camoImageCache.set(n, null);
   }
-}
+
+  async function preloadPetImages() {
+    for (const p of PET_SHOP) {
+      for (const ext of ['png','gif','webp','jpg','jpeg']) {
+        const url = `pets/${p.petNum}.${ext}`;
+        if (await testImage(url)) { petImageCache.set(p.id, url); break; }
+      }
+      if (!petImageCache.has(p.id)) petImageCache.set(p.id, null);
+    }
+  }
+
+  /* ---- Движок прогулки питомца ---- */
+  function startPetWalk(petId) {
+    stopPetWalk();
+    const url = petImageCache.get(petId);
+    if (!url) return;
+    const layer = document.getElementById('petLayer');
+    if (!layer) return;
+
+    layer.innerHTML = '';
+    const img = document.createElement('img');
+    img.className = 'pet-sprite';
+    img.src = url;
+    img.alt = '';
+    layer.appendChild(img);
+
+    const PET_W = 48, PET_H = 48, SPEED = 0.7;
+
+    const st = {
+      img, layer,
+      x: 40, y: 40, tx: 40, ty: 40,
+      dir: 1,
+      paused: false,
+      pauseUntil: 0,
+      raf: null
+    };
+
+    function pickTarget() {
+      const W = layer.clientWidth;
+      const H = layer.clientHeight;
+      if (W <= PET_W || H <= PET_H) return;
+      st.tx = Math.random() * (W - PET_W);
+      st.ty = Math.random() * (H - PET_H);
+    }
+
+    function tick() {
+      if (petWalker !== st) return;
+      const now = performance.now();
+
+      if (st.paused) {
+        if (now >= st.pauseUntil) { st.paused = false; pickTarget(); }
+      } else {
+        const dx = st.tx - st.x;
+        const dy = st.ty - st.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 2) {
+          st.paused = true;
+          st.pauseUntil = now + 1000 + Math.random() * 2500;
+        } else {
+          st.x += (dx / dist) * SPEED;
+          st.y += (dy / dist) * SPEED;
+          st.dir = dx < 0 ? -1 : 1;
+        }
+      }
+
+      const W = layer.clientWidth;
+      const H = layer.clientHeight;
+      if (st.x < 0) st.x = 0;
+      if (st.y < 0) st.y = 0;
+      if (st.x > W - PET_W) st.x = Math.max(0, W - PET_W);
+      if (st.y > H - PET_H) st.y = Math.max(0, H - PET_H);
+
+      st.img.style.left = st.x + 'px';
+      st.img.style.top  = st.y + 'px';
+      st.img.style.transform = 'scaleX(' + st.dir + ')';
+
+      st.raf = requestAnimationFrame(tick);
+    }
+
+    petWalker = st;
+    pickLayerSizeFirst();
+
+    function pickLayerSizeFirst() {
+      // ждём, пока слой получит размеры (после рендера)
+      requestAnimationFrame(() => {
+        if (petWalker !== st) return;
+        pickTarget();
+        st.x = st.tx;
+        st.y = st.ty;
+        tick();
+      });
+    }
+  }
+
+  function stopPetWalk() {
+    if (!petWalker) return;
+    if (petWalker.raf) cancelAnimationFrame(petWalker.raf);
+    if (petWalker.img && petWalker.img.parentNode) {
+      petWalker.img.parentNode.removeChild(petWalker.img);
+    }
+    petWalker = null;
+  }
 
 function nickHtml(login) {
   const safe = esc(login);
@@ -1326,17 +1444,21 @@ async function renderShop() {
 
   const groups = [
     { title: 'Переливающиеся ники', items: NICK_SHOP.filter(i => i.category === 'color') },
-    { title: 'Камуфляжные ники',    items: NICK_SHOP.filter(i => i.category === 'camo')  }
+    { title: 'Камуфляжные ники',    items: NICK_SHOP.filter(i => i.category === 'camo')  },
+    { title: 'Питомцы',             items: PET_SHOP }
   ];
+  const allItems = [...NICK_SHOP, ...PET_SHOP];
 
-  const activeStyle = me.nick_style || null;
   const balance = me.pryaniki || 0;
 
   let html = '';
   for (const g of groups) {
     html += '<div class="shop-category"><h3>' + esc(g.title) + '</h3><div class="shop-grid">';
     for (const item of g.items) {
-      html += renderShopCard(item, myOwnedItems.has(item.id), activeStyle === item.id, balance);
+      const isActive = item.type === 'pet'
+        ? (me.active_pet === item.id)
+        : (me.nick_style === item.id);
+      html += renderShopCard(item, myOwnedItems.has(item.id), isActive, balance);
     }
     html += '</div></div>';
   }
@@ -1344,24 +1466,24 @@ async function renderShop() {
 
   container.querySelectorAll('[data-shop-action]').forEach(btn => {
     btn.addEventListener('click', async () => {
-      const item = NICK_SHOP.find(i => i.id === btn.dataset.itemId);
+      const item = allItems.find(i => i.id === btn.dataset.itemId);
       if (!item) return;
       const action = btn.dataset.shopAction;
-      if (action === 'buy') await buyNickItem(item);
-      else if (action === 'equip') await equipNickItem(item);
-      else if (action === 'unequip') await unequipNickItem();
+      if (action === 'buy') await buyShopItem(item);
+      else if (action === 'equip') await equipShopItem(item);
+      else if (action === 'unequip') await unequipShopItem(item);
     });
   });
 }
 
 function renderShopCard(item, owned, active, balance) {
-  const preview = nickPreviewHtml(item);
+  const preview = shopPreviewHtml(item);
 
   let actionHtml = '';
   if (active) {
-    actionHtml = '<button type="button" class="aero-btn red small" data-shop-action="unequip" data-item-id="' + item.id + '">Снять</button>';
+    actionHtml = '<button type="button" class="aero-btn red small" data-shop-action="unequip" data-item-id="' + item.id + '">' + (item.type === 'pet' ? 'Убрать' : 'Снять') + '</button>';
   } else if (owned) {
-    actionHtml = '<button type="button" class="aero-btn green small" data-shop-action="equip" data-item-id="' + item.id + '">Надеть</button>';
+    actionHtml = '<button type="button" class="aero-btn green small" data-shop-action="equip" data-item-id="' + item.id + '">' + (item.type === 'pet' ? 'Выпустить' : 'Надеть') + '</button>';
   } else {
     const canAfford = balance >= item.price;
     actionHtml = '<button type="button" class="aero-btn green small" data-shop-action="buy" data-item-id="' + item.id + '"' +
@@ -1369,7 +1491,7 @@ function renderShopCard(item, owned, active, balance) {
   }
 
   let badge = '';
-  if (active) badge = '<span class="badge active">НАДЕТО</span>';
+  if (active) badge = '<span class="badge active">' + (item.type === 'pet' ? 'ГУЛЯЕТ' : 'НАДЕТО') + '</span>';
   else if (owned) badge = '<span class="badge owned">КУПЛЕНО</span>';
 
   return '<div class="shop-item' + (owned ? ' owned' : '') + (active ? ' active' : '') + '">' +
@@ -1382,20 +1504,24 @@ function renderShopCard(item, owned, active, balance) {
   '</div>';
 }
 
-function nickPreviewHtml(item) {
-  const sample = 'Солдат';
+function shopPreviewHtml(item) {
   if (item.type === 'class') {
-    return '<span class="nick ' + item.cls + '">' + sample + '</span>';
+    return '<span class="nick ' + item.cls + '">Солдат</span>';
   }
   if (item.type === 'camo') {
     const url = camoImageCache.get(item.camoNum);
     if (!url) return '<span style="color:#7a94b0;font-style:italic;">картинка не найдена</span>';
-    return '<span class="nick nick-camo" style="--camo-url:url(\'' + url + '\')">' + sample + '</span>';
+    return '<span class="nick nick-camo" style="--camo-url:url(\'' + url + '\')">Солдат</span>';
   }
-  return esc(sample);
+  if (item.type === 'pet') {
+    const url = petImageCache.get(item.id);
+    if (!url) return '<span style="color:#7a94b0;font-style:italic;">картинка не найдена</span>';
+    return '<img src="' + esc(url) + '" alt="" style="width:56px;height:56px;object-fit:contain;image-rendering:pixelated;">';
+  }
+  return '';
 }
 
-async function buyNickItem(item) {
+async function buyShopItem(item) {
   const me = getMe();
   if (!me) { openModal('login'); return; }
   if (myOwnedItems.has(item.id)) return;
@@ -1413,10 +1539,7 @@ async function buyNickItem(item) {
     return;
   }
 
-  if ((me.pryaniki || 0) < item.price) {
-    alert('Не хватает пряников');
-    return;
-  }
+  if ((me.pryaniki || 0) < item.price) { alert('Не хватает пряников'); return; }
 
   const startBalance = me.pryaniki || 0;
   const newBalance = startBalance - item.price;
@@ -1432,7 +1555,6 @@ async function buyNickItem(item) {
     .insert({ user_id: me.id, item_id: item.id });
 
   if (errIns) {
-    // откат денег
     await supabaseClient
       .from('profiles')
       .update({ pryaniki: startBalance })
@@ -1455,11 +1577,25 @@ async function buyNickItem(item) {
   await renderShop();
 }
 
-async function equipNickItem(item) {
+async function equipShopItem(item) {
   const me = getMe();
   if (!me) return;
   if (!myOwnedItems.has(item.id)) return;
 
+  if (item.type === 'pet') {
+    const { error } = await supabaseClient
+      .from('profiles')
+      .update({ active_pet: item.id })
+      .eq('id', me.id);
+    if (error) { alert('Ошибка: ' + error.message); return; }
+
+    await loadMyProfile();
+    startPetWalk(item.id);
+    await renderShop();
+    return;
+  }
+
+  // ник (class / camo)
   const { error } = await supabaseClient
     .from('profiles')
     .update({ nick_style: item.id })
@@ -1471,30 +1607,37 @@ async function equipNickItem(item) {
   await renderShop();
   await renderUserArea();
   await renderChat();
-  if (currentProfile && currentProfile.id === me.id) {
-    currentProfile.nick_style = item.id;
-  }
+  if (currentProfile && currentProfile.id === me.id) currentProfile.nick_style = item.id;
   if (currentProfile) await renderProfile();
 }
 
-async function unequipNickItem() {
+async function unequipShopItem(item) {
   const me = getMe();
-  if (!me) return;
+  if (!me || !item) return;
+
+  if (item.type === 'pet') {
+    const { error } = await supabaseClient
+      .from('profiles')
+      .update({ active_pet: null })
+      .eq('id', me.id);
+    if (error) { alert('Ошибка: ' + error.message); return; }
+    await loadMyProfile();
+    stopPetWalk();
+    await renderShop();
+    return;
+  }
 
   const { error } = await supabaseClient
     .from('profiles')
     .update({ nick_style: null })
     .eq('id', me.id);
   if (error) { alert('Ошибка: ' + error.message); return; }
-
   await loadMyProfile();
   nickStyleCache.set(me.login, null);
   await renderShop();
   await renderUserArea();
   await renderChat();
-  if (currentProfile && currentProfile.id === me.id) {
-    currentProfile.nick_style = null;
-  }
+  if (currentProfile && currentProfile.id === me.id) currentProfile.nick_style = null;
   if (currentProfile) await renderProfile();
 }
 
@@ -1510,13 +1653,13 @@ async function renderAll() {
   if (getMe()) await loadMyOwnedItems();
 }
 
-(async () => {
-  await preloadCamoImages();
-  await loadMyProfile();
-  await loadChatMessages();
-  await renderAll();
-  subscribeChat();
-})();
+  (async () => {
+    await Promise.all([ preloadCamoImages(), preloadPetImages() ]);
+    await loadMyProfile();
+    await loadChatMessages();
+    await renderAll();
+    subscribeChat();
+  })();
 
 supabaseClient.auth.onAuthStateChange(async () => {
   await loadMyProfile();
