@@ -29,23 +29,23 @@ const NICK_SHOP = [
   { id: 'fire',    type: 'class', cls: 'nick-fire',    category: 'color', name: 'Огненный',  price: 120, desc: 'Пылающий ник, как костёр в ночи' },
   { id: 'ice',     type: 'class', cls: 'nick-ice',     category: 'color', name: 'Ледяной',   price: 120, desc: 'Холодный ледяной отблеск' },
 
-  { id: 'camo_1', type: 'camo', camoNum: 1, category: 'camo', name: 'ВСР-93',            price: 100, desc: 'Барвиха, Вертикалка, Арбуз. Первый российский камуфляж, принятый на вооружение в 1993 году' },
-  { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Берёзка серебряный лист',   price: 100, desc: 'Классическая «Берёзка» серебряный лист.' },
-  { id: 'camo_3', type: 'camo', camoNum: 3, category: 'camo', name: 'ВСР-98 Флора',              price: 100, desc: 'Арбуз. Легендарная «Флора»,' },
-  { id: 'camo_4', type: 'camo', camoNum: 4, category: 'camo', name: 'Бутан',                     price: 100, desc: 'Дубок. Элитный камуфляж Советского Союза, мабуте такое не выдавали' },
-  { id: 'camo_5', type: 'camo', camoNum: 5, category: 'camo', name: 'Цифра',                     price: 100, desc: 'Пиксель, ЕМР, современный камуфляж РФ' },
-  { id: 'camo_6', type: 'camo', camoNum: 6, category: 'camo', name: 'Вудланд',                   price: 100, desc: 'Старый камуфляж америкосов' },
-  { id: 'camo_7', type: 'camo', camoNum: 7, category: 'camo', name: 'Камыш синий',               price: 100, desc: 'Синий камуфляж для морских частей и спецподразделений' },
-  { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Берёзка бронзовый лист',    price: 100, desc: '«Берёзка» с бронзовым отливом — редкая поздняя версия' }
+  { id: 'camo_1', type: 'camo', camoNum: 1, category: 'camo', name: 'ВСР-93 Барвиха',          price: 100, desc: 'Первый российский камуфляж, принятый на вооружение в 1993 году' },
+  { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Берёзка серебряный лист', price: 100, desc: 'Классическая «Берёзка» с серебристыми пятнами на светлом фоне' },
+  { id: 'camo_3', type: 'camo', camoNum: 3, category: 'camo', name: 'ВСР-98 Флора',            price: 100, desc: 'Легендарная «Флора» — «арбуз» конца 90-х, символ срочной службы' },
+  { id: 'camo_4', type: 'camo', camoNum: 4, category: 'camo', name: 'Бутан',                   price: 100, desc: 'Горный камуфляж, разработанный для условий высокогорья' },
+  { id: 'camo_5', type: 'camo', camoNum: 5, category: 'camo', name: 'Цифра',                   price: 100, desc: 'Цифровая расцветка нового поколения — пиксельный рисунок' },
+  { id: 'camo_6', type: 'camo', camoNum: 6, category: 'camo', name: 'Вудланд',                 price: 100, desc: 'Лесной американский камуфляж — четыре оттенка зелёного и коричневого' },
+  { id: 'camo_7', type: 'camo', camoNum: 7, category: 'camo', name: 'Камыш синий',             price: 100, desc: 'Синий камуфляж для морских частей и спецподразделений' },
+  { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Берёзка бронзовый лист',  price: 100, desc: '«Берёзка» с бронзовым отливом — редкая поздняя версия' }
 ];
 
-const PET_SHOP = [
-  { id: 'pet_1', type: 'pet', petNum: 1, category: 'pet', name: 'Кот Барсик',   price: 300, desc: 'Полосатый кот, любит гулять по расположению' },
-  { id: 'pet_2', type: 'pet', petNum: 2, category: 'pet', name: 'Кошка Мурка',  price: 300, desc: 'Трёхцветная кошка, спит на солнце у КПП' },
-  { id: 'pet_3', type: 'pet', petNum: 3, category: 'pet', name: 'Пёс Шарик',    price: 350, desc: 'Верный пёс, охраняет казарму по ночам' },
-  { id: 'pet_4', type: 'pet', petNum: 4, category: 'pet', name: 'Собака Жучка', price: 350, desc: 'Дворняга, знает всех солдат в лицо' },
-  { id: 'pet_5', type: 'pet', petNum: 5, category: 'pet', name: 'Кот Васька',   price: 400, desc: 'Хитрый кот, таскает еду со стола' },
-  { id: 'pet_6', type: 'pet', petNum: 6, category: 'pet', name: 'Щенок Рекс',   price: 450, desc: 'Маленький щенок, будущий защитник части' }
+const PET_BREEDS = [
+  { id: 'cat_dvor',  type: 'pet', petNum: 1, category: 'pets', name: 'Дворовая кошка',   price: 300, desc: 'Обычная кошка, живёт при части и ловит мышей' },
+  { id: 'cat_sib',   type: 'pet', petNum: 2, category: 'pets', name: 'Сибирская кошка',  price: 400, desc: 'Пушистая, с характером. Уважает только деда' },
+  { id: 'cat_brit',  type: 'pet', petNum: 3, category: 'pets', name: 'Британская кошка', price: 500, desc: 'Плюшевая порода, любит спать на подоконнике' },
+  { id: 'dog_dvor',  type: 'pet', petNum: 4, category: 'pets', name: 'Дворовый пёс',     price: 350, desc: 'Верный друг, охраняет КПП по ночам' },
+  { id: 'dog_ovch',  type: 'pet', petNum: 5, category: 'pets', name: 'Овчарка',          price: 550, desc: 'Служебная собака, знает команды «сидеть» и «фас»' },
+  { id: 'dog_husky', type: 'pet', petNum: 6, category: 'pets', name: 'Хаски',            price: 600, desc: 'Северный пёс, любит снег и внимание' }
 ];
 
 /* ============================================================
@@ -76,13 +76,11 @@ findImage(document.getElementById('armeykafonImg'),
   ['armeykafon', 'Armeykafon', 'ARMEYKAFON'],
   (el) => { const w = el.closest('.main-photo'); if (w) w.classList.add('empty'); });
 
-/* --- Картинка пряника: грузим один раз и запоминаем успешный src --- */
 let pryanikIconSrc = null;
 const pryanikIconEl = document.getElementById('pryanikIcon');
 if (pryanikIconEl) {
   pryanikIconEl.addEventListener('load', () => {
     pryanikIconSrc = pryanikIconEl.src;
-    // если магазин уже открыт — перерисуем, чтобы картинка появилась сразу
     const shopPanel = document.getElementById('panel-shop');
     if (shopPanel && shopPanel.classList.contains('active')) renderShop();
   });
@@ -189,24 +187,20 @@ requestAnimationFrame(tickClock);
    ============================================================ */
 function getMe() { return myProfile; }
 
-  async function loadMyProfile() {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) { myProfile = null; stopPetWalk(); return; }
-    const { data } = await supabaseClient
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle();
-    myProfile = data || null;
-    if (myProfile) {
-      avatarCache.set(myProfile.login, myProfile.avatar || null);
-      nickStyleCache.set(myProfile.login, myProfile.nick_style || null);
-      if (myProfile.active_pet) startPetWalk(myProfile.active_pet);
-      else stopPetWalk();
-    } else {
-      stopPetWalk();
-    }
+async function loadMyProfile() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) { myProfile = null; return; }
+  const { data } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+  myProfile = data || null;
+  if (myProfile) {
+    avatarCache.set(myProfile.login, myProfile.avatar || null);
+    nickStyleCache.set(myProfile.login, myProfile.nick_style || null);
   }
+}
 
 async function findUser(login) {
   const { data } = await supabaseClient
@@ -252,6 +246,8 @@ document.addEventListener('keydown', (e) => {
     if (gm && gm.classList.contains('open')) closeGift();
     const dm = document.getElementById('dmModal');
     if (dm && dm.classList.contains('open')) closeDM();
+    const pm = document.getElementById('petNameModal');
+    if (pm && pm.classList.contains('open')) closePetName();
   }
 });
 
@@ -309,14 +305,14 @@ async function submitAuth(e) {
   }
 }
 
-  async function logout() {
-    await supabaseClient.auth.signOut();
-    myProfile = null;
-    currentProfile = null;
-    stopPetWalk();
-    await renderAll();
-    switchTab('main', true);
-  }
+async function logout() {
+  await supabaseClient.auth.signOut();
+  myProfile = null;
+  currentProfile = null;
+  stopPetWalk();
+  await renderAll();
+  switchTab('main', true);
+}
 
 /* ============================================================
    6. Смена аватара
@@ -356,12 +352,10 @@ function esc(s) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* Аватары: кэш и дефолт */
 const avatarCache = new Map();
 const nickStyleCache = new Map();
-  const camoImageCache = new Map();    // camoNum -> url | null
-  const petImageCache  = new Map();    // pet_id  -> url | null
-  let petWalker = null;                // активный питомец (движок прогулки)
+const camoImageCache = new Map();
+const petImageCache  = new Map();
 const camoNums = [1,2,3,4,5,6,7,8];
 let defaultAvatarUrl;
 let myOwnedItems = new Set();
@@ -408,118 +402,40 @@ async function resolveDefaultAvatar() {
   return null;
 }
 
-/* ---- Ники ---- */
-  async function preloadCamoImages() {
-    for (const n of camoNums) {
-      for (const ext of ['jpg','jpeg','png','webp','gif']) {
-        const url = `kamuflyazh/${n}.${ext}`;
-        if (await testImage(url)) { camoImageCache.set(n, url); break; }
-      }
-      if (!camoImageCache.has(n)) camoImageCache.set(n, null);
+async function preloadCamoImages() {
+  for (const n of camoNums) {
+    for (const ext of ['jpg','jpeg','png','webp','gif']) {
+      const url = `kamuflyazh/${n}.${ext}`;
+      if (await testImage(url)) { camoImageCache.set(n, url); break; }
     }
+    if (!camoImageCache.has(n)) camoImageCache.set(n, null);
   }
+}
 
-  async function preloadPetImages() {
-    for (const p of PET_SHOP) {
-      for (const ext of ['png','gif','webp','jpg','jpeg']) {
-        const url = `pets/${p.petNum}.${ext}`;
-        if (await testImage(url)) { petImageCache.set(p.id, url); break; }
-      }
-      if (!petImageCache.has(p.id)) petImageCache.set(p.id, null);
+const pawImage = { url: null };
+
+async function preloadPetImages() {
+  for (const b of PET_BREEDS) {
+    let found = null;
+    for (const ext of ['png','gif','webp','jpg','jpeg']) {
+      const url = `pets/${b.petNum}.${ext}`;
+      if (await testImage(url)) { found = url; break; }
     }
+    petImageCache.set(b.id, found);
   }
-
-  /* ---- Движок прогулки питомца ---- */
-  function startPetWalk(petId) {
-    stopPetWalk();
-    const url = petImageCache.get(petId);
-    if (!url) return;
-    const layer = document.getElementById('petLayer');
-    if (!layer) return;
-
-    layer.innerHTML = '';
-    const img = document.createElement('img');
-    img.className = 'pet-sprite';
-    img.src = url;
-    img.alt = '';
-    layer.appendChild(img);
-
-    const PET_W = 48, PET_H = 48, SPEED = 0.7;
-
-    const st = {
-      img, layer,
-      x: 40, y: 40, tx: 40, ty: 40,
-      dir: 1,
-      paused: false,
-      pauseUntil: 0,
-      raf: null
-    };
-
-    function pickTarget() {
-      const W = layer.clientWidth;
-      const H = layer.clientHeight;
-      if (W <= PET_W || H <= PET_H) return;
-      st.tx = Math.random() * (W - PET_W);
-      st.ty = Math.random() * (H - PET_H);
-    }
-
-    function tick() {
-      if (petWalker !== st) return;
-      const now = performance.now();
-
-      if (st.paused) {
-        if (now >= st.pauseUntil) { st.paused = false; pickTarget(); }
-      } else {
-        const dx = st.tx - st.x;
-        const dy = st.ty - st.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist < 2) {
-          st.paused = true;
-          st.pauseUntil = now + 1000 + Math.random() * 2500;
-        } else {
-          st.x += (dx / dist) * SPEED;
-          st.y += (dy / dist) * SPEED;
-          st.dir = dx < 0 ? -1 : 1;
-        }
-      }
-
-      const W = layer.clientWidth;
-      const H = layer.clientHeight;
-      if (st.x < 0) st.x = 0;
-      if (st.y < 0) st.y = 0;
-      if (st.x > W - PET_W) st.x = Math.max(0, W - PET_W);
-      if (st.y > H - PET_H) st.y = Math.max(0, H - PET_H);
-
-      st.img.style.left = st.x + 'px';
-      st.img.style.top  = st.y + 'px';
-      st.img.style.transform = 'scaleX(' + st.dir + ')';
-
-      st.raf = requestAnimationFrame(tick);
-    }
-
-    petWalker = st;
-    pickLayerSizeFirst();
-
-    function pickLayerSizeFirst() {
-      // ждём, пока слой получит размеры (после рендера)
-      requestAnimationFrame(() => {
-        if (petWalker !== st) return;
-        pickTarget();
-        st.x = st.tx;
-        st.y = st.ty;
-        tick();
-      });
-    }
+  for (const ext of ['png','gif','webp','jpg','jpeg']) {
+    const url = `pets/paw.${ext}`;
+    if (await testImage(url)) { pawImage.url = url; break; }
   }
+}
 
-  function stopPetWalk() {
-    if (!petWalker) return;
-    if (petWalker.raf) cancelAnimationFrame(petWalker.raf);
-    if (petWalker.img && petWalker.img.parentNode) {
-      petWalker.img.parentNode.removeChild(petWalker.img);
-    }
-    petWalker = null;
-  }
+const PET_DECAY = {
+  hunger: 4,
+  mood:   3,
+  energy: 8,
+  sleepRestore: 12,
+  offlineEnergy: 8
+};
 
 function nickHtml(login) {
   const safe = esc(login);
@@ -1414,7 +1330,337 @@ function unsubscribeDM() {
 }
 
 /* ============================================================
-   16.5. Магазин
+   17. ПИТОМЦЫ — движок прогулки, состояния, уход
+   ============================================================ */
+const PET_SPRITE_W = 64, PET_SPRITE_H = 64;
+let petWalker = null;
+let petResizeTimer = null;
+let lastPawX = 0, lastPawY = 0;
+
+function buildPetGraph() {
+  const wrap = document.querySelector('.wrap');
+  if (!wrap) return { nodes: [], edges: [], W: 0, H: 0 };
+  const r = wrap.getBoundingClientRect();
+  const W = window.innerWidth, H = window.innerHeight;
+  const PET_W = 64, PET_H = 64, pad = 10;
+  const leftMax  = r.left - PET_W - pad;
+  const rightMin = r.right + pad;
+  const topMax   = r.top - PET_H - pad;
+  const hasLeft  = leftMax > pad + 10;
+  const hasRight = rightMin + PET_W < W - pad;
+  const hasTop   = topMax > pad + 10;
+
+  const nodes = [], edges = [], idx = {};
+  if (hasTop) {
+    const y = Math.max(pad, topMax - 10);
+    idx.topMid = nodes.length; nodes.push({ x: W / 2, y });
+  }
+  if (hasLeft) {
+    const x = Math.max(pad, leftMax - 10);
+    const yTop = hasTop ? Math.max(pad, topMax - 10) : pad + 40;
+    const yBot = H - PET_H - 80;
+    idx.leftTop = nodes.length; nodes.push({ x, y: yTop });
+    idx.leftBot = nodes.length; nodes.push({ x, y: yBot });
+  }
+  if (hasRight) {
+    const x = Math.min(W - PET_W - pad, rightMin + 10);
+    const yTop = hasTop ? Math.max(pad, topMax - 10) : pad + 40;
+    const yBot = H - PET_H - 80;
+    idx.rightTop = nodes.length; nodes.push({ x, y: yTop });
+    idx.rightBot = nodes.length; nodes.push({ x, y: yBot });
+  }
+  if (hasLeft && hasTop)  edges.push([idx.leftTop,  idx.topMid]);
+  if (hasTop && hasRight) edges.push([idx.topMid,   idx.rightTop]);
+  if (hasLeft)            edges.push([idx.leftBot,  idx.leftTop]);
+  if (hasRight)           edges.push([idx.rightTop, idx.rightBot]);
+
+  return { nodes, edges, W, H,
+           sleepLeft:  hasLeft  ? idx.leftBot  : null,
+           sleepRight: hasRight ? idx.rightBot : null };
+}
+
+function dropPaw(x, y) {
+  if (!pawImage.url) return;
+  const layer = document.getElementById('petLayer');
+  if (!layer) return;
+  const img = document.createElement('img');
+  img.className = 'pet-paw';
+  img.src = pawImage.url;
+  img.style.left = (x + 20) + 'px';
+  img.style.top  = (y + PET_SPRITE_H - 14) + 'px';
+  layer.appendChild(img);
+  setTimeout(() => img.classList.add('fade'), 400);
+  setTimeout(() => { if (img.parentNode) img.parentNode.removeChild(img); }, 2800);
+}
+
+function startPetWalk(pet) {
+  stopPetWalk();
+  if (!pet) return;
+  const url = petImageCache.get(pet.breed_id);
+  if (!url) return;
+  const layer = document.getElementById('petLayer');
+  if (!layer) return;
+
+  layer.innerHTML = '';
+
+  const sprite = document.createElement('div');
+  sprite.className = 'pet-sprite';
+  sprite.dataset.dir = '1';
+  const img = document.createElement('img');
+  img.src = url; img.alt = '';
+  sprite.appendChild(img);
+  layer.appendChild(sprite);
+
+  const graph = buildPetGraph();
+  if (!graph.nodes.length) { stopPetWalk(); return; }
+
+  const startNode = graph.nodes[0];
+  const st = {
+    pet, sprite, layer, graph,
+    nodeIdx: 0,
+    x: startNode.x, y: startNode.y,
+    tx: startNode.x, ty: startNode.y,
+    dir: 1,
+    paused: false, pauseUntil: 0,
+    state: 'normal',
+    dragging: false, dragOffsetX: 0, dragOffsetY: 0,
+    petting: false, lastMoodGain: 0,
+    petCursorX: null, petCursorY: null,
+    raf: null
+  };
+
+  sprite.style.left = st.x + 'px';
+  sprite.style.top  = st.y + 'px';
+
+  function pickNext() {
+    const { nodes, edges } = graph;
+
+    if (st.state === 'sleepy' && (graph.sleepLeft !== null || graph.sleepRight !== null)) {
+      const leftDist  = graph.sleepLeft  !== null ? Math.hypot(st.x - nodes[graph.sleepLeft].x,  st.y - nodes[graph.sleepLeft].y)  : Infinity;
+      const rightDist = graph.sleepRight !== null ? Math.hypot(st.x - nodes[graph.sleepRight].x, st.y - nodes[graph.sleepRight].y) : Infinity;
+      st.nodeIdx = leftDist <= rightDist ? graph.sleepLeft : graph.sleepRight;
+      st.tx = nodes[st.nodeIdx].x;
+      st.ty = nodes[st.nodeIdx].y;
+      return;
+    }
+
+    let next = st.nodeIdx;
+    if (edges.length > 0 && Math.random() < 0.45) {
+      const nb = [];
+      for (const [a, b] of edges) {
+        if (a === st.nodeIdx) nb.push(b);
+        else if (b === st.nodeIdx) nb.push(a);
+      }
+      if (nb.length) next = nb[Math.floor(Math.random() * nb.length)];
+    }
+    st.nodeIdx = next;
+    const n = nodes[next];
+    st.tx = n.x + (Math.random() - 0.5) * 24;
+    st.ty = n.y + (Math.random() - 0.5) * 24;
+  }
+
+  function tick() {
+    if (petWalker !== st) return;
+    const now = performance.now();
+    const p = st.pet;
+
+    const isSleeping  = st.state === 'sleeping';
+    const isSleepy    = (p.energy ?? 100) < 25;
+    const isSad       = (p.hunger ?? 100) < 25;
+    const lowMood     = (p.mood ?? 100) < 40;
+
+    if (st.state !== 'dragging') {
+      if (isSleeping && (p.energy ?? 100) < 80) {
+        // продолжает спать
+      } else if (isSleeping && (p.energy ?? 100) >= 80) {
+        st.state = 'normal';
+        st.sprite.classList.remove('sleeping');
+        st.paused = false;
+        pickNext();
+      } else if (isSleepy && st.state !== 'sleepy' && st.state !== 'sleeping') {
+        st.state = 'sleepy';
+        st.paused = false;
+        pickNext();
+      } else if (st.state !== 'sleeping' && st.state !== 'sleepy' && st.state !== 'dragging') {
+        st.state = (isSad || lowMood) ? 'sad' : 'normal';
+      }
+    }
+
+    const dtHours = (1 / 3600) / 60;
+    if (st.state === 'sleeping') {
+      p.energy = Math.min(100, (p.energy ?? 100) + PET_DECAY.sleepRestore * dtHours);
+    } else {
+      p.energy = Math.max(0, (p.energy ?? 100) - PET_DECAY.energy * dtHours);
+    }
+
+    if (st.dragging) {
+      st.sprite.style.left = st.x + 'px';
+      st.sprite.style.top  = st.y + 'px';
+      st.raf = requestAnimationFrame(tick);
+      return;
+    }
+
+    if (st.state === 'sleeping') {
+      st.pauseUntil = now + 1000;
+      st.sprite.style.left = st.x + 'px';
+      st.sprite.style.top  = st.y + 'px';
+      st.raf = requestAnimationFrame(tick);
+      return;
+    }
+
+    if (st.petting && (now - st.lastMoodGain) > 120) {
+      st.lastMoodGain = now;
+      p.mood = Math.min(100, (p.mood ?? 0) + 0.5);
+      if (st.petCursorX != null && st.petCursorY != null) {
+        const cx = st.x + PET_SPRITE_W / 2, cy = st.y + PET_SPRITE_H / 2;
+        st.x += (st.petCursorX - cx) * 0.08;
+        st.y += (st.petCursorY - cy) * 0.08;
+      }
+      sprite.classList.add('happy');
+    } else if (!st.petting) {
+      sprite.classList.remove('happy');
+    }
+
+    if (st.paused) {
+      if (now >= st.pauseUntil) {
+        st.paused = false;
+        sprite.classList.remove('paused');
+        pickNext();
+      }
+    } else {
+      if (lowMood && st.petCursorX != null && st.petCursorY != null) {
+        st.tx = st.petCursorX - PET_SPRITE_W / 2;
+        st.ty = st.petCursorY - PET_SPRITE_H / 2;
+      }
+
+      const dx = st.tx - st.x;
+      const dy = st.ty - st.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 2) {
+        st.paused = true;
+        st.pauseUntil = now + (lowMood ? 300 : (1000 + Math.random() * 3000));
+        sprite.classList.add('paused');
+      } else {
+        const baseSpeed = lowMood ? 1.0 : 0.65;
+        const speed = st.state === 'sleepy' ? baseSpeed * 1.2 : baseSpeed;
+        const nx = st.x + (dx / dist) * speed;
+        const ny = st.y + (dy / dist) * speed;
+
+        if (Math.hypot(nx - lastPawX, ny - lastPawY) > 40) {
+          lastPawX = nx; lastPawY = ny;
+          dropPaw(st.x, st.y);
+        }
+        st.x = nx; st.y = ny;
+        const nd = dx < 0 ? -1 : 1;
+        if (nd !== st.dir) { st.dir = nd; sprite.dataset.dir = String(nd); }
+      }
+    }
+
+    if (st.state === 'sleepy') {
+      const target = graph.nodes[st.nodeIdx];
+      if (target && Math.hypot(st.x - target.x, st.y - target.y) < 4) {
+        st.state = 'sleeping';
+        st.sprite.classList.add('sleeping');
+        st.paused = true;
+        st.pauseUntil = now + 60000;
+      }
+    }
+
+    if (st.state === 'sad' && !sprite.classList.contains('sad')) sprite.classList.add('sad');
+    if (st.state !== 'sad') sprite.classList.remove('sad');
+
+    st.sprite.style.left = st.x + 'px';
+    st.sprite.style.top  = st.y + 'px';
+    st.raf = requestAnimationFrame(tick);
+  }
+
+  petWalker = st;
+  pickNext();
+  tick();
+}
+
+function stopPetWalk() {
+  if (!petWalker) return;
+  if (petWalker.raf) cancelAnimationFrame(petWalker.raf);
+  if (petWalker.sprite && petWalker.sprite.parentNode) {
+    petWalker.sprite.parentNode.removeChild(petWalker.sprite);
+  }
+  petWalker = null;
+  const layer = document.getElementById('petLayer');
+  if (layer) layer.innerHTML = '';
+}
+
+document.addEventListener('mousemove', (e) => {
+  if (!petWalker) return;
+  const st = petWalker;
+
+  if (st.dragging) {
+    st.x = e.clientX - st.dragOffsetX;
+    st.y = e.clientY - st.dragOffsetY;
+    const W = window.innerWidth, H = window.innerHeight;
+    st.x = Math.max(0, Math.min(W - PET_SPRITE_W, st.x));
+    st.y = Math.max(0, Math.min(H - PET_SPRITE_H, st.y));
+    return;
+  }
+
+  const cx = st.x + PET_SPRITE_W / 2;
+  const cy = st.y + PET_SPRITE_H / 2;
+  const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+  if (dist < 60) {
+    st.petting = true;
+    st.petCursorX = e.clientX;
+    st.petCursorY = e.clientY;
+  } else {
+    st.petting = false;
+    st.petCursorX = null;
+    st.petCursorY = null;
+  }
+});
+
+document.addEventListener('mousedown', (e) => {
+  if (!petWalker) return;
+  const st = petWalker;
+  const cx = st.x, cy = st.y;
+  const inside =
+    e.clientX >= cx && e.clientX <= cx + PET_SPRITE_W &&
+    e.clientY >= cy && e.clientY <= cy + PET_SPRITE_H;
+  if (!inside) return;
+
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  if (!el || !el.closest('.pet-sprite')) return;
+
+  e.preventDefault();
+  st.dragging = true;
+  st.state = 'dragging';
+  st.dragOffsetX = e.clientX - st.x;
+  st.dragOffsetY = e.clientY - st.y;
+  st.sprite.classList.add('dragging');
+});
+
+document.addEventListener('mouseup', () => {
+  if (!petWalker) return;
+  const st = petWalker;
+  if (st.dragging) {
+    st.dragging = false;
+    st.state = 'normal';
+    st.sprite.classList.remove('dragging');
+    st.paused = false;
+    st.pauseUntil = 0;
+  }
+});
+
+window.addEventListener('resize', () => {
+  if (petResizeTimer) clearTimeout(petResizeTimer);
+  petResizeTimer = setTimeout(() => {
+    const me = getMe();
+    if (!me || !me.active_pet_id) return;
+    const pet = myPets.find(p => p.id === me.active_pet_id);
+    if (pet) startPetWalk(pet);
+  }, 250);
+});
+
+/* ============================================================
+   18. МАГАЗИН
    ============================================================ */
 async function loadMyOwnedItems() {
   myOwnedItems = new Set();
@@ -1425,6 +1671,91 @@ async function loadMyOwnedItems() {
     .select('item_id')
     .eq('user_id', me.id);
   (data || []).forEach(r => myOwnedItems.add(r.item_id));
+}
+
+let myPets = [];
+
+async function loadMyPets() {
+  myPets = [];
+  const me = getMe();
+  if (!me) return;
+  const { data } = await supabaseClient
+    .from('pets')
+    .select('*')
+    .eq('user_id', me.id)
+    .order('created_at', { ascending: true });
+  myPets = data || [];
+  const now = Date.now();
+  const toSave = [];
+  for (const p of myPets) {
+    const last = p.last_tick ? new Date(p.last_tick).getTime() : now;
+    const hours = Math.max(0, (now - last) / 3600000);
+    if (hours < 0.01) continue;
+    applyPetDecay(p, hours);
+    toSave.push(p);
+  }
+  for (const p of toSave) {
+    await supabaseClient.from('pets').update({
+      hunger: Math.round(p.hunger),
+      mood:   Math.round(p.mood),
+      energy: Math.round(p.energy),
+      last_tick: new Date().toISOString()
+    }).eq('id', p.id);
+  }
+}
+
+function applyPetDecay(pet, hours) {
+  pet.hunger = Math.max(0, (pet.hunger ?? 100) - PET_DECAY.hunger * hours);
+  pet.mood   = Math.max(0, (pet.mood   ?? 100) - PET_DECAY.mood   * hours);
+  let en = pet.energy ?? 100;
+  let remaining = hours;
+  while (remaining > 0) {
+    const step = Math.min(remaining, 0.25);
+    if (en < 25) en = Math.min(100, en + PET_DECAY.offlineEnergy * step);
+    else         en = Math.max(25, en - PET_DECAY.energy * step);
+    remaining -= step;
+  }
+  pet.energy = en;
+}
+
+async function savePetState(pet) {
+  if (!pet || !pet.id) return;
+  await supabaseClient.from('pets').update({
+    hunger: Math.round(pet.hunger),
+    mood:   Math.round(pet.mood),
+    energy: Math.round(pet.energy),
+    last_tick: new Date().toISOString()
+  }).eq('id', pet.id);
+}
+
+let petTickTimer = null;
+
+function startPetTick() {
+  if (petTickTimer) return;
+  petTickTimer = setInterval(async () => {
+    const me = getMe();
+    if (!me || !myPets.length) return;
+    for (const p of myPets) {
+      applyPetDecay(p, 30 / 3600);
+      await savePetState(p);
+    }
+    if (petWalker && petWalker.pet) {
+      const fresh = myPets.find(x => x.id === petWalker.pet.id);
+      if (fresh) petWalker.pet = fresh;
+    }
+    const shop = document.getElementById('panel-shop');
+    if (shop && shop.classList.contains('active') && myPets.length) {
+      renderShop();
+    }
+  }, 30000);
+}
+
+async function startActivePetFromProfile() {
+  const me = getMe();
+  if (!me || !me.active_pet_id) { stopPetWalk(); return; }
+  const pet = myPets.find(p => p.id === me.active_pet_id);
+  if (pet) startPetWalk(pet);
+  else stopPetWalk();
 }
 
 async function renderShop() {
@@ -1445,20 +1776,26 @@ async function renderShop() {
   const groups = [
     { title: 'Переливающиеся ники', items: NICK_SHOP.filter(i => i.category === 'color') },
     { title: 'Камуфляжные ники',    items: NICK_SHOP.filter(i => i.category === 'camo')  },
-    { title: 'Питомцы',             items: PET_SHOP }
+    { title: 'Питомцы',             items: PET_BREEDS }
   ];
-  const allItems = [...NICK_SHOP, ...PET_SHOP];
+  const allItems = [...NICK_SHOP, ...PET_BREEDS];
 
   const balance = me.pryaniki || 0;
-
   let html = '';
+
+  if (myPets.length > 0) {
+    html += renderMyPetsSection();
+  }
+
   for (const g of groups) {
     html += '<div class="shop-category"><h3>' + esc(g.title) + '</h3><div class="shop-grid">';
     for (const item of g.items) {
-      const isActive = item.type === 'pet'
-        ? (me.active_pet === item.id)
-        : (me.nick_style === item.id);
-      html += renderShopCard(item, myOwnedItems.has(item.id), isActive, balance);
+      let owned = false, active = false;
+      if (item.type !== 'pet') {
+        owned = myOwnedItems.has(item.id);
+        active = me.nick_style === item.id;
+      }
+      html += renderShopCard(item, owned, active, balance);
     }
     html += '</div></div>';
   }
@@ -1467,23 +1804,78 @@ async function renderShop() {
   container.querySelectorAll('[data-shop-action]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const item = allItems.find(i => i.id === btn.dataset.itemId);
-      if (!item) return;
       const action = btn.dataset.shopAction;
+      if (action === 'buy-pet') { openPetName(item); return; }
+      if (!item) return;
       if (action === 'buy') await buyShopItem(item);
       else if (action === 'equip') await equipShopItem(item);
       else if (action === 'unequip') await unequipShopItem(item);
     });
   });
+
+  container.querySelectorAll('[data-pet-action]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const petId = btn.dataset.petId;
+      const action = btn.dataset.petAction;
+      if (action === 'activate')   await activatePet(petId);
+      else if (action === 'deactivate') await deactivatePet();
+      else if (action === 'rename')     openPetName(null, petId);
+      else if (action === 'feed')       await feedPet(petId);
+      else if (action === 'release')    await releasePet(petId);
+    });
+  });
+}
+
+function renderMyPetsSection() {
+  const activeId = myProfile && myProfile.active_pet_id;
+  let html = '<div class="shop-category"><h3>Мои питомцы</h3><div class="pets-list">';
+  for (const p of myPets) {
+    const breed = PET_BREEDS.find(b => b.id === p.breed_id);
+    const url = petImageCache.get(p.breed_id) || '';
+    const isActive = p.id === activeId;
+
+    const h = Math.round(p.hunger ?? 100);
+    const m = Math.round(p.mood   ?? 100);
+    const e = Math.round(p.energy ?? 100);
+    const cls = v => v < 25 ? 'low' : '';
+
+    html += '<div class="pet-row' + (isActive ? ' active' : '') + '">' +
+      '<div class="pet-thumb">' + (url ? '<img src="' + esc(url) + '" alt="">' : '') + '</div>' +
+      '<div class="pet-info">' +
+        '<div class="pet-name">' + esc(p.name) + '</div>' +
+        '<div class="pet-breed">' + esc(breed ? breed.name : p.breed_id) + '</div>' +
+      '</div>' +
+      '<div class="pet-actions">' +
+        (isActive
+          ? '<button type="button" class="aero-btn red small" data-pet-action="deactivate" data-pet-id="' + p.id + '">Убрать</button>'
+          : '<button type="button" class="aero-btn green small" data-pet-action="activate" data-pet-id="' + p.id + '">Выпустить</button>') +
+        '<button type="button" class="aero-btn small" data-pet-action="rename" data-pet-id="' + p.id + '">Переименовать</button>' +
+        '<button type="button" class="aero-btn green small" data-pet-action="feed" data-pet-id="' + p.id + '">Покормить (5)</button>' +
+        '<button type="button" class="aero-btn red small" data-pet-action="release" data-pet-id="' + p.id + '">Отпустить</button>' +
+      '</div>' +
+      '<div class="pet-stats">' +
+        '<div class="pet-stat hunger ' + cls(h) + '"><span class="label">Еда</span><span class="pet-stat-bar"><i style="width:' + h + '%"></i></span></div>' +
+        '<div class="pet-stat mood '   + cls(m) + '"><span class="label">Настр</span><span class="pet-stat-bar"><i style="width:' + m + '%"></i></span></div>' +
+        '<div class="pet-stat energy ' + cls(e) + '"><span class="label">Силы</span><span class="pet-stat-bar"><i style="width:' + e + '%"></i></span></div>' +
+      '</div>' +
+    '</div>';
+  }
+  html += '</div></div>';
+  return html;
 }
 
 function renderShopCard(item, owned, active, balance) {
   const preview = shopPreviewHtml(item);
 
   let actionHtml = '';
-  if (active) {
-    actionHtml = '<button type="button" class="aero-btn red small" data-shop-action="unequip" data-item-id="' + item.id + '">' + (item.type === 'pet' ? 'Убрать' : 'Снять') + '</button>';
+  if (item.type === 'pet') {
+    const canAfford = balance >= item.price;
+    actionHtml = '<button type="button" class="aero-btn green small" data-shop-action="buy-pet" data-item-id="' + item.id + '"' +
+      (canAfford ? '' : ' disabled') + '>' + (canAfford ? 'Купить' : 'Не хватает') + '</button>';
+  } else if (active) {
+    actionHtml = '<button type="button" class="aero-btn red small" data-shop-action="unequip" data-item-id="' + item.id + '">Снять</button>';
   } else if (owned) {
-    actionHtml = '<button type="button" class="aero-btn green small" data-shop-action="equip" data-item-id="' + item.id + '">' + (item.type === 'pet' ? 'Выпустить' : 'Надеть') + '</button>';
+    actionHtml = '<button type="button" class="aero-btn green small" data-shop-action="equip" data-item-id="' + item.id + '">Надеть</button>';
   } else {
     const canAfford = balance >= item.price;
     actionHtml = '<button type="button" class="aero-btn green small" data-shop-action="buy" data-item-id="' + item.id + '"' +
@@ -1491,8 +1883,10 @@ function renderShopCard(item, owned, active, balance) {
   }
 
   let badge = '';
-  if (active) badge = '<span class="badge active">' + (item.type === 'pet' ? 'ГУЛЯЕТ' : 'НАДЕТО') + '</span>';
-  else if (owned) badge = '<span class="badge owned">КУПЛЕНО</span>';
+  if (item.type !== 'pet') {
+    if (active) badge = '<span class="badge active">НАДЕТО</span>';
+    else if (owned) badge = '<span class="badge owned">КУПЛЕНО</span>';
+  }
 
   return '<div class="shop-item' + (owned ? ' owned' : '') + (active ? ' active' : '') + '">' +
     badge +
@@ -1582,20 +1976,6 @@ async function equipShopItem(item) {
   if (!me) return;
   if (!myOwnedItems.has(item.id)) return;
 
-  if (item.type === 'pet') {
-    const { error } = await supabaseClient
-      .from('profiles')
-      .update({ active_pet: item.id })
-      .eq('id', me.id);
-    if (error) { alert('Ошибка: ' + error.message); return; }
-
-    await loadMyProfile();
-    startPetWalk(item.id);
-    await renderShop();
-    return;
-  }
-
-  // ник (class / camo)
   const { error } = await supabaseClient
     .from('profiles')
     .update({ nick_style: item.id })
@@ -1615,23 +1995,12 @@ async function unequipShopItem(item) {
   const me = getMe();
   if (!me || !item) return;
 
-  if (item.type === 'pet') {
-    const { error } = await supabaseClient
-      .from('profiles')
-      .update({ active_pet: null })
-      .eq('id', me.id);
-    if (error) { alert('Ошибка: ' + error.message); return; }
-    await loadMyProfile();
-    stopPetWalk();
-    await renderShop();
-    return;
-  }
-
   const { error } = await supabaseClient
     .from('profiles')
     .update({ nick_style: null })
     .eq('id', me.id);
   if (error) { alert('Ошибка: ' + error.message); return; }
+
   await loadMyProfile();
   nickStyleCache.set(me.login, null);
   await renderShop();
@@ -1642,7 +2011,200 @@ async function unequipShopItem(item) {
 }
 
 /* ============================================================
-   17. Старт
+   19. Модалка имени питомца
+   ============================================================ */
+let petModalMode = 'create';
+let petModalBreed = null;
+let petModalPetId = null;
+
+function openPetName(breed, petId) {
+  const me = getMe();
+  if (!me) { openModal('login'); return; }
+
+  const input = document.getElementById('petNameInput');
+  const errEl = document.getElementById('petNameError');
+  const submitBtn = document.getElementById('petNameSubmit');
+
+  if (breed) {
+    if ((me.pryaniki || 0) < breed.price) { alert('Не хватает пряников'); return; }
+    petModalMode = 'create';
+    petModalBreed = breed;
+    petModalPetId = null;
+    document.getElementById('petNameTitle').textContent = 'Купить: ' + breed.name;
+    submitBtn.textContent = 'Создать';
+    input.value = '';
+  } else if (petId) {
+    const pet = myPets.find(p => p.id === petId);
+    if (!pet) return;
+    petModalMode = 'rename';
+    petModalBreed = null;
+    petModalPetId = petId;
+    document.getElementById('petNameTitle').textContent = 'Переименовать';
+    submitBtn.textContent = 'Сохранить';
+    input.value = pet.name;
+  } else {
+    return;
+  }
+
+  errEl.textContent = '';
+  document.getElementById('petNameModal').classList.add('open');
+  setTimeout(() => { input.focus(); input.select(); }, 50);
+}
+
+function closePetName() {
+  document.getElementById('petNameModal').classList.remove('open');
+  petModalBreed = null;
+  petModalPetId = null;
+}
+
+async function confirmPetName(e) {
+  e.preventDefault();
+  const me = getMe();
+  if (!me) return;
+
+  const name = document.getElementById('petNameInput').value.trim();
+  const errEl = document.getElementById('petNameError');
+
+  if (name.length < 1) { errEl.textContent = 'Введи имя'; return; }
+  if (name.length > 20) { errEl.textContent = 'Максимум 20 символов'; return; }
+
+  if (petModalMode === 'create') {
+    const breed = petModalBreed;
+    if (!breed) return;
+
+    const startBalance = me.pryaniki || 0;
+    if (startBalance < breed.price) { errEl.textContent = 'Не хватает пряников'; return; }
+
+    const { error: errUpd } = await supabaseClient
+      .from('profiles')
+      .update({ pryaniki: startBalance - breed.price })
+      .eq('id', me.id);
+    if (errUpd) { errEl.textContent = errUpd.message; return; }
+
+    const { error: errIns } = await supabaseClient
+      .from('pets')
+      .insert({ user_id: me.id, breed_id: breed.id, name });
+    if (errIns) {
+      await supabaseClient.from('profiles').update({ pryaniki: startBalance }).eq('id', me.id);
+      errEl.textContent = errIns.message;
+      return;
+    }
+
+    await loadMyProfile();
+    await loadMyPets();
+    renderPryanikChip();
+    closePetName();
+    await renderShop();
+  } else {
+    const { error } = await supabaseClient
+      .from('pets')
+      .update({ name })
+      .eq('id', petModalPetId);
+    if (error) { errEl.textContent = error.message; return; }
+    await loadMyPets();
+    closePetName();
+    await renderShop();
+  }
+}
+
+/* ============================================================
+   20. Питомцы: управление
+   ============================================================ */
+async function activatePet(petId) {
+  const me = getMe();
+  if (!me) return;
+  const { error } = await supabaseClient
+    .from('profiles')
+    .update({ active_pet_id: petId })
+    .eq('id', me.id);
+  if (error) { alert('Ошибка: ' + error.message); return; }
+  await loadMyProfile();
+  const pet = myPets.find(p => p.id === petId);
+  if (pet) startPetWalk(pet); else stopPetWalk();
+  await renderShop();
+}
+
+async function deactivatePet() {
+  const me = getMe();
+  if (!me) return;
+  const { error } = await supabaseClient
+    .from('profiles')
+    .update({ active_pet_id: null })
+    .eq('id', me.id);
+  if (error) { alert('Ошибка: ' + error.message); return; }
+  await loadMyProfile();
+  stopPetWalk();
+  await renderShop();
+}
+
+async function releasePet(petId) {
+  const me = getMe();
+  if (!me) return;
+  if (!confirm('Отпустить питомца навсегда? Это нельзя отменить.')) return;
+
+  const { error } = await supabaseClient
+    .from('pets')
+    .delete()
+    .eq('id', petId);
+  if (error) { alert('Ошибка: ' + error.message); return; }
+
+  if (me.active_pet_id === petId) {
+    await supabaseClient
+      .from('profiles')
+      .update({ active_pet_id: null })
+      .eq('id', me.id);
+    stopPetWalk();
+  }
+
+  await loadMyProfile();
+  await loadMyPets();
+  await renderShop();
+}
+
+async function feedPet(petId) {
+  const me = getMe();
+  if (!me) return;
+  const pet = myPets.find(p => p.id === petId);
+  if (!pet) return;
+
+  const COST = 5, RESTORE = 40;
+
+  if ((me.pryaniki || 0) < COST) { alert('Не хватает пряников'); return; }
+
+  const startBalance = me.pryaniki || 0;
+  const newBalance = startBalance - COST;
+
+  const { error: errUpd } = await supabaseClient
+    .from('profiles')
+    .update({ pryaniki: newBalance })
+    .eq('id', me.id);
+  if (errUpd) { alert('Ошибка: ' + errUpd.message); return; }
+
+  const newHunger = Math.min(100, (pet.hunger ?? 100) + RESTORE);
+  const newMood   = Math.min(100, (pet.mood   ?? 100) + 10);
+  const { error: errPet } = await supabaseClient
+    .from('pets')
+    .update({ hunger: newHunger, mood: newMood, last_tick: new Date().toISOString() })
+    .eq('id', pet.id);
+  if (errPet) {
+    await supabaseClient.from('profiles').update({ pryaniki: startBalance }).eq('id', me.id);
+    alert('Ошибка: ' + errPet.message);
+    return;
+  }
+
+  pet.hunger = newHunger;
+  pet.mood = newMood;
+
+  await loadMyProfile();
+  renderPryanikChip();
+  if (petWalker && petWalker.pet && petWalker.pet.id === pet.id) {
+    petWalker.pet = pet;
+  }
+  await renderShop();
+}
+
+/* ============================================================
+   21. Старт
    ============================================================ */
 async function renderAll() {
   await renderUserArea();
@@ -1650,16 +2212,23 @@ async function renderAll() {
   renderChatAccess();
   await renderChat();
   await renderProfile();
-  if (getMe()) await loadMyOwnedItems();
+  if (getMe()) {
+    await loadMyOwnedItems();
+    await loadMyPets();
+    await startActivePetFromProfile();
+  } else {
+    stopPetWalk();
+  }
 }
 
-  (async () => {
-    await Promise.all([ preloadCamoImages(), preloadPetImages() ]);
-    await loadMyProfile();
-    await loadChatMessages();
-    await renderAll();
-    subscribeChat();
-  })();
+(async () => {
+  await Promise.all([ preloadCamoImages(), preloadPetImages() ]);
+  await loadMyProfile();
+  await loadChatMessages();
+  await renderAll();
+  subscribeChat();
+  startPetTick();
+})();
 
 supabaseClient.auth.onAuthStateChange(async () => {
   await loadMyProfile();

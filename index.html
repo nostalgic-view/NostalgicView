@@ -9,6 +9,8 @@
 </head>
 <body>
 
+<div class="pet-layer" id="petLayer"></div>
+
 <div class="wrap">
 
   <header class="top">
@@ -37,7 +39,6 @@
     <aside class="left">
       <div class="fon-frame">
         <img id="fonImg" alt="Fon">
-        <div class="pet-layer" id="petLayer"></div>
       </div>
     </aside>
 
@@ -258,6 +259,26 @@
     <form class="dm-form" onsubmit="sendDM(event)">
       <input type="text" id="dmInput" placeholder="Написать сообщение..." maxlength="500" autocomplete="off">
       <button class="aero-btn green small" type="submit">Отправить</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА ИМЕНИ ПИТОМЦА ===== -->
+<div class="modal-overlay" id="petNameModal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h3 id="petNameTitle">Назови питомца</h3>
+      <button class="modal-close" type="button" onclick="closePetName()">×</button>
+    </div>
+    <form class="modal-body" onsubmit="confirmPetName(event)">
+      <label>Имя питомца
+        <input type="text" id="petNameInput" maxlength="20" required placeholder="Например, Барсик">
+      </label>
+      <div class="modal-error" id="petNameError"></div>
+      <div class="modal-actions">
+        <button type="button" class="aero-btn red small" onclick="closePetName()">Отмена</button>
+        <button type="submit" class="aero-btn green" id="petNameSubmit">Создать</button>
+      </div>
     </form>
   </div>
 </div>
