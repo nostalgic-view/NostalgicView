@@ -2130,6 +2130,18 @@ body > .wrap {
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+  width: 140px;
+  min-width: 140px;
+  max-width: 140px;
+}
+.profile-avatar-col .profile-avatar {
+  width: 140px;
+  height: 140px;
+  min-width: 140px;
+  max-width: 140px;
+  max-height: 140px;
+  flex-shrink: 0;
+  align-self: center;
 }
 .gifts-btn-wrap { width: 140px; }
 .gifts-btn-wrap .aero-btn { width: 100%; }
