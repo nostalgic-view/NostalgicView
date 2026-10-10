@@ -183,6 +183,42 @@ function tickClock() {
 requestAnimationFrame(tickClock);
 
 /* ============================================================
+   3.5. Армейские объявления (отбой / подъём)
+   ============================================================ */
+let lastAnnouncedHour = -1;
+
+function showArmyAnnouncement(text, ms) {
+  const el = document.getElementById('armyAnnouncement');
+  if (!el) return;
+  el.textContent = text;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), ms || 25000);
+}
+
+function checkArmyAnnouncement() {
+  const now = new Date();
+  const h = now.getHours();
+  const m = now.getMinutes();
+
+  // Сброс флага, когда ушли из «объявленного» часа
+  if (h !== 22 && h !== 6) {
+    lastAnnouncedHour = -1;
+    return;
+  }
+
+  if (m !== 0) return;
+  if (lastAnnouncedHour === h) return;
+
+  lastAnnouncedHour = h;
+  if (h === 22) showArmyAnnouncement('Рота, отбой!');
+  else          showArmyAnnouncement('Рота, подъём!');
+}
+
+// Проверяем сразу при загрузке и потом каждые 10 секунд
+checkArmyAnnouncement();
+setInterval(checkArmyAnnouncement, 10000);
+
+/* ============================================================
    4. Пользователи
    ============================================================ */
 function getMe() { return myProfile; }
@@ -248,6 +284,8 @@ document.addEventListener('keydown', (e) => {
     if (dm && dm.classList.contains('open')) closeDM();
     const pm = document.getElementById('petNameModal');
     if (pm && pm.classList.contains('open')) closePetName();
+    const gvm = document.getElementById('giftsModal');
+    if (gvm && gvm.classList.contains('open')) closeGiftsModal();
   }
 });
 
@@ -588,6 +626,8 @@ async function renderProfile() {
     lsWrap.innerHTML = '';
     friendsSec.innerHTML = '';
     if (invSec) invSec.innerHTML = '';
+    const gbw = document.getElementById('giftsBtnWrap');
+    if (gbw) gbw.innerHTML = '';
     return;
   }
 
@@ -608,6 +648,18 @@ async function renderProfile() {
     pImg.removeAttribute('src');
     pAvatar.classList.add('empty');
     pAvatar.dataset.initial = (user.login[0] || '?').toUpperCase();
+  }
+
+  // Кнопка «Подарки» под аватаркой
+  const giftsBtnWrap = document.getElementById('giftsBtnWrap');
+  if (giftsBtnWrap) {
+    giftsBtnWrap.innerHTML = '';
+    const gBtn = document.createElement('button');
+    gBtn.type = 'button';
+    gBtn.className = 'aero-btn small';
+    gBtn.textContent = 'Подарки';
+    gBtn.addEventListener('click', () => openGiftsModal(user.login));
+    giftsBtnWrap.appendChild(gBtn);
   }
 
   if (!bioEditMode) {
@@ -1168,6 +1220,8 @@ async function openGift(login) {
   giftTargetId = user.id;
 
   document.getElementById('giftModalTitle').textContent = 'Подарить · ' + login;
+  const msgEl = document.getElementById('giftMessageInput');
+  if (msgEl) msgEl.value = '';
   const list = document.getElementById('giftList');
   list.innerHTML = '';
 
@@ -1212,12 +1266,16 @@ async function sendGift(gift) {
   if (!me) return;
   if ((me.pryaniki || 0) < gift.price) return;
 
+  const msgInput = document.getElementById('giftMessageInput');
+  const message = msgInput ? msgInput.value.trim().slice(0, 200) : '';
+
   const { error: errIns } = await supabaseClient.from('gifts').insert({
     from_id: me.id,
     to_id: giftTargetId,
     gift_id: gift.id,
     gift_name: gift.name,
-    gift_icon: gift.icon
+    gift_icon: gift.icon,
+    message: message
   });
   if (errIns) { alert('Ошибка: ' + errIns.message); return; }
 
@@ -1231,6 +1289,112 @@ async function sendGift(gift) {
   renderPryanikChip();
   closeGift();
   alert('Подарок отправлен!');
+}
+
+/* ============================================================
+   Просмотр подарков
+   ============================================================ */
+async function openGiftsModal(login) {
+  const me = getMe();
+  if (!me) { openModal('login'); return; }
+  const user = await findUser(login);
+  if (!user) return;
+
+  const isOwn = user.id === me.id;
+
+  const titleEl = document.getElementById('giftsModalTitle');
+  titleEl.textContent = isOwn ? 'Мои подарки' : ('Подарки · ' + login);
+
+  const visWrap = document.getElementById('giftsViewVisibility');
+  const visBtn = document.getElementById('giftsVisBtn');
+  if (isOwn) {
+    visWrap.style.display = '';
+    visBtn.textContent = user.gifts_hidden ? 'Показать всем' : 'Скрыть ото всех';
+  } else {
+    visWrap.style.display = 'none';
+  }
+
+  const list = document.getElementById('giftsViewList');
+  list.innerHTML = '<div class="empty-note">Загрузка...</div>';
+  document.getElementById('giftsModal').classList.add('open');
+
+  // Скрыто чужому пользователю
+  if (!isOwn && user.gifts_hidden) {
+    list.innerHTML = '<div class="empty-note">Подарки скрыты владельцем</div>';
+    return;
+  }
+
+  const { data: gifts } = await supabaseClient
+    .from('gifts')
+    .select('*')
+    .eq('to_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (!gifts || gifts.length === 0) {
+    list.innerHTML = '<div class="empty-note">' +
+      (isOwn ? 'Тебе пока никто не дарил подарков' : 'Подарков пока нет') +
+      '</div>';
+    return;
+  }
+
+  const senderIds = [...new Set(gifts.map(g => g.from_id))];
+  const { data: profiles } = await supabaseClient
+    .from('profiles')
+    .select('id, login')
+    .in('id', senderIds);
+  const loginMap = {};
+  (profiles || []).forEach(p => { loginMap[p.id] = p.login; });
+
+  list.innerHTML = gifts.map(g => {
+    const d = new Date(g.created_at);
+    const when = d.toLocaleString('ru-RU', {
+      day:'2-digit', month:'2-digit', year:'numeric',
+      hour:'2-digit', minute:'2-digit'
+    });
+    const sender = loginMap[g.from_id] || '?';
+    const icon = g.gift_icon || '🎁';
+    const msg = g.message
+      ? '<div class="gift-msg">«' + esc(g.message) + '»</div>'
+      : '';
+
+    return '<div class="gifts-view-row">' +
+      '<div class="gifts-view-icon">' + esc(icon) + '</div>' +
+      '<div class="gifts-view-info">' +
+        '<div class="gifts-view-name">' + esc(g.gift_name || g.gift_id) + '</div>' +
+        '<div class="gifts-view-from">от <span class="gifts-view-from-link" data-login="' + esc(sender) + '">' + esc(sender) + '</span> · ' + when + '</div>' +
+        msg +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  list.querySelectorAll('.gifts-view-from-link').forEach(el => {
+    el.addEventListener('click', () => {
+      closeGiftsModal();
+      openProfile(el.dataset.login);
+    });
+  });
+}
+
+function closeGiftsModal() {
+  document.getElementById('giftsModal').classList.remove('open');
+}
+
+async function toggleGiftsVisibility() {
+  const me = getMe();
+  if (!me) return;
+  const newHidden = !me.gifts_hidden;
+
+  const { error } = await supabaseClient
+    .from('profiles')
+    .update({ gifts_hidden: newHidden })
+    .eq('id', me.id);
+  if (error) { alert('Ошибка: ' + error.message); return; }
+
+  await loadMyProfile();
+  if (currentProfile && currentProfile.id === me.id) {
+    currentProfile.gifts_hidden = newHidden;
+  }
+  await openGiftsModal(me.login);
 }
 
 /* ============================================================

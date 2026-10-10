@@ -129,11 +129,14 @@
         </div>
 
         <div class="profile-header">
-          <label class="profile-avatar" id="profileAvatar" title="Сменить аватар">
-            <img id="profileAvatarImg" alt="">
-            <input type="file" accept="image/*" hidden onchange="changeAvatar(event)">
-            <span class="edit-hint">Сменить аватар</span>
-          </label>
+          <div class="profile-avatar-col">
+            <label class="profile-avatar" id="profileAvatar" title="Сменить аватар">
+              <img id="profileAvatarImg" alt="">
+              <input type="file" accept="image/*" hidden onchange="changeAvatar(event)">
+              <span class="edit-hint">Сменить аватар</span>
+            </label>
+            <div id="giftsBtnWrap" class="gifts-btn-wrap"></div>
+          </div>
 
           <div class="profile-info">
             <div class="profile-name-row">
@@ -166,6 +169,7 @@
 </div>
 
 <!-- ===== ЧАСЫ ===== -->
+<div class="army-announcement" id="armyAnnouncement"></div>
 <div class="wall-clock" title="Время">
   <div class="wall-clock-dial" id="clockDial"></div>
   <div class="wall-clock-hand hour" id="clockHour"></div>
@@ -242,6 +246,10 @@
       <button class="modal-close" type="button" onclick="closeGift()">×</button>
     </div>
     <div class="modal-body">
+      <label style="display:block; margin-bottom:12px; font-size:12px; font-weight:bold; color:#1a4a7a;">
+        Сообщение к подарку (необязательно)
+        <input type="text" id="giftMessageInput" maxlength="200" placeholder="Например, с днём рождения!">
+      </label>
       <div class="gift-list" id="giftList"></div>
     </div>
   </div>
@@ -279,6 +287,22 @@
         <button type="submit" class="aero-btn green" id="petNameSubmit">Создать</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА ПРОСМОТРА ПОДАРКОВ ===== -->
+<div class="modal-overlay" id="giftsModal">
+  <div class="modal-panel gifts-view-panel">
+    <div class="modal-head">
+      <h3 id="giftsModalTitle">Подарки</h3>
+      <button class="modal-close" type="button" onclick="closeGiftsModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="giftsViewVisibility" style="display:none; margin-bottom:14px; text-align:right;">
+        <button type="button" class="aero-btn small" id="giftsVisBtn" onclick="toggleGiftsVisibility()">Скрыть ото всех</button>
+      </div>
+      <div class="gifts-view-list" id="giftsViewList"></div>
+    </div>
   </div>
 </div>
 
