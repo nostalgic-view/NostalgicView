@@ -40,12 +40,12 @@ const NICK_SHOP = [
 ];
 
 const PET_BREEDS = [
-  { id: 'cat_dvor',  type: 'pet', petNum: 1, category: 'pets', name: 'Дворовая кошка',   price: 300, desc: '' },
-  { id: 'cat_sib',   type: 'pet', petNum: 2, category: 'pets', name: 'Сибирская кошка',  price: 400, desc: 'Пушистая, с характером. Уважает только деда' },
-  { id: 'cat_brit',  type: 'pet', petNum: 3, category: 'pets', name: 'Британская кошка', price: 500, desc: 'Плюшевая порода, любит спать на подоконнике' },
-  { id: 'dog_dvor',  type: 'pet', petNum: 4, category: 'pets', name: 'Дворовый пёс',     price: 350, desc: 'Верный друг, охраняет КПП по ночам' },
-  { id: 'dog_ovch',  type: 'pet', petNum: 5, category: 'pets', name: 'Овчарка',          price: 550, desc: 'Служебная собака, знает команды «сидеть» и «фас»' },
-  { id: 'dog_husky', type: 'pet', petNum: 6, category: 'pets', name: 'Хаски',            price: 600, desc: 'Северный пёс, любит снег и внимание' }
+  { id: 'cat_dvor',  type: 'pet', petNum: 1, category: 'pets', name: 'Дворовая кошка',   price: 300, desc: 'Дворовая, Без породы' },
+//  { id: 'cat_sib',   type: 'pet', petNum: 2, category: 'pets', name: 'Сибирская кошка',  price: 400, desc: 'Пушистая, с характером. Уважает только деда' },
+//  { id: 'cat_brit',  type: 'pet', petNum: 3, category: 'pets', name: 'Британская кошка', price: 500, desc: 'Плюшевая порода, любит спать на подоконнике' },
+//  { id: 'dog_dvor',  type: 'pet', petNum: 4, category: 'pets', name: 'Дворовый пёс',     price: 350, desc: 'Верный друг, охраняет КПП по ночам' },
+//  { id: 'dog_ovch',  type: 'pet', petNum: 5, category: 'pets', name: 'Овчарка',          price: 550, desc: 'Служебная собака, знает команды «сидеть» и «фас»' },
+//  { id: 'dog_husky', type: 'pet', petNum: 6, category: 'pets', name: 'Хаски',            price: 600, desc: 'Северный пёс, любит снег и внимание' }
 ];
 
 /* ============================================================
@@ -1434,7 +1434,6 @@ function dropPaw(x, y, dir) {
   img.src = pawImage.url;
   img.style.left = (x + 20) + 'px';
   img.style.top  = (y + PET_SPRITE_H - 14) + 'px';
-  // всегда явно ставим зеркалирование в нужную сторону
   img.style.transform = (dir === -1) ? 'scaleX(-1)' : 'scaleX(1)';
   layer.insertBefore(img, layer.firstChild);
   setTimeout(() => img.classList.add('fade'), 400);
@@ -1464,7 +1463,6 @@ function startPetWalk(pet) {
 
   const startNode = graph.nodes[0];
 
-  // Стартовая позиция — сохранённая, если валидна
   let startX = startNode.x;
   let startY = startNode.y;
   if (typeof pet.pos_x === 'number' && typeof pet.pos_y === 'number') {
@@ -1800,22 +1798,6 @@ document.addEventListener('mouseup', () => {
   }
 });
 
-window.addEventListener('resize', () => {
-	// Сохраняем позицию кота при уходе со страницы / закрытии
-window.addEventListener('beforeunload', () => {
-  if (!petWalker || !petWalker.pet) return;
-  // sendBeacon или синхронный запрос — используем navigator.sendBeacon через REST
-  try {
-    const url = SUPABASE_URL + '/rest/v1/pets?id=eq.' + petWalker.pet.id;
-    const body = JSON.stringify({
-      pos_x: Math.round(petWalker.x),
-      pos_y: Math.round(petWalker.y),
-      pos_at: new Date().toISOString()
-    });
-    navigator.sendBeacon(url + '&apikey=' + SUPABASE_KEY, new Blob([body], { type: 'application/json' }));
-  } catch (e) {}
-});
-
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState === 'hidden' && petWalker && petWalker.pet) {
     await savePetPosition(petWalker.pet, petWalker.x, petWalker.y);
@@ -1876,7 +1858,6 @@ async function loadMyPets() {
     }).eq('id', p.id);
   }
 
-  // Оффлайн-дрейф позиции: если пользователя долго не было — «погуляй» питомца
   const nowMs = Date.now();
   for (const p of myPets) {
     if (!p.pos_x || !p.pos_y) continue;
@@ -1884,8 +1865,6 @@ async function loadMyPets() {
     const secondsOffline = Math.max(0, (nowMs - lastPos) / 1000);
     if (secondsOffline < 30) continue;
 
-    // 1 «шаг прогулки» ≈ 3 сек реального времени.
-    // За каждые 3 сек оффлайна — 1 случайный прыжок до 80px.
     const steps = Math.min(30, Math.floor(secondsOffline / 3));
     let nx = p.pos_x;
     let ny = p.pos_y;
@@ -1895,7 +1874,6 @@ async function loadMyPets() {
       nx += Math.cos(ang) * dist;
       ny += Math.sin(ang) * dist;
     }
-    // Загоняем обратно в пределы окна (с запасом)
     const W = window.innerWidth, H = window.innerHeight;
     nx = Math.max(20, Math.min(W - PET_SPRITE_W - 20, nx));
     ny = Math.max(20, Math.min(H - PET_SPRITE_H - 20, ny));
@@ -1945,8 +1923,6 @@ async function savePetPosition(pet, x, y) {
 
 let petTickTimer = null;
 
-let petPosTimer = null;
-
 function startPetTick() {
   if (petTickTimer) return;
   petTickTimer = setInterval(async () => {
@@ -1957,7 +1933,6 @@ function startPetTick() {
       await savePetState(p);
     }
 
-    // Позиция активного питомца — сохраняем чаще (раз в 30 сек)
     if (petWalker && petWalker.pet) {
       await savePetPosition(petWalker.pet, petWalker.x, petWalker.y);
       const fresh = myPets.find(x => x.id === petWalker.pet.id);
@@ -1965,11 +1940,8 @@ function startPetTick() {
         fresh.pos_x = petWalker.x;
         fresh.pos_y = petWalker.y;
         fresh.pos_at = new Date().toISOString();
+        petWalker.pet = fresh;
       }
-    }
-    if (petWalker && petWalker.pet) {
-      const fresh = myPets.find(x => x.id === petWalker.pet.id);
-      if (fresh) petWalker.pet = fresh;
     }
     const shop = document.getElementById('panel-shop');
     if (shop && shop.classList.contains('active') && myPets.length) renderShop();
@@ -2231,7 +2203,7 @@ function renderMyPetsSection() {
           ? '<button type="button" class="aero-btn red small" data-pet-action="deactivate" data-pet-id="' + p.id + '">Убрать</button>'
           : '<button type="button" class="aero-btn green small" data-pet-action="activate" data-pet-id="' + p.id + '">Выпустить</button>') +
         '<button type="button" class="aero-btn small" data-pet-action="rename" data-pet-id="' + p.id + '">Переименовать</button>' +
-        '<button type="button" class="aero-btn green small" data-pet-action="feed" data-pet-id="' + p.id + '">Покормить (5)</button>' +
+        '<button type="button" class="aero-btn green small" data-pet-action="feed" data-pet-id="' + p.id + '">Покормить</button>' +
         '<button type="button" class="aero-btn red small" data-pet-action="release" data-pet-id="' + p.id + '">Отпустить</button>' +
       '</div>' +
       '<div class="pet-stats">' +
@@ -2442,18 +2414,7 @@ async function feedPet(petId) {
   const pet = myPets.find(p => p.id === petId);
   if (!pet) return;
 
-  const COST = 5, RESTORE = 40;
-
-  if ((me.pryaniki || 0) < COST) { alert('Не хватает пряников'); return; }
-
-  const startBalance = me.pryaniki || 0;
-  const newBalance = startBalance - COST;
-
-  const { error: errUpd } = await supabaseClient
-    .from('profiles')
-    .update({ pryaniki: newBalance })
-    .eq('id', me.id);
-  if (errUpd) { alert('Ошибка: ' + errUpd.message); return; }
+  const RESTORE = 40;
 
   const newHunger = Math.min(100, (pet.hunger ?? 100) + RESTORE);
   const newMood   = Math.min(100, (pet.mood   ?? 100) + 10);
@@ -2461,17 +2422,11 @@ async function feedPet(petId) {
     .from('pets')
     .update({ hunger: newHunger, mood: newMood, last_tick: new Date().toISOString() })
     .eq('id', pet.id);
-  if (errPet) {
-    await supabaseClient.from('profiles').update({ pryaniki: startBalance }).eq('id', me.id);
-    alert('Ошибка: ' + errPet.message);
-    return;
-  }
+  if (errPet) { alert('Ошибка: ' + errPet.message); return; }
 
   pet.hunger = newHunger;
   pet.mood = newMood;
 
-  await loadMyProfile();
-  renderPryanikChip();
   if (petWalker && petWalker.pet && petWalker.pet.id === pet.id) {
     petWalker.pet = pet;
   }
