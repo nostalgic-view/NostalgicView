@@ -14,12 +14,12 @@ const ZVUK_VOLUME = 0.6;
 const RUB_PER_PRYANIK = 1.2;
 
 const GIFTS = [
-  { id: '', giftNum: 1, name: '', price: 0, desc: '' },
-  { id: '', giftNum: 2, name: '', price: 0, desc: '' },
-  { id: '', giftNum: 3, name: '', price: 0, desc: '' },
-  { id: '', giftNum: 4, name: '', price: 0, desc: '' },
-  { id: '', giftNum: 5, name: '', price: 0, desc: '' },
-  { id: '', giftNum: 6, name: '', price: 0, desc: '' }
+  { id: 'rose',    icon: '', name: '',    price: 999  },
+  { id: 'cake',    icon: '', name: '',  price: 999  },
+  { id: 'star',    icon: '', name: '',  price: 999 },
+  { id: 'diamond', icon: '', name: '',   price: 999 },
+  { id: 'cup',     icon: '', name: '',   price: 999 },
+  { id: 'heart',   icon: '', name: '',  price: 999 }
 ];
 
 const NICK_SHOP = [
@@ -30,13 +30,13 @@ const NICK_SHOP = [
   { id: 'ice',     type: 'class', cls: 'nick-ice',     category: 'color', name: 'Ледяной',   price: 120, desc: 'Холодный ледяной отблеск' },
 
   { id: 'camo_1', type: 'camo', camoNum: 1, category: 'camo', name: 'ВСР-93',          price: 100, desc: 'Барвиха, Вертикалка, Арбуз' },
-  { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Берёзка серебряный лист', price: 100, desc: 'КЛМК, Классическая берёзка, основной камуфляж погранцов или разведки' },
+  { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Берёзка серебряный лист', price: 100, desc: 'Классическая берёзка, камуфляж погранцов или разведчиков' },
   { id: 'camo_3', type: 'camo', camoNum: 3, category: 'camo', name: 'ВСР-98',            price: 100, desc: 'Легендарная общевойсковая флора' },
   { id: 'camo_4', type: 'camo', camoNum: 4, category: 'camo', name: 'Бутан',                   price: 100, desc: 'Дубок, мабуте такое не выдавали' },
   { id: 'camo_5', type: 'camo', camoNum: 5, category: 'camo', name: 'Цифра',                   price: 100, desc: 'Соверменный камуфляж ВС РФ' },
   { id: 'camo_6', type: 'camo', camoNum: 6, category: 'camo', name: 'Вудланд',                 price: 100, desc: 'Старый камуфляж пендосов' },
   { id: 'camo_7', type: 'camo', camoNum: 7, category: 'camo', name: 'Камыш синий',             price: 100, desc: 'ОМОН такое носил' },
-  { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Берёзка бронзовый лист',  price: 100, desc: 'КЛМК, Более новая версия берёзки' }
+  { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Берёзка бронзовый лист',  price: 100, desc: 'Более версия берёзки' }
 ];
 
 const PET_BREEDS = [
@@ -424,16 +424,8 @@ async function prefetchAvatars(logins) {
 function testImage(url) {
   return new Promise(res => {
     const i = new Image();
-    let done = false;
-    const finish = (ok) => {
-      if (done) return;
-      done = true;
-      clearTimeout(timer);
-      res(ok);
-    };
-    const timer = setTimeout(() => finish(false), 3000);
-    i.onload  = () => finish(true);
-    i.onerror = () => finish(false);
+    i.onload = () => res(true);
+    i.onerror = () => res(false);
     i.src = url;
   });
 }
@@ -458,18 +450,9 @@ async function preloadCamoImages() {
   }
 }
 
-const giftImageCache = new Map();
-
-async function preloadGiftImages() {
-  for (const g of GIFTS) {
-    let found = null;
-    for (const ext of ['png','gif','webp','jpg','jpeg']) {
-      const url = `podarki/${g.giftNum}.${ext}`;
-      if (await testImage(url)) { found = url; break; }
-    }
-    giftImageCache.set(g.id, found);
-  }
-}
+const pawImage  = { url: null };
+const loveImage = { url: null };
+const starImage = { url: null };
 
 async function preloadPetImages() {
   for (const b of PET_BREEDS) {
@@ -705,15 +688,6 @@ async function renderProfile() {
   if (invSec) invSec.innerHTML = '';
 
   if (!isOwn) {
-    const giftBtn = document.createElement('button');
-    giftBtn.type = 'button';
-    giftBtn.className = 'ls-btn gift';
-    giftBtn.textContent = 'Подарить подарок';
-    giftBtn.title = 'Подарить подарок';
-    giftBtn.addEventListener('click', () => openGift(user.login));
-    friendBox.appendChild(giftBtn);
-
-    // Кнопка дружбы
     const rel = await getRelation(user.id);
     if (rel === 'none') {
       friendBox.appendChild(makeFriendBtn('+', 'Добавить в друзья', 'green', () => relationAction(user)));
@@ -724,6 +698,14 @@ async function renderProfile() {
     } else if (rel === 'friend') {
       friendBox.appendChild(makeFriendBtn('✕', 'Удалить из друзей', 'red', () => relationAction(user)));
     }
+
+    const giftBtn = document.createElement('button');
+    giftBtn.type = 'button';
+    giftBtn.className = 'friend-btn gift';
+    giftBtn.textContent = '🎁';
+    giftBtn.title = 'Подарить подарок';
+    giftBtn.addEventListener('click', () => openGift(user.login));
+    friendBox.appendChild(giftBtn);
 
     const lsBtn = document.createElement('button');
     lsBtn.type = 'button';
@@ -1249,20 +1231,11 @@ async function openGift(login) {
 
     const ic = document.createElement('div');
     ic.className = 'gift-icon';
-    const iconUrl = giftImageCache.get(g.id);
-    if (iconUrl) {
-      const img = document.createElement('img');
-      img.src = iconUrl;
-      img.alt = '';
-      ic.appendChild(img);
-    } else {
-      ic.textContent = 'Подарить';
-    }
+    ic.textContent = g.icon;
 
     const info = document.createElement('div');
     info.className = 'gift-info';
     info.innerHTML = '<div class="gift-name">' + esc(g.name) + '</div>' +
-                     '<div class="gift-desc">' + esc(g.desc || '') + '</div>' +
                      '<div class="gift-price">' + g.price + ' пряников</div>';
 
     const canAfford = (me.pryaniki || 0) >= g.price;
@@ -1301,7 +1274,7 @@ async function sendGift(gift) {
     to_id: giftTargetId,
     gift_id: gift.id,
     gift_name: gift.name,
-    gift_icon: gift.id,
+    gift_icon: gift.icon,
     message: message
   });
   if (errIns) { alert('Ошибка: ' + errIns.message); return; }
@@ -1379,16 +1352,13 @@ async function openGiftsModal(login) {
       hour:'2-digit', minute:'2-digit'
     });
     const sender = loginMap[g.from_id] || '?';
-    const iconUrl = giftImageCache.get(g.gift_id);
-    const iconHtml = iconUrl
-      ? '<img src="' + esc(iconUrl) + '" alt="" style="width:100%;height:100%;object-fit:contain;image-rendering:pixelated;">'
-      : 'Подарок';
+    const icon = g.gift_icon || '🎁';
     const msg = g.message
       ? '<div class="gift-msg">«' + esc(g.message) + '»</div>'
       : '';
 
     return '<div class="gifts-view-row">' +
-      '<div class="gifts-view-icon">' + iconHtml + '</div>' +
+      '<div class="gifts-view-icon">' + esc(icon) + '</div>' +
       '<div class="gifts-view-info">' +
         '<div class="gifts-view-name">' + esc(g.gift_name || g.gift_id) + '</div>' +
         '<div class="gifts-view-from">от <span class="gifts-view-from-link" data-login="' + esc(sender) + '">' + esc(sender) + '</span> · ' + when + '</div>' +
@@ -2646,20 +2616,12 @@ async function renderAll() {
 }
 
 (async () => {
-  // Преload картинок — не блокирует старт. Запускается фоном.
-  preloadCamoImages().catch(() => {});
-  preloadPetImages().catch(() => {});
-  preloadGiftImages().catch(() => {});
-
-  try {
-    await loadMyProfile();
-    await loadChatMessages();
-    await renderAll();
-    subscribeChat();
-    startPetTick();
-  } catch (e) {
-    console.error('Ошибка инициализации:', e);
-  }
+  await Promise.all([ preloadCamoImages(), preloadPetImages() ]);
+  await loadMyProfile();
+  await loadChatMessages();
+  await renderAll();
+  subscribeChat();
+  startPetTick();
 })();
 
 supabaseClient.auth.onAuthStateChange(async () => {
