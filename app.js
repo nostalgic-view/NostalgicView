@@ -30,13 +30,13 @@ const NICK_SHOP = [
   { id: 'ice',     type: 'class', cls: 'nick-ice',     category: 'color', name: 'Ледяной',   price: 120, desc: 'Холодный ледяной отблеск' },
 
   { id: 'camo_1', type: 'camo', camoNum: 1, category: 'camo', name: 'ВСР-93',          price: 100, desc: 'Барвиха, Вертикалка, Арбуз' },
-  { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Берёзка серебряный лист', price: 100, desc: 'Классическая берёзка, камуфляж погранцов или разведчиков' },
+  { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Берёзка серебряный лист', price: 100, desc: 'КЛМК, Классическая берёзка, основной камуфляж погранцов или разведки' },
   { id: 'camo_3', type: 'camo', camoNum: 3, category: 'camo', name: 'ВСР-98',            price: 100, desc: 'Легендарная общевойсковая флора' },
   { id: 'camo_4', type: 'camo', camoNum: 4, category: 'camo', name: 'Бутан',                   price: 100, desc: 'Дубок, мабуте такое не выдавали' },
   { id: 'camo_5', type: 'camo', camoNum: 5, category: 'camo', name: 'Цифра',                   price: 100, desc: 'Соверменный камуфляж ВС РФ' },
   { id: 'camo_6', type: 'camo', camoNum: 6, category: 'camo', name: 'Вудланд',                 price: 100, desc: 'Старый камуфляж пендосов' },
   { id: 'camo_7', type: 'camo', camoNum: 7, category: 'camo', name: 'Камыш синий',             price: 100, desc: 'ОМОН такое носил' },
-  { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Берёзка бронзовый лист',  price: 100, desc: 'Более версия берёзки' }
+  { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Берёзка бронзовый лист',  price: 100, desc: 'КЛМК, Более новая версия берёзки' }
 ];
 
 const PET_BREEDS = [
@@ -697,12 +697,11 @@ async function renderProfile() {
   if (invSec) invSec.innerHTML = '';
 
   if (!isOwn) {
-    // Кнопка «Подарить» — слева от «+»
     const giftBtn = document.createElement('button');
     giftBtn.type = 'button';
-    giftBtn.className = 'friend-btn gift';
-    giftBtn.textContent = 'Подарить';
-    giftBtn.title = 'Подарить';
+    giftBtn.className = 'ls-btn gift';
+    giftBtn.textContent = 'Подарить подарок';
+    giftBtn.title = 'Подарить подарок';
     giftBtn.addEventListener('click', () => openGift(user.login));
     friendBox.appendChild(giftBtn);
 
