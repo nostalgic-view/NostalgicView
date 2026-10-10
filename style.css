@@ -1893,7 +1893,6 @@ body > .wrap {
   transition: transform .2s ease;
   will-change: left, top;
   cursor: grab;
-  pointer-events: auto;
 }
 .pet-sprite[data-dir="-1"] {
   transform: scaleX(-1);
