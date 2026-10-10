@@ -14,12 +14,12 @@ const ZVUK_VOLUME = 0.6;
 const RUB_PER_PRYANIK = 1.2;
 
 const GIFTS = [
-  { id: 'rose',    icon: '🌹', name: 'Роза',    price: 10  },
-  { id: 'cake',    icon: '🍰', name: 'Тортик',  price: 25  },
-  { id: 'star',    icon: '⭐', name: 'Звезда',  price: 50  },
-  { id: 'diamond', icon: '💎', name: 'Алмаз',   price: 100 },
-  { id: 'cup',     icon: '🏆', name: 'Кубок',   price: 250 },
-  { id: 'heart',   icon: '💖', name: 'Сердце',  price: 500 }
+  { id: 'rose',    icon: '', name: '',    price: 999  },
+  { id: 'cake',    icon: '', name: '',  price: 999  },
+  { id: 'star',    icon: '', name: '',  price: 999 },
+  { id: 'diamond', icon: '', name: '',   price: 999 },
+  { id: 'cup',     icon: '', name: '',   price: 999 },
+  { id: 'heart',   icon: '', name: '',  price: 999 }
 ];
 
 const NICK_SHOP = [
@@ -29,18 +29,18 @@ const NICK_SHOP = [
   { id: 'fire',    type: 'class', cls: 'nick-fire',    category: 'color', name: 'Огненный',  price: 120, desc: 'Пылающий ник, как костёр в ночи' },
   { id: 'ice',     type: 'class', cls: 'nick-ice',     category: 'color', name: 'Ледяной',   price: 120, desc: 'Холодный ледяной отблеск' },
 
-  { id: 'camo_1', type: 'camo', camoNum: 1, category: 'camo', name: 'ВСР-93 Барвиха',          price: 100, desc: 'Первый российский камуфляж, принятый на вооружение в 1993 году' },
-  { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Берёзка серебряный лист', price: 100, desc: 'Классическая «Берёзка» с серебристыми пятнами на светлом фоне' },
-  { id: 'camo_3', type: 'camo', camoNum: 3, category: 'camo', name: 'ВСР-98 Флора',            price: 100, desc: 'Легендарная «Флора» — «арбуз» конца 90-х, символ срочной службы' },
-  { id: 'camo_4', type: 'camo', camoNum: 4, category: 'camo', name: 'Бутан',                   price: 100, desc: 'Горный камуфляж, разработанный для условий высокогорья' },
-  { id: 'camo_5', type: 'camo', camoNum: 5, category: 'camo', name: 'Цифра',                   price: 100, desc: 'Цифровая расцветка нового поколения — пиксельный рисунок' },
-  { id: 'camo_6', type: 'camo', camoNum: 6, category: 'camo', name: 'Вудланд',                 price: 100, desc: 'Лесной американский камуфляж — четыре оттенка зелёного и коричневого' },
-  { id: 'camo_7', type: 'camo', camoNum: 7, category: 'camo', name: 'Камыш синий',             price: 100, desc: 'Синий камуфляж для морских частей и спецподразделений' },
-  { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Берёзка бронзовый лист',  price: 100, desc: '«Берёзка» с бронзовым отливом — редкая поздняя версия' }
+  { id: 'camo_1', type: 'camo', camoNum: 1, category: 'camo', name: 'ВСР-93',          price: 100, desc: 'Барвиха, Вертикалка, Арбуз' },
+  { id: 'camo_2', type: 'camo', camoNum: 2, category: 'camo', name: 'Берёзка серебряный лист', price: 100, desc: 'Классическая берёзка, камуфляж погранцов или разведчиков' },
+  { id: 'camo_3', type: 'camo', camoNum: 3, category: 'camo', name: 'ВСР-98',            price: 100, desc: 'Легендарная общевойсковая флора' },
+  { id: 'camo_4', type: 'camo', camoNum: 4, category: 'camo', name: 'Бутан',                   price: 100, desc: 'Дубок, мабуте такое не выдавали' },
+  { id: 'camo_5', type: 'camo', camoNum: 5, category: 'camo', name: 'Цифра',                   price: 100, desc: 'Соверменный камуфляж ВС РФ' },
+  { id: 'camo_6', type: 'camo', camoNum: 6, category: 'camo', name: 'Вудланд',                 price: 100, desc: 'Старый камуфляж пендосов' },
+  { id: 'camo_7', type: 'camo', camoNum: 7, category: 'camo', name: 'Камыш синий',             price: 100, desc: 'ОМОН такое носил' },
+  { id: 'camo_8', type: 'camo', camoNum: 8, category: 'camo', name: 'Берёзка бронзовый лист',  price: 100, desc: 'Более версия берёзки' }
 ];
 
 const PET_BREEDS = [
-  { id: 'cat_dvor',  type: 'pet', petNum: 1, category: 'pets', name: 'Дворовая кошка',   price: 300, desc: 'Обычная кошка, живёт при части и ловит мышей' },
+  { id: 'cat_dvor',  type: 'pet', petNum: 1, category: 'pets', name: 'Дворовая кошка',   price: 300, desc: '' },
   { id: 'cat_sib',   type: 'pet', petNum: 2, category: 'pets', name: 'Сибирская кошка',  price: 400, desc: 'Пушистая, с характером. Уважает только деда' },
   { id: 'cat_brit',  type: 'pet', petNum: 3, category: 'pets', name: 'Британская кошка', price: 500, desc: 'Плюшевая порода, любит спать на подоконнике' },
   { id: 'dog_dvor',  type: 'pet', petNum: 4, category: 'pets', name: 'Дворовый пёс',     price: 350, desc: 'Верный друг, охраняет КПП по ночам' },
