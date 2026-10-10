@@ -14,12 +14,12 @@ const ZVUK_VOLUME = 0.6;
 const RUB_PER_PRYANIK = 1.2;
 
 const GIFTS = [
-  { id: 'rose',    icon: '', name: '',    price: 999  },
-  { id: 'cake',    icon: '', name: '',  price: 999  },
-  { id: 'star',    icon: '', name: '',  price: 999 },
-  { id: 'diamond', icon: '', name: '',   price: 999 },
-  { id: 'cup',     icon: '', name: '',   price: 999 },
-  { id: 'heart',   icon: '', name: '',  price: 999 }
+  { id: '', giftNum: 1, name: '', price: 0, desc: '' },
+  { id: '', giftNum: 2, name: '', price: 0, desc: '' },
+  { id: '', giftNum: 3, name: '', price: 0, desc: '' },
+  { id: '', giftNum: 4, name: '', price: 0, desc: '' },
+  { id: '', giftNum: 5, name: '', price: 0, desc: '' },
+  { id: '', giftNum: 6, name: '', price: 0, desc: '' }
 ];
 
 const NICK_SHOP = [
@@ -450,9 +450,18 @@ async function preloadCamoImages() {
   }
 }
 
-const pawImage  = { url: null };
-const loveImage = { url: null };
-const starImage = { url: null };
+const giftImageCache = new Map();
+
+async function preloadGiftImages() {
+  for (const g of GIFTS) {
+    let found = null;
+    for (const ext of ['png','gif','webp','jpg','jpeg']) {
+      const url = `podarki/${g.giftNum}.${ext}`;
+      if (await testImage(url)) { found = url; break; }
+    }
+    giftImageCache.set(g.id, found);
+  }
+}
 
 async function preloadPetImages() {
   for (const b of PET_BREEDS) {
@@ -688,6 +697,16 @@ async function renderProfile() {
   if (invSec) invSec.innerHTML = '';
 
   if (!isOwn) {
+    // Кнопка «Подарить» — слева от «+»
+    const giftBtn = document.createElement('button');
+    giftBtn.type = 'button';
+    giftBtn.className = 'friend-btn gift';
+    giftBtn.textContent = 'Подарить';
+    giftBtn.title = 'Подарить';
+    giftBtn.addEventListener('click', () => openGift(user.login));
+    friendBox.appendChild(giftBtn);
+
+    // Кнопка дружбы
     const rel = await getRelation(user.id);
     if (rel === 'none') {
       friendBox.appendChild(makeFriendBtn('+', 'Добавить в друзья', 'green', () => relationAction(user)));
@@ -698,14 +717,6 @@ async function renderProfile() {
     } else if (rel === 'friend') {
       friendBox.appendChild(makeFriendBtn('✕', 'Удалить из друзей', 'red', () => relationAction(user)));
     }
-
-    const giftBtn = document.createElement('button');
-    giftBtn.type = 'button';
-    giftBtn.className = 'friend-btn gift';
-    giftBtn.textContent = '🎁';
-    giftBtn.title = 'Подарить подарок';
-    giftBtn.addEventListener('click', () => openGift(user.login));
-    friendBox.appendChild(giftBtn);
 
     const lsBtn = document.createElement('button');
     lsBtn.type = 'button';
@@ -1231,11 +1242,20 @@ async function openGift(login) {
 
     const ic = document.createElement('div');
     ic.className = 'gift-icon';
-    ic.textContent = g.icon;
+    const iconUrl = giftImageCache.get(g.id);
+    if (iconUrl) {
+      const img = document.createElement('img');
+      img.src = iconUrl;
+      img.alt = '';
+      ic.appendChild(img);
+    } else {
+      ic.textContent = 'Подарить';
+    }
 
     const info = document.createElement('div');
     info.className = 'gift-info';
     info.innerHTML = '<div class="gift-name">' + esc(g.name) + '</div>' +
+                     '<div class="gift-desc">' + esc(g.desc || '') + '</div>' +
                      '<div class="gift-price">' + g.price + ' пряников</div>';
 
     const canAfford = (me.pryaniki || 0) >= g.price;
@@ -1274,7 +1294,7 @@ async function sendGift(gift) {
     to_id: giftTargetId,
     gift_id: gift.id,
     gift_name: gift.name,
-    gift_icon: gift.icon,
+    gift_icon: gift.id,
     message: message
   });
   if (errIns) { alert('Ошибка: ' + errIns.message); return; }
@@ -1352,13 +1372,16 @@ async function openGiftsModal(login) {
       hour:'2-digit', minute:'2-digit'
     });
     const sender = loginMap[g.from_id] || '?';
-    const icon = g.gift_icon || '🎁';
+    const iconUrl = giftImageCache.get(g.gift_id);
+    const iconHtml = iconUrl
+      ? '<img src="' + esc(iconUrl) + '" alt="" style="width:100%;height:100%;object-fit:contain;image-rendering:pixelated;">'
+      : 'Подарок';
     const msg = g.message
       ? '<div class="gift-msg">«' + esc(g.message) + '»</div>'
       : '';
 
     return '<div class="gifts-view-row">' +
-      '<div class="gifts-view-icon">' + esc(icon) + '</div>' +
+      '<div class="gifts-view-icon">' + iconHtml + '</div>' +
       '<div class="gifts-view-info">' +
         '<div class="gifts-view-name">' + esc(g.gift_name || g.gift_id) + '</div>' +
         '<div class="gifts-view-from">от <span class="gifts-view-from-link" data-login="' + esc(sender) + '">' + esc(sender) + '</span> · ' + when + '</div>' +
@@ -2616,7 +2639,7 @@ async function renderAll() {
 }
 
 (async () => {
-  await Promise.all([ preloadCamoImages(), preloadPetImages() ]);
+  await Promise.all([ preloadCamoImages(), preloadPetImages(), preloadGiftImages() ]);
   await loadMyProfile();
   await loadChatMessages();
   await renderAll();
