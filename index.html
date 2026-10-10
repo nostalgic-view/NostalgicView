@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nostalgic View</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="pet-layer" id="petLayer"></div>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="logo-box">
+      <img id="logoImg" alt="Logo">
+    </div>
+
+    <button class="tab-name" data-tab="main">Nostalgic View</button>
+
+    <button class="tab" data-tab="games">Игры</button>
+    <button class="tab" data-tab="chat">Чат</button>
+    <button class="tab" data-tab="shop">Магазин</button>
+    <button class="tab" data-tab="donate">Донат</button>
+
+    <div class="top-right">
+      <div class="pryanik-chip" id="pryanikChip" title="Пряники · Нажми, чтобы пополнить" onclick="openTopUp()" style="display:none;">
+        <span class="p-count" id="pryanikCount">0</span>
+        <img id="pryanikIcon" alt="Пряник">
+      </div>
+      <div class="user" id="userArea"></div>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <aside class="left">
+      <div class="fon-frame">
+        <img id="fonImg" alt="Fon">
+      </div>
+    </aside>
+
+    <section class="content">
+
+      <div class="panel active" id="panel-main">
+        <h2>Nostalgic View</h2>
+
+        <div class="main-photo" id="mainPhotoWrap">
+          <img id="armeykafonImg" alt="Армейский фон">
+        </div>
+
+        <div class="placeholder">Приветствую! Я делаю игру про срочную службу в Вооружённых силах Российской Федерации 2000-х годов. Воинская часть полностью воссоздана на основе сериала «Солдаты». К сожалению, из-за довольно приличного количества киноляпов расположение некоторых комнат пришлось сделать по своему видению. В игре сделан упор на атмосферу, тактильность и взаимодействие с предметами. </div>
+      </div>
+
+      <div class="panel" id="panel-games">
+        <h2>Игры</h2>
+        <div class="games-grid">
+
+          <div class="game-card">
+            <div class="game-cover" data-logo-base="games/ballast/logo">
+              <img alt="BALLAST">
+            </div>
+            <div class="game-title">BALLAST</div>
+            <div class="game-desc">Головоломка. Подставляй камуфляжи друг к другу чтобы они заполнили линию.</div>
+            <button class="aero-btn green" onclick="openGame('games/ballast/ballast.html', 'BALLAST')">▶ Играть</button>
+          </div>
+
+          <div class="game-card">
+            <div class="game-cover" data-logo-base="games/stroybat/logo">
+              <img alt="STROYBAT">
+            </div>
+            <div class="game-title">STROYBAT</div>
+            <div class="game-desc">Два солдата из стройбата заменяют экскаватор, так замените экскаватор в одного как настоящий Ефрейтор стройбата!</div>
+            <button class="aero-btn green" onclick="openGame('games/stroybat/stroybat.html', 'STROYBAT')">▶ Играть</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="panel" id="panel-game">
+        <div class="game-panel-head">
+          <h2 id="gamePanelTitle">Игра</h2>
+          <div class="game-panel-actions">
+            <button class="aero-btn small" type="button" onclick="toggleFullscreen()" id="fsBtn">⛶ Во весь экран</button>
+            <button class="aero-btn red small" onclick="closeGame()">✕ Закрыть</button>
+          </div>
+        </div>
+        <div class="game-iframe-wrap" id="gameWrap">
+          <iframe id="gameFrame" src="" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-chat">
+        <h2>Чат</h2>
+        <div class="chat-list" id="chatList"></div>
+        <form class="chat-form" onsubmit="sendMsg(event)">
+          <input type="text" name="who" id="chatWho" placeholder="Войди, чтобы писать" maxlength="20" readonly>
+          <input type="text" name="text" id="chatText" placeholder="Сообщение..." maxlength="500" autocomplete="off" disabled>
+          <button class="aero-btn" type="submit" id="chatSend" disabled>Отправить</button>
+        </form>
+        <div class="chat-cooldown" id="chatCooldown"></div>
+      </div>
+
+      <div class="panel" id="panel-shop">
+        <h2>Магазин</h2>
+        <div class="shop-balance" id="shopBalance">
+          <span class="label">баланс</span>
+          <span class="amount" id="shopBalanceAmount">0</span>
+        </div>
+        <div id="shopContent">
+          <div class="placeholder">Войдите, чтобы увидеть магазин.</div>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-donate">
+        <h2>Донат</h2>
+        <div class="placeholder"></div>
+        <div style="margin-top:16px; text-align:center;">
+          <button type="button" class="aero-btn green" onclick="openDonate()">Поддержать проект</button>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-profile">
+        <div class="game-panel-head">
+          <h2 id="profilePanelTitle">Моя страничка</h2>
+          <button class="aero-btn red small" onclick="closeProfile()">✕ Закрыть</button>
+        </div>
+
+        <div class="profile-header">
+          <div class="profile-avatar-col">
+            <label class="profile-avatar" id="profileAvatar" title="Сменить аватар">
+              <img id="profileAvatarImg" alt="">
+              <input type="file" accept="image/*" hidden onchange="changeAvatar(event)">
+              <span class="edit-hint">Сменить аватар</span>
+            </label>
+            <div id="giftsBtnWrap" class="gifts-btn-wrap"></div>
+          </div>
+
+          <div class="profile-info">
+            <div class="profile-name-row">
+              <div class="profile-name" id="profileName">—</div>
+              <div class="profile-name-actions" id="profileActions"></div>
+            </div>
+
+            <div id="lsBtnWrap"></div>
+
+            <div class="profile-label">Описание</div>
+            <div class="profile-bio" id="profileBio"></div>
+
+            <div class="profile-actions" id="bioActions" style="display:none;">
+              <button type="button" class="aero-btn red small" onclick="cancelBioEdit()">Отмена</button>
+              <button type="button" class="aero-btn green small" onclick="saveBio()">Сохранить</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="inventorySection"></div>
+        <div id="friendsSection"></div>
+      </div>
+
+    </section>
+  </div>
+
+  <div class="footer">
+    © 2026 Nostalgic View · Все права защищены.
+  </div>
+</div>
+
+<!-- ===== ЧАСЫ ===== -->
+<div class="army-announcement" id="armyAnnouncement"></div>
+<div class="wall-clock" title="Время">
+  <div class="wall-clock-dial" id="clockDial"></div>
+  <div class="wall-clock-hand hour" id="clockHour"></div>
+  <div class="wall-clock-hand minute" id="clockMinute"></div>
+  <div class="wall-clock-hand second" id="clockSecond"></div>
+  <div class="wall-clock-center"></div>
+</div>
+
+<!-- ===== МОДАЛКА АВТОРИЗАЦИИ ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h3 id="modalTitle">Вход</h3>
+      <button class="modal-close" type="button" onclick="closeModal()">×</button>
+    </div>
+    <form class="modal-body" id="modalForm" onsubmit="submitAuth(event)">
+      <label>Ник
+        <input type="text" id="mLogin" required minlength="3" maxlength="20" autocomplete="username" placeholder="от 3 до 20 символов">
+      </label>
+      <label>Пароль
+        <input type="password" id="mPassword" required minlength="6" maxlength="40" autocomplete="current-password" placeholder="минимум 6 символов">
+      </label>
+      <div class="modal-hint" id="mHint" style="display:none;">
+        Аватар по умолчанию берётся из файла <b>Avatar</b> в папке сайта. Свой можно поставить позже — клик по аватарке в шапке.
+      </div>
+      <div class="modal-error" id="mError"></div>
+      <div class="modal-actions">
+        <button type="button" class="aero-btn red small" onclick="closeModal()">Отмена</button>
+        <button type="submit" class="aero-btn green" id="mSubmit">Войти</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА ПОПОЛНЕНИЯ ПРЯНИКОВ ===== -->
+<div class="modal-overlay" id="topUpModal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h3>Пополнить пряники</h3>
+      <button class="modal-close" type="button" onclick="closeTopUp()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="rate-box">1 пряник = 1,2 Руб.</div>
+      <div class="topup-grid">
+        <button class="topup-btn" type="button" onclick="topUp(100)">
+          <span class="tp-amount">+100</span>
+          <span class="tp-price">120 ₽</span>
+        </button>
+        <button class="topup-btn" type="button" onclick="topUp(500)">
+          <span class="tp-amount">+500</span>
+          <span class="tp-price">600 ₽</span>
+        </button>
+        <button class="topup-btn" type="button" onclick="topUp(1000)">
+          <span class="tp-amount">+1000</span>
+          <span class="tp-price">1200 ₽</span>
+        </button>
+        <button class="topup-btn" type="button" onclick="topUp(5000)">
+          <span class="tp-amount">+5000</span>
+          <span class="tp-price">6000 ₽</span>
+        </button>
+      </div>
+      <div class="modal-hint" style="text-align:center; margin-top:14px;">
+        Пополнение пока что выполняется руками. Задонатьте на Boosty и напишите сколько нужно пряников.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА ПОДАРКА ===== -->
+<div class="modal-overlay" id="giftModal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h3 id="giftModalTitle">Подарить</h3>
+      <button class="modal-close" type="button" onclick="closeGift()">×</button>
+    </div>
+    <div class="modal-body">
+      <label style="display:block; margin-bottom:12px; font-size:12px; font-weight:bold; color:#1a4a7a;">
+        Сообщение к подарку (необязательно)
+        <input type="text" id="giftMessageInput" maxlength="200" placeholder="Например, с днём рождения!">
+      </label>
+      <div class="gift-list" id="giftList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА ЛС ===== -->
+<div class="modal-overlay" id="dmModal">
+  <div class="modal-panel dm-panel">
+    <div class="modal-head">
+      <h3 id="dmTitle">Сообщение</h3>
+      <button class="modal-close" type="button" onclick="closeDM()">×</button>
+    </div>
+    <div class="dm-list" id="dmList"></div>
+    <form class="dm-form" onsubmit="sendDM(event)">
+      <input type="text" id="dmInput" placeholder="Написать сообщение..." maxlength="500" autocomplete="off">
+      <button class="aero-btn green small" type="submit">Отправить</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА ИМЕНИ ПИТОМЦА ===== -->
+<div class="modal-overlay" id="petNameModal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h3 id="petNameTitle">Назови питомца</h3>
+      <button class="modal-close" type="button" onclick="closePetName()">×</button>
+    </div>
+    <form class="modal-body" onsubmit="confirmPetName(event)">
+      <label>Имя питомца
+        <input type="text" id="petNameInput" maxlength="20" required placeholder="Например, Барсик">
+      </label>
+      <div class="modal-error" id="petNameError"></div>
+      <div class="modal-actions">
+        <button type="button" class="aero-btn red small" onclick="closePetName()">Отмена</button>
+        <button type="submit" class="aero-btn green" id="petNameSubmit">Создать</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА ПРОСМОТРА ПОДАРКОВ ===== -->
+<div class="modal-overlay" id="giftsModal">
+  <div class="modal-panel gifts-view-panel">
+    <div class="modal-head">
+      <h3 id="giftsModalTitle">Подарки</h3>
+      <button class="modal-close" type="button" onclick="closeGiftsModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="giftsViewVisibility" style="display:none; margin-bottom:14px; text-align:right;">
+        <button type="button" class="aero-btn small" id="giftsVisBtn" onclick="toggleGiftsVisibility()">Скрыть ото всех</button>
+      </div>
+      <div class="gifts-view-list" id="giftsViewList"></div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
