@@ -26,7 +26,7 @@ const NICK_SHOP = [
   { id: 'rainbow', type: 'class', cls: 'nick-rainbow', category: 'color', name: 'Радужный',  price: 100, desc: 'Переливается всеми цветами радуги' },
   { id: 'gold',    type: 'class', cls: 'nick-gold',    category: 'color', name: 'Золотой',   price: 200, desc: 'Золотой блеск, как на погонах' },
   { id: 'neon',    type: 'class', cls: 'nick-neon',    category: 'color', name: 'Неоновый',  price: 150, desc: 'Сине-фиолетовое неоновое свечение' },
-  { id: 'fire',    type: 'class', cls: 'nick-fire',    category: 'color', name: 'Огненный',  price: 120, desc: 'Пылающий ник, как костёр в ночи' },
+  { id: 'fire',    type: 'class', cls: 'nick-fire',    category: 'color', name: 'Огненный',  price: 120, desc: 'Пылающий ник' },
   { id: 'ice',     type: 'class', cls: 'nick-ice',     category: 'color', name: 'Ледяной',   price: 120, desc: 'Холодный ледяной отблеск' },
 
   { id: 'camo_1', type: 'camo', camoNum: 1, category: 'camo', name: 'ВСР-93',          price: 100, desc: 'Барвиха, Вертикалка, Арбуз' },
