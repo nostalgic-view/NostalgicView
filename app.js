@@ -424,8 +424,16 @@ async function prefetchAvatars(logins) {
 function testImage(url) {
   return new Promise(res => {
     const i = new Image();
-    i.onload = () => res(true);
-    i.onerror = () => res(false);
+    let done = false;
+    const finish = (ok) => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      res(ok);
+    };
+    const timer = setTimeout(() => finish(false), 3000);
+    i.onload  = () => finish(true);
+    i.onerror = () => finish(false);
     i.src = url;
   });
 }
@@ -2638,12 +2646,20 @@ async function renderAll() {
 }
 
 (async () => {
-  await Promise.all([ preloadCamoImages(), preloadPetImages(), preloadGiftImages() ]);
-  await loadMyProfile();
-  await loadChatMessages();
-  await renderAll();
-  subscribeChat();
-  startPetTick();
+  // Преload картинок — не блокирует старт. Запускается фоном.
+  preloadCamoImages().catch(() => {});
+  preloadPetImages().catch(() => {});
+  preloadGiftImages().catch(() => {});
+
+  try {
+    await loadMyProfile();
+    await loadChatMessages();
+    await renderAll();
+    subscribeChat();
+    startPetTick();
+  } catch (e) {
+    console.error('Ошибка инициализации:', e);
+  }
 })();
 
 supabaseClient.auth.onAuthStateChange(async () => {
