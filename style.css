@@ -1624,8 +1624,9 @@ a:hover { text-decoration: underline; }
   .tab-name { font-size: 15px; }
   .game-iframe-wrap { height: 500px; }
 }
+
 /* ============================================================
-   НИКИ (переливающиеся + камуфляж)
+   НИКИ
    ============================================================ */
 .nick {
   display: inline-block;
@@ -1854,7 +1855,7 @@ a:hover { text-decoration: underline; }
 }
 .shop-item .actions { margin-top: auto; }
 .shop-item .actions .aero-btn { width: 100%; }
-/* ===== ПРЯНИК-КАРТИНКА (замена эмодзи) ===== */
+
 .pryanik-img {
   display: inline-block;
   vertical-align: middle;
@@ -1870,6 +1871,7 @@ a:hover { text-decoration: underline; }
   width: 16px;
   height: 16px;
 }
+
 /* ===== ПИТОМЦЫ ===== */
 .pet-layer {
   position: fixed;
@@ -1890,6 +1892,7 @@ body > .wrap {
   height: 64px;
   transition: transform .2s ease;
   will-change: left, top;
+  cursor: grab;
 }
 .pet-sprite[data-dir="-1"] {
   transform: scaleX(-1);
@@ -1911,8 +1914,100 @@ body > .wrap {
   0%   { transform: rotate(-6deg) translateY(0); }
   100% { transform: rotate(6deg) translateY(-3px); }
 }
+.pet-sprite.dragging { cursor: grabbing; filter: brightness(1.15); }
 
-/* ===== МОИ ПИТОМЦЫ (список в магазине) ===== */
+.pet-sprite.sleeping img {
+  animation: none;
+  transform: rotate(0) scaleY(.9);
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)) brightness(.95);
+}
+.pet-sprite.sleeping::after {
+  content: "z";
+  position: absolute;
+  top: -18px; left: 55%;
+  color: #fff;
+  font-family: Georgia, serif;
+  font-size: 16px;
+  font-weight: bold;
+  text-shadow: 0 1px 3px rgba(0,0,0,.7);
+  animation: pet-zzz 2s ease-in-out infinite;
+}
+@keyframes pet-zzz {
+  0%,100% { opacity: .3; transform: translate(0,0) scale(.9); }
+  50%     { opacity: 1;  transform: translate(-4px,-10px) scale(1.15); }
+}
+
+.pet-sprite.sad img {
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)) grayscale(.35) brightness(.85);
+}
+
+.pet-sprite.happy img {
+  animation: pet-happy .32s ease-in-out infinite alternate;
+}
+@keyframes pet-happy {
+  0%   { transform: rotate(-9deg) translateY(-2px) scale(1.05); }
+  100% { transform: rotate(9deg)  translateY(-7px) scale(1.05); }
+}
+
+.pet-sprite.dizzy img {
+  animation: pet-dizzy .28s ease-in-out infinite alternate;
+}
+@keyframes pet-dizzy {
+  0%   { transform: rotate(-11deg) translateY(-2px); }
+  100% { transform: rotate(11deg)  translateY(-4px); }
+}
+
+/* Следы */
+.pet-paw {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  opacity: .55;
+  pointer-events: none;
+  transition: opacity 2.2s linear;
+  image-rendering: pixelated;
+  z-index: 0;
+}
+.pet-paw.fade { opacity: 0; }
+
+/* Эмоции */
+.pet-emote {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.45));
+  will-change: transform, opacity;
+}
+.pet-emote img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.pet-emote.love { animation: pet-emote-float 1.6s ease-out forwards; }
+@keyframes pet-emote-float {
+  0%   { opacity: 0; transform: translate(0, 0) scale(.5); }
+  20%  { opacity: 1; transform: translate(-2px, -14px) scale(1); }
+  70%  { opacity: 1; transform: translate(-6px, -40px) scale(1.1); }
+  100% { opacity: 0; transform: translate(-8px, -60px) scale(1.15); }
+}
+
+.pet-emote.star { animation: pet-emote-spin 1.6s ease-out forwards; }
+@keyframes pet-emote-spin {
+  0%   { opacity: 0; transform: translate(0, 0)     rotate(0deg)    scale(.5); }
+  20%  { opacity: 1; transform: translate(0, -14px) rotate(180deg)  scale(1); }
+  70%  { opacity: 1; transform: translate(0, -38px) rotate(540deg)  scale(1.1); }
+  100% { opacity: 0; transform: translate(0, -58px) rotate(900deg)  scale(1.15); }
+}
+
+/* Список питомцев и статусы */
 .pets-list {
   display: flex;
   flex-direction: column;
@@ -1950,74 +2045,10 @@ body > .wrap {
   image-rendering: pixelated;
 }
 .pet-info { flex: 1; min-width: 140px; }
-.pet-name {
-  font-weight: bold;
-  color: #0d3f7a;
-  font-size: 14px;
-}
-.pet-breed {
-  font-size: 11px;
-  color: #6a86a4;
-  font-style: italic;
-}
-.pet-actions {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-/* ===== ПИТОМЕЦ: состояния ===== */
-.pet-sprite { cursor: grab; }
-.pet-sprite.dragging { cursor: grabbing; filter: brightness(1.15); }
+.pet-name { font-weight: bold; color: #0d3f7a; font-size: 14px; }
+.pet-breed { font-size: 11px; color: #6a86a4; font-style: italic; }
+.pet-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
-.pet-sprite.sleeping { pointer-events: none; }
-.pet-sprite.sleeping img {
-  animation: none;
-  transform: rotate(0) scaleY(.9);
-  filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)) brightness(.95);
-}
-.pet-sprite.sleeping::after {
-  content: "z";
-  position: absolute;
-  top: -18px; left: 55%;
-  color: #fff;
-  font-family: Georgia, serif;
-  font-size: 16px;
-  font-weight: bold;
-  text-shadow: 0 1px 3px rgba(0,0,0,.7);
-  animation: pet-zzz 2s ease-in-out infinite;
-}
-@keyframes pet-zzz {
-  0%,100% { opacity: .3; transform: translate(0,0) scale(.9); }
-  50%     { opacity: 1;  transform: translate(-4px,-10px) scale(1.15); }
-}
-
-.pet-sprite.sad img {
-  filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)) grayscale(.35) brightness(.85);
-}
-
-.pet-sprite.happy img {
-  animation: pet-happy .32s ease-in-out infinite alternate;
-}
-@keyframes pet-happy {
-  0%   { transform: rotate(-9deg) translateY(-2px) scale(1.05); }
-  100% { transform: rotate(9deg)  translateY(-7px) scale(1.05); }
-}
-
-/* Следы лапок */
-.pet-paw {
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-  opacity: .55;
-  pointer-events: none;
-  transition: opacity 2.2s linear;
-  image-rendering: pixelated;
-  z-index: 0;
-}
-.pet-paw.fade { opacity: 0; }
-
-/* ===== ПИТОМЕЦ: статус-бары в магазине ===== */
 .pet-row .pet-stats {
   display: flex;
   flex-direction: column;

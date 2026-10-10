@@ -412,7 +412,9 @@ async function preloadCamoImages() {
   }
 }
 
-const pawImage = { url: null };
+const pawImage  = { url: null };
+const loveImage = { url: null };
+const starImage = { url: null };
 
 async function preloadPetImages() {
   for (const b of PET_BREEDS) {
@@ -426,6 +428,14 @@ async function preloadPetImages() {
   for (const ext of ['png','gif','webp','jpg','jpeg']) {
     const url = `pets/paw.${ext}`;
     if (await testImage(url)) { pawImage.url = url; break; }
+  }
+  for (const ext of ['png','gif','webp','jpg','jpeg']) {
+    const url = `pets/love.${ext}`;
+    if (await testImage(url)) { loveImage.url = url; break; }
+  }
+  for (const ext of ['png','gif','webp','jpg','jpeg']) {
+    const url = `pets/star.${ext}`;
+    if (await testImage(url)) { starImage.url = url; break; }
   }
 }
 
@@ -559,6 +569,7 @@ async function renderProfile() {
   const titleEl   = document.getElementById('profilePanelTitle');
   const lsWrap    = document.getElementById('lsBtnWrap');
   const friendsSec= document.getElementById('friendsSection');
+  const invSec    = document.getElementById('inventorySection');
 
   const user = currentProfile;
 
@@ -576,6 +587,7 @@ async function renderProfile() {
     friendBox.innerHTML = '';
     lsWrap.innerHTML = '';
     friendsSec.innerHTML = '';
+    if (invSec) invSec.innerHTML = '';
     return;
   }
 
@@ -621,6 +633,7 @@ async function renderProfile() {
   friendBox.innerHTML = '';
   lsWrap.innerHTML = '';
   friendsSec.innerHTML = '';
+  if (invSec) invSec.innerHTML = '';
 
   if (!isOwn) {
     const rel = await getRelation(user.id);
@@ -649,6 +662,7 @@ async function renderProfile() {
     lsBtn.addEventListener('click', () => openDM(user.login));
     lsWrap.appendChild(lsBtn);
   } else {
+    await renderInventory();
     await buildFriendsSection(friendsSec, me);
   }
 }
@@ -1330,12 +1344,14 @@ function unsubscribeDM() {
 }
 
 /* ============================================================
-   17. ПИТОМЦЫ — движок прогулки, состояния, уход
+   17. ПИТОМЦЫ
    ============================================================ */
 const PET_SPRITE_W = 64, PET_SPRITE_H = 64;
 let petWalker = null;
 let petResizeTimer = null;
 let lastPawX = 0, lastPawY = 0;
+let lastMouseMoveTs = 0;
+let lastMouseMoveX = 0, lastMouseMoveY = 0;
 
 function buildPetGraph() {
   const wrap = document.querySelector('.wrap');
@@ -1379,7 +1395,37 @@ function buildPetGraph() {
            sleepRight: hasRight ? idx.rightBot : null };
 }
 
-function dropPaw(x, y) {
+function spawnPetEmote(kind) {
+  if (!petWalker) return;
+  const layer = document.getElementById('petLayer');
+  if (!layer) return;
+  const st = petWalker;
+
+  const el = document.createElement('div');
+  el.className = 'pet-emote ' + kind;
+
+  const imgUrl = kind === 'love' ? loveImage.url : (kind === 'star' ? starImage.url : null);
+  if (imgUrl) {
+    const img = document.createElement('img');
+    img.src = imgUrl;
+    img.alt = '';
+    el.appendChild(img);
+  } else {
+    el.textContent = kind === 'love' ? '❤' : '⭐';
+    el.style.fontSize = kind === 'love' ? '14px' : '12px';
+    el.style.color = kind === 'love' ? '#e84a6f' : '';
+  }
+
+  const offsetX = -28 + Math.random() * 56;
+  const offsetY = Math.random() * 8;
+  el.style.left = (st.x + PET_SPRITE_W / 2 - 9 + offsetX) + 'px';
+  el.style.top  = (st.y - 14 + offsetY) + 'px';
+
+  layer.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 1700);
+}
+
+function dropPaw(x, y, dir) {
   if (!pawImage.url) return;
   const layer = document.getElementById('petLayer');
   if (!layer) return;
@@ -1388,7 +1434,9 @@ function dropPaw(x, y) {
   img.src = pawImage.url;
   img.style.left = (x + 20) + 'px';
   img.style.top  = (y + PET_SPRITE_H - 14) + 'px';
-  layer.appendChild(img);
+  // всегда явно ставим зеркалирование в нужную сторону
+  img.style.transform = (dir === -1) ? 'scaleX(-1)' : 'scaleX(1)';
+  layer.insertBefore(img, layer.firstChild);
   setTimeout(() => img.classList.add('fade'), 400);
   setTimeout(() => { if (img.parentNode) img.parentNode.removeChild(img); }, 2800);
 }
@@ -1415,6 +1463,7 @@ function startPetWalk(pet) {
   if (!graph.nodes.length) { stopPetWalk(); return; }
 
   const startNode = graph.nodes[0];
+
   const st = {
     pet, sprite, layer, graph,
     nodeIdx: 0,
@@ -1426,6 +1475,11 @@ function startPetWalk(pet) {
     dragging: false, dragOffsetX: 0, dragOffsetY: 0,
     petting: false, lastMoodGain: 0,
     petCursorX: null, petCursorY: null,
+    lastPetEmoteAt: 0,
+    shakePoints: [],
+    lastShakeEmoteAt: 0,
+    hadShake: false,
+    dizzyUntil: 0,
     raf: null
   };
 
@@ -1469,9 +1523,19 @@ function startPetWalk(pet) {
     const isSad       = (p.hunger ?? 100) < 25;
     const lowMood     = (p.mood ?? 100) < 40;
 
-    if (st.state !== 'dragging') {
+    if (st.state === 'dizzy') {
+      if (now >= st.dizzyUntil) {
+        st.state = 'normal';
+        st.sprite.classList.remove('dizzy');
+        st.paused = false;
+        st.pauseUntil = 0;
+        pickNext();
+      }
+    }
+
+    if (st.state !== 'dragging' && st.state !== 'dizzy') {
       if (isSleeping && (p.energy ?? 100) < 80) {
-        // продолжает спать
+        // спит
       } else if (isSleeping && (p.energy ?? 100) >= 80) {
         st.state = 'normal';
         st.sprite.classList.remove('sleeping');
@@ -1481,7 +1545,7 @@ function startPetWalk(pet) {
         st.state = 'sleepy';
         st.paused = false;
         pickNext();
-      } else if (st.state !== 'sleeping' && st.state !== 'sleepy' && st.state !== 'dragging') {
+      } else if (st.state !== 'sleeping' && st.state !== 'sleepy') {
         st.state = (isSad || lowMood) ? 'sad' : 'normal';
       }
     }
@@ -1500,8 +1564,7 @@ function startPetWalk(pet) {
       return;
     }
 
-    if (st.state === 'sleeping') {
-      st.pauseUntil = now + 1000;
+    if (st.state === 'dizzy') {
       st.sprite.style.left = st.x + 'px';
       st.sprite.style.top  = st.y + 'px';
       st.raf = requestAnimationFrame(tick);
@@ -1511,14 +1574,27 @@ function startPetWalk(pet) {
     if (st.petting && (now - st.lastMoodGain) > 120) {
       st.lastMoodGain = now;
       p.mood = Math.min(100, (p.mood ?? 0) + 0.5);
-      if (st.petCursorX != null && st.petCursorY != null) {
+      if (st.petCursorX != null && st.petCursorY != null && st.state !== 'sleeping') {
         const cx = st.x + PET_SPRITE_W / 2, cy = st.y + PET_SPRITE_H / 2;
         st.x += (st.petCursorX - cx) * 0.08;
         st.y += (st.petCursorY - cy) * 0.08;
       }
-      sprite.classList.add('happy');
+      if (st.state !== 'sleeping') sprite.classList.add('happy');
     } else if (!st.petting) {
       sprite.classList.remove('happy');
+    }
+
+    if (st.petting && !st.dragging && now - st.lastPetEmoteAt > 320) {
+      st.lastPetEmoteAt = now;
+      const count = 2 + Math.floor(Math.random() * 2);
+      for (let i = 0; i < count; i++) spawnPetEmote('love');
+    }
+
+    if (st.state === 'sleeping') {
+      st.sprite.style.left = st.x + 'px';
+      st.sprite.style.top  = st.y + 'px';
+      st.raf = requestAnimationFrame(tick);
+      return;
     }
 
     if (st.paused) {
@@ -1531,6 +1607,10 @@ function startPetWalk(pet) {
       if (lowMood && st.petCursorX != null && st.petCursorY != null) {
         st.tx = st.petCursorX - PET_SPRITE_W / 2;
         st.ty = st.petCursorY - PET_SPRITE_H / 2;
+        if (st.paused) {
+          st.paused = false;
+          st.sprite.classList.remove('paused');
+        }
       }
 
       const dx = st.tx - st.x;
@@ -1546,13 +1626,14 @@ function startPetWalk(pet) {
         const nx = st.x + (dx / dist) * speed;
         const ny = st.y + (dy / dist) * speed;
 
-        if (Math.hypot(nx - lastPawX, ny - lastPawY) > 40) {
-          lastPawX = nx; lastPawY = ny;
-          dropPaw(st.x, st.y);
-        }
-        st.x = nx; st.y = ny;
         const nd = dx < 0 ? -1 : 1;
         if (nd !== st.dir) { st.dir = nd; sprite.dataset.dir = String(nd); }
+
+        if (Math.hypot(nx - lastPawX, ny - lastPawY) > 40) {
+          lastPawX = nx; lastPawY = ny;
+          dropPaw(st.x, st.y, st.dir);
+        }
+        st.x = nx; st.y = ny;
       }
     }
 
@@ -1590,6 +1671,7 @@ function stopPetWalk() {
   if (layer) layer.innerHTML = '';
 }
 
+/* --- МЫШЬ --- */
 document.addEventListener('mousemove', (e) => {
   if (!petWalker) return;
   const st = petWalker;
@@ -1600,20 +1682,59 @@ document.addEventListener('mousemove', (e) => {
     const W = window.innerWidth, H = window.innerHeight;
     st.x = Math.max(0, Math.min(W - PET_SPRITE_W, st.x));
     st.y = Math.max(0, Math.min(H - PET_SPRITE_H, st.y));
+
+    const nowMs = performance.now();
+    st.shakePoints.push({ t: nowMs, x: e.clientX });
+    st.shakePoints = st.shakePoints.filter(pt => nowMs - pt.t < 600);
+
+    if (st.shakePoints.length >= 4) {
+      let minX = Infinity, maxX = -Infinity;
+      let signChanges = 0;
+      let lastSign = 0;
+      for (let i = 1; i < st.shakePoints.length; i++) {
+        const dx = st.shakePoints[i].x - st.shakePoints[i - 1].x;
+        if (Math.abs(dx) < 2) continue;
+        const s = dx > 0 ? 1 : -1;
+        if (lastSign && s !== lastSign) signChanges++;
+        lastSign = s;
+        if (st.shakePoints[i].x < minX) minX = st.shakePoints[i].x;
+        if (st.shakePoints[i].x > maxX) maxX = st.shakePoints[i].x;
+      }
+      const amplitude = maxX - minX;
+      if (signChanges >= 3 && amplitude > 200 && nowMs - st.lastShakeEmoteAt > 180) {
+        st.lastShakeEmoteAt = nowMs;
+        st.hadShake = true;
+        spawnPetEmote('star');
+      }
+    }
     return;
   }
+
+  const nowMs = performance.now();
+  const moved = Math.abs(e.clientX - lastMouseMoveX) + Math.abs(e.clientY - lastMouseMoveY);
+  if (moved > 1) lastMouseMoveTs = nowMs;
+  lastMouseMoveX = e.clientX;
+  lastMouseMoveY = e.clientY;
+
+  st.petCursorX = e.clientX;
+  st.petCursorY = e.clientY;
 
   const cx = st.x + PET_SPRITE_W / 2;
   const cy = st.y + PET_SPRITE_H / 2;
   const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-  if (dist < 60) {
-    st.petting = true;
-    st.petCursorX = e.clientX;
-    st.petCursorY = e.clientY;
-  } else {
-    st.petting = false;
-    st.petCursorX = null;
-    st.petCursorY = null;
+
+  const isMoving = (nowMs - lastMouseMoveTs) < 250;
+  st.petting = dist < 90 && isMoving;
+
+  const lowMood = (st.pet.mood ?? 100) < 40;
+  const busy = st.state === 'sleeping' || st.state === 'sleepy' || st.state === 'dizzy';
+  if (lowMood && !busy) {
+    st.tx = e.clientX - PET_SPRITE_W / 2;
+    st.ty = e.clientY - PET_SPRITE_H / 2;
+    if (st.paused) {
+      st.paused = false;
+      st.sprite.classList.remove('paused');
+    }
   }
 });
 
@@ -1626,12 +1747,21 @@ document.addEventListener('mousedown', (e) => {
     e.clientY >= cy && e.clientY <= cy + PET_SPRITE_H;
   if (!inside) return;
 
-  const el = document.elementFromPoint(e.clientX, e.clientY);
-  if (!el || !el.closest('.pet-sprite')) return;
-
   e.preventDefault();
+
+  if (st.state === 'sleeping') {
+    st.sprite.classList.remove('sleeping');
+    st.state = 'normal';
+  }
+  if (st.state === 'dizzy') {
+    st.sprite.classList.remove('dizzy');
+    st.state = 'normal';
+  }
+
   st.dragging = true;
   st.state = 'dragging';
+  st.hadShake = false;
+  st.shakePoints = [];
   st.dragOffsetX = e.clientX - st.x;
   st.dragOffsetY = e.clientY - st.y;
   st.sprite.classList.add('dragging');
@@ -1642,10 +1772,19 @@ document.addEventListener('mouseup', () => {
   const st = petWalker;
   if (st.dragging) {
     st.dragging = false;
-    st.state = 'normal';
     st.sprite.classList.remove('dragging');
-    st.paused = false;
-    st.pauseUntil = 0;
+    st.shakePoints = [];
+
+    if (st.hadShake) {
+      st.state = 'dizzy';
+      st.dizzyUntil = performance.now() + 2000;
+      st.hadShake = false;
+      st.sprite.classList.add('dizzy');
+    } else {
+      st.state = 'normal';
+      st.paused = false;
+      st.pauseUntil = 0;
+    }
   }
 });
 
@@ -1660,7 +1799,7 @@ window.addEventListener('resize', () => {
 });
 
 /* ============================================================
-   18. МАГАЗИН
+   18. Магазин и инвентарь
    ============================================================ */
 async function loadMyOwnedItems() {
   myOwnedItems = new Set();
@@ -1744,9 +1883,9 @@ function startPetTick() {
       if (fresh) petWalker.pet = fresh;
     }
     const shop = document.getElementById('panel-shop');
-    if (shop && shop.classList.contains('active') && myPets.length) {
-      renderShop();
-    }
+    if (shop && shop.classList.contains('active') && myPets.length) renderShop();
+    const profilePanel = document.getElementById('panel-profile');
+    if (profilePanel && profilePanel.classList.contains('active')) renderInventory();
   }, 30000);
 }
 
@@ -1758,6 +1897,7 @@ async function startActivePetFromProfile() {
   else stopPetWalk();
 }
 
+/* ---- МАГАЗИН ---- */
 async function renderShop() {
   const container = document.getElementById('shopContent');
   if (!container) return;
@@ -1783,18 +1923,11 @@ async function renderShop() {
   const balance = me.pryaniki || 0;
   let html = '';
 
-  if (myPets.length > 0) {
-    html += renderMyPetsSection();
-  }
-
   for (const g of groups) {
     html += '<div class="shop-category"><h3>' + esc(g.title) + '</h3><div class="shop-grid">';
     for (const item of g.items) {
-      let owned = false, active = false;
-      if (item.type !== 'pet') {
-        owned = myOwnedItems.has(item.id);
-        active = me.nick_style === item.id;
-      }
+      const owned  = item.type !== 'pet' && myOwnedItems.has(item.id);
+      const active = item.type !== 'pet' && me.nick_style === item.id;
       html += renderShopCard(item, owned, active, balance);
     }
     html += '</div></div>';
@@ -1805,63 +1938,13 @@ async function renderShop() {
     btn.addEventListener('click', async () => {
       const item = allItems.find(i => i.id === btn.dataset.itemId);
       const action = btn.dataset.shopAction;
-      if (action === 'buy-pet') { openPetName(item); return; }
       if (!item) return;
-      if (action === 'buy') await buyShopItem(item);
-      else if (action === 'equip') await equipShopItem(item);
-      else if (action === 'unequip') await unequipShopItem(item);
+      if (action === 'buy-pet') { openPetName(item); return; }
+      if (action === 'buy')       await buyShopItem(item);
+      else if (action === 'equip')   await equipNick(item);
+      else if (action === 'unequip') await unequipNick(item);
     });
   });
-
-  container.querySelectorAll('[data-pet-action]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const petId = btn.dataset.petId;
-      const action = btn.dataset.petAction;
-      if (action === 'activate')   await activatePet(petId);
-      else if (action === 'deactivate') await deactivatePet();
-      else if (action === 'rename')     openPetName(null, petId);
-      else if (action === 'feed')       await feedPet(petId);
-      else if (action === 'release')    await releasePet(petId);
-    });
-  });
-}
-
-function renderMyPetsSection() {
-  const activeId = myProfile && myProfile.active_pet_id;
-  let html = '<div class="shop-category"><h3>Мои питомцы</h3><div class="pets-list">';
-  for (const p of myPets) {
-    const breed = PET_BREEDS.find(b => b.id === p.breed_id);
-    const url = petImageCache.get(p.breed_id) || '';
-    const isActive = p.id === activeId;
-
-    const h = Math.round(p.hunger ?? 100);
-    const m = Math.round(p.mood   ?? 100);
-    const e = Math.round(p.energy ?? 100);
-    const cls = v => v < 25 ? 'low' : '';
-
-    html += '<div class="pet-row' + (isActive ? ' active' : '') + '">' +
-      '<div class="pet-thumb">' + (url ? '<img src="' + esc(url) + '" alt="">' : '') + '</div>' +
-      '<div class="pet-info">' +
-        '<div class="pet-name">' + esc(p.name) + '</div>' +
-        '<div class="pet-breed">' + esc(breed ? breed.name : p.breed_id) + '</div>' +
-      '</div>' +
-      '<div class="pet-actions">' +
-        (isActive
-          ? '<button type="button" class="aero-btn red small" data-pet-action="deactivate" data-pet-id="' + p.id + '">Убрать</button>'
-          : '<button type="button" class="aero-btn green small" data-pet-action="activate" data-pet-id="' + p.id + '">Выпустить</button>') +
-        '<button type="button" class="aero-btn small" data-pet-action="rename" data-pet-id="' + p.id + '">Переименовать</button>' +
-        '<button type="button" class="aero-btn green small" data-pet-action="feed" data-pet-id="' + p.id + '">Покормить (5)</button>' +
-        '<button type="button" class="aero-btn red small" data-pet-action="release" data-pet-id="' + p.id + '">Отпустить</button>' +
-      '</div>' +
-      '<div class="pet-stats">' +
-        '<div class="pet-stat hunger ' + cls(h) + '"><span class="label">Еда</span><span class="pet-stat-bar"><i style="width:' + h + '%"></i></span></div>' +
-        '<div class="pet-stat mood '   + cls(m) + '"><span class="label">Настр</span><span class="pet-stat-bar"><i style="width:' + m + '%"></i></span></div>' +
-        '<div class="pet-stat energy ' + cls(e) + '"><span class="label">Силы</span><span class="pet-stat-bar"><i style="width:' + e + '%"></i></span></div>' +
-      '</div>' +
-    '</div>';
-  }
-  html += '</div></div>';
-  return html;
 }
 
 function renderShopCard(item, owned, active, balance) {
@@ -1899,9 +1982,7 @@ function renderShopCard(item, owned, active, balance) {
 }
 
 function shopPreviewHtml(item) {
-  if (item.type === 'class') {
-    return '<span class="nick ' + item.cls + '">Солдат</span>';
-  }
+  if (item.type === 'class') return '<span class="nick ' + item.cls + '">Солдат</span>';
   if (item.type === 'camo') {
     const url = camoImageCache.get(item.camoNum);
     if (!url) return '<span style="color:#7a94b0;font-style:italic;">картинка не найдена</span>';
@@ -1971,11 +2052,116 @@ async function buyShopItem(item) {
   await renderShop();
 }
 
-async function equipShopItem(item) {
+/* ============================================================
+   18.5. ИНВЕНТАРЬ (на страничке)
+   ============================================================ */
+async function renderInventory() {
+  const container = document.getElementById('inventorySection');
+  if (!container) return;
+  const me = getMe();
+
+  if (!me) { container.innerHTML = ''; return; }
+
+  let html = '';
+
+  if (myPets.length > 0) {
+    html += renderMyPetsSection();
+  } else {
+    html += '<div class="shop-category"><h3>Мои питомцы</h3>' +
+            '<div class="empty-note">Пока никого. Загляни в магазин!</div></div>';
+  }
+
+  const ownedNicks = NICK_SHOP.filter(i => myOwnedItems.has(i.id));
+  if (ownedNicks.length > 0) {
+    html += '<div class="shop-category"><h3>Мои ники</h3><div class="shop-grid">';
+    for (const item of ownedNicks) {
+      const active = me.nick_style === item.id;
+      html += '<div class="shop-item' + (active ? ' active' : '') + ' owned">' +
+        (active ? '<span class="badge active">НАДЕТО</span>' : '<span class="badge owned">КУПЛЕНО</span>') +
+        '<div class="shop-preview">' + shopPreviewHtml(item) + '</div>' +
+        '<div class="name">' + esc(item.name) + '</div>' +
+        '<div class="desc">' + esc(item.desc || '') + '</div>' +
+        '<div class="actions">' +
+          (active
+            ? '<button type="button" class="aero-btn red small" data-inv-nick="unequip" data-item-id="' + item.id + '">Снять</button>'
+            : '<button type="button" class="aero-btn green small" data-inv-nick="equip" data-item-id="' + item.id + '">Надеть</button>') +
+        '</div>' +
+      '</div>';
+    }
+    html += '</div></div>';
+  } else {
+    html += '<div class="shop-category"><h3>Мои ники</h3>' +
+            '<div class="empty-note">Пока пусто.</div></div>';
+  }
+
+  container.innerHTML = html;
+
+  container.querySelectorAll('[data-inv-nick]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const item = NICK_SHOP.find(i => i.id === btn.dataset.itemId);
+      if (!item) return;
+      if (btn.dataset.invNick === 'equip') await equipNick(item);
+      else await unequipNick(item);
+    });
+  });
+
+  container.querySelectorAll('[data-pet-action]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const petId = btn.dataset.petId;
+      const action = btn.dataset.petAction;
+      if (action === 'activate')   await activatePet(petId);
+      else if (action === 'deactivate') await deactivatePet();
+      else if (action === 'rename')     openPetName(null, petId);
+      else if (action === 'feed')       await feedPet(petId);
+      else if (action === 'release')    await releasePet(petId);
+    });
+  });
+}
+
+function renderMyPetsSection() {
+  const activeId = myProfile && myProfile.active_pet_id;
+  let html = '<div class="shop-category"><h3>Мои питомцы</h3><div class="pets-list">';
+  for (const p of myPets) {
+    const breed = PET_BREEDS.find(b => b.id === p.breed_id);
+    const url = petImageCache.get(p.breed_id) || '';
+    const isActive = p.id === activeId;
+
+    const h = Math.round(p.hunger ?? 100);
+    const m = Math.round(p.mood   ?? 100);
+    const e = Math.round(p.energy ?? 100);
+    const cls = v => v < 25 ? 'low' : '';
+
+    html += '<div class="pet-row' + (isActive ? ' active' : '') + '">' +
+      '<div class="pet-thumb">' + (url ? '<img src="' + esc(url) + '" alt="">' : '') + '</div>' +
+      '<div class="pet-info">' +
+        '<div class="pet-name">' + esc(p.name) + '</div>' +
+        '<div class="pet-breed">' + esc(breed ? breed.name : p.breed_id) + '</div>' +
+      '</div>' +
+      '<div class="pet-actions">' +
+        (isActive
+          ? '<button type="button" class="aero-btn red small" data-pet-action="deactivate" data-pet-id="' + p.id + '">Убрать</button>'
+          : '<button type="button" class="aero-btn green small" data-pet-action="activate" data-pet-id="' + p.id + '">Выпустить</button>') +
+        '<button type="button" class="aero-btn small" data-pet-action="rename" data-pet-id="' + p.id + '">Переименовать</button>' +
+        '<button type="button" class="aero-btn green small" data-pet-action="feed" data-pet-id="' + p.id + '">Покормить (5)</button>' +
+        '<button type="button" class="aero-btn red small" data-pet-action="release" data-pet-id="' + p.id + '">Отпустить</button>' +
+      '</div>' +
+      '<div class="pet-stats">' +
+        '<div class="pet-stat hunger ' + cls(h) + '"><span class="label">Еда</span><span class="pet-stat-bar"><i style="width:' + h + '%"></i></span></div>' +
+        '<div class="pet-stat mood '   + cls(m) + '"><span class="label">Настр</span><span class="pet-stat-bar"><i style="width:' + m + '%"></i></span></div>' +
+        '<div class="pet-stat energy ' + cls(e) + '"><span class="label">Силы</span><span class="pet-stat-bar"><i style="width:' + e + '%"></i></span></div>' +
+      '</div>' +
+    '</div>';
+  }
+  html += '</div></div>';
+  return html;
+}
+
+/* ============================================================
+   19. Ники: надеть / снять
+   ============================================================ */
+async function equipNick(item) {
   const me = getMe();
   if (!me) return;
-  if (!myOwnedItems.has(item.id)) return;
-
   const { error } = await supabaseClient
     .from('profiles')
     .update({ nick_style: item.id })
@@ -1985,16 +2171,15 @@ async function equipShopItem(item) {
   await loadMyProfile();
   nickStyleCache.set(me.login, item.id);
   await renderShop();
-  await renderUserArea();
-  await renderChat();
   if (currentProfile && currentProfile.id === me.id) currentProfile.nick_style = item.id;
   if (currentProfile) await renderProfile();
+  await renderUserArea();
+  await renderChat();
 }
 
-async function unequipShopItem(item) {
+async function unequipNick(item) {
   const me = getMe();
-  if (!me || !item) return;
-
+  if (!me) return;
   const { error } = await supabaseClient
     .from('profiles')
     .update({ nick_style: null })
@@ -2004,14 +2189,14 @@ async function unequipShopItem(item) {
   await loadMyProfile();
   nickStyleCache.set(me.login, null);
   await renderShop();
-  await renderUserArea();
-  await renderChat();
   if (currentProfile && currentProfile.id === me.id) currentProfile.nick_style = null;
   if (currentProfile) await renderProfile();
+  await renderUserArea();
+  await renderChat();
 }
 
 /* ============================================================
-   19. Модалка имени питомца
+   20. Модалка имени питомца
    ============================================================ */
 let petModalMode = 'create';
 let petModalBreed = null;
@@ -2095,6 +2280,7 @@ async function confirmPetName(e) {
     renderPryanikChip();
     closePetName();
     await renderShop();
+    await renderInventory();
   } else {
     const { error } = await supabaseClient
       .from('pets')
@@ -2103,12 +2289,12 @@ async function confirmPetName(e) {
     if (error) { errEl.textContent = error.message; return; }
     await loadMyPets();
     closePetName();
-    await renderShop();
+    await renderInventory();
   }
 }
 
 /* ============================================================
-   20. Питомцы: управление
+   21. Питомцы: управление
    ============================================================ */
 async function activatePet(petId) {
   const me = getMe();
@@ -2121,7 +2307,7 @@ async function activatePet(petId) {
   await loadMyProfile();
   const pet = myPets.find(p => p.id === petId);
   if (pet) startPetWalk(pet); else stopPetWalk();
-  await renderShop();
+  await renderInventory();
 }
 
 async function deactivatePet() {
@@ -2134,7 +2320,7 @@ async function deactivatePet() {
   if (error) { alert('Ошибка: ' + error.message); return; }
   await loadMyProfile();
   stopPetWalk();
-  await renderShop();
+  await renderInventory();
 }
 
 async function releasePet(petId) {
@@ -2158,7 +2344,7 @@ async function releasePet(petId) {
 
   await loadMyProfile();
   await loadMyPets();
-  await renderShop();
+  await renderInventory();
 }
 
 async function feedPet(petId) {
@@ -2200,11 +2386,11 @@ async function feedPet(petId) {
   if (petWalker && petWalker.pet && petWalker.pet.id === pet.id) {
     petWalker.pet = pet;
   }
-  await renderShop();
+  await renderInventory();
 }
 
 /* ============================================================
-   21. Старт
+   22. Старт
    ============================================================ */
 async function renderAll() {
   await renderUserArea();
