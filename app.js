@@ -1464,11 +1464,23 @@ function startPetWalk(pet) {
 
   const startNode = graph.nodes[0];
 
+  // Стартовая позиция — сохранённая, если валидна
+  let startX = startNode.x;
+  let startY = startNode.y;
+  if (typeof pet.pos_x === 'number' && typeof pet.pos_y === 'number') {
+    const W = window.innerWidth, H = window.innerHeight;
+    if (pet.pos_x >= 0 && pet.pos_x <= W - PET_SPRITE_W &&
+        pet.pos_y >= 0 && pet.pos_y <= H - PET_SPRITE_H) {
+      startX = pet.pos_x;
+      startY = pet.pos_y;
+    }
+  }
+
   const st = {
     pet, sprite, layer, graph,
     nodeIdx: 0,
-    x: startNode.x, y: startNode.y,
-    tx: startNode.x, ty: startNode.y,
+    x: startX, y: startY,
+    tx: startX, ty: startY,
     dir: 1,
     paused: false, pauseUntil: 0,
     state: 'normal',
@@ -1789,6 +1801,28 @@ document.addEventListener('mouseup', () => {
 });
 
 window.addEventListener('resize', () => {
+	// Сохраняем позицию кота при уходе со страницы / закрытии
+window.addEventListener('beforeunload', () => {
+  if (!petWalker || !petWalker.pet) return;
+  // sendBeacon или синхронный запрос — используем navigator.sendBeacon через REST
+  try {
+    const url = SUPABASE_URL + '/rest/v1/pets?id=eq.' + petWalker.pet.id;
+    const body = JSON.stringify({
+      pos_x: Math.round(petWalker.x),
+      pos_y: Math.round(petWalker.y),
+      pos_at: new Date().toISOString()
+    });
+    navigator.sendBeacon(url + '&apikey=' + SUPABASE_KEY, new Blob([body], { type: 'application/json' }));
+  } catch (e) {}
+});
+
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'hidden' && petWalker && petWalker.pet) {
+    await savePetPosition(petWalker.pet, petWalker.x, petWalker.y);
+  }
+});
+
+window.addEventListener('resize', () => {
   if (petResizeTimer) clearTimeout(petResizeTimer);
   petResizeTimer = setTimeout(() => {
     const me = getMe();
@@ -1841,6 +1875,39 @@ async function loadMyPets() {
       last_tick: new Date().toISOString()
     }).eq('id', p.id);
   }
+
+  // Оффлайн-дрейф позиции: если пользователя долго не было — «погуляй» питомца
+  const nowMs = Date.now();
+  for (const p of myPets) {
+    if (!p.pos_x || !p.pos_y) continue;
+    const lastPos = p.pos_at ? new Date(p.pos_at).getTime() : nowMs;
+    const secondsOffline = Math.max(0, (nowMs - lastPos) / 1000);
+    if (secondsOffline < 30) continue;
+
+    // 1 «шаг прогулки» ≈ 3 сек реального времени.
+    // За каждые 3 сек оффлайна — 1 случайный прыжок до 80px.
+    const steps = Math.min(30, Math.floor(secondsOffline / 3));
+    let nx = p.pos_x;
+    let ny = p.pos_y;
+    for (let i = 0; i < steps; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 20 + Math.random() * 60;
+      nx += Math.cos(ang) * dist;
+      ny += Math.sin(ang) * dist;
+    }
+    // Загоняем обратно в пределы окна (с запасом)
+    const W = window.innerWidth, H = window.innerHeight;
+    nx = Math.max(20, Math.min(W - PET_SPRITE_W - 20, nx));
+    ny = Math.max(20, Math.min(H - PET_SPRITE_H - 20, ny));
+    p.pos_x = nx;
+    p.pos_y = ny;
+
+    await supabaseClient.from('pets').update({
+      pos_x: Math.round(nx),
+      pos_y: Math.round(ny),
+      pos_at: new Date().toISOString()
+    }).eq('id', p.id);
+  }
 }
 
 function applyPetDecay(pet, hours) {
@@ -1867,7 +1934,18 @@ async function savePetState(pet) {
   }).eq('id', pet.id);
 }
 
+async function savePetPosition(pet, x, y) {
+  if (!pet || !pet.id) return;
+  await supabaseClient.from('pets').update({
+    pos_x: Math.round(x),
+    pos_y: Math.round(y),
+    pos_at: new Date().toISOString()
+  }).eq('id', pet.id);
+}
+
 let petTickTimer = null;
+
+let petPosTimer = null;
 
 function startPetTick() {
   if (petTickTimer) return;
@@ -1877,6 +1955,17 @@ function startPetTick() {
     for (const p of myPets) {
       applyPetDecay(p, 30 / 3600);
       await savePetState(p);
+    }
+
+    // Позиция активного питомца — сохраняем чаще (раз в 30 сек)
+    if (petWalker && petWalker.pet) {
+      await savePetPosition(petWalker.pet, petWalker.x, petWalker.y);
+      const fresh = myPets.find(x => x.id === petWalker.pet.id);
+      if (fresh) {
+        fresh.pos_x = petWalker.x;
+        fresh.pos_y = petWalker.y;
+        fresh.pos_at = new Date().toISOString();
+      }
     }
     if (petWalker && petWalker.pet) {
       const fresh = myPets.find(x => x.id === petWalker.pet.id);
