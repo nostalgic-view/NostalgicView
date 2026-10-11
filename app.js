@@ -2070,6 +2070,7 @@ async function savePetState(pet) {
   }).eq('id', pet.id);
 }
 
+
 async function savePetPosition(pet, x, y) {
   if (!pet || !pet.id) return;
   await supabaseClient.from('pets').update({
