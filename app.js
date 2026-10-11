@@ -2053,17 +2053,11 @@ async function loadMyPets() {
 }
 
 function applyPetDecay(pet, hours) {
+  // Голод и настроение тратятся всегда — кот не ест и не играет без хозяина
   pet.hunger = Math.max(0, (pet.hunger ?? 100) - PET_DECAY.hunger * hours);
   pet.mood   = Math.max(0, (pet.mood   ?? 100) - PET_DECAY.mood   * hours);
-  let en = pet.energy ?? 100;
-  let remaining = hours;
-  while (remaining > 0) {
-    const step = Math.min(remaining, 0.25);
-    if (en < 25) en = Math.min(100, en + PET_DECAY.offlineEnergy * step);
-    else         en = Math.max(25, en - PET_DECAY.energy * step);
-    remaining -= step;
-  }
-  pet.energy = en;
+  // В оффлайне кот спит — энергия восстанавливается
+  pet.energy = Math.min(100, (pet.energy ?? 100) + PET_DECAY.sleepRestore * hours);
 }
 
 async function savePetState(pet) {
