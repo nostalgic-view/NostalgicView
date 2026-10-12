@@ -2575,8 +2575,8 @@ async function feedPet(petId) {
 
   const RESTORE = 40;
 
-  const newHunger = Math.min(100, (pet.hunger ?? 100) + RESTORE);
-  const newMood   = Math.min(100, (pet.mood   ?? 100) + 10);
+  const newHunger = Math.round(Math.min(100, (pet.hunger ?? 100) + RESTORE));
+  const newMood   = Math.round(Math.min(100, (pet.mood   ?? 100) + 10));
   const { error: errPet } = await supabaseClient
     .from('pets')
     .update({ hunger: newHunger, mood: newMood, last_tick: new Date().toISOString() })
